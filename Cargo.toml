@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 
+[target.'cfg(target_os = "dragonos")'.dependencies]
+# Development
+dragonos-dsc = { git = "https://github.com/DragonOS-Community/dsc.git", rev = "d6e4fd8" }
 
 # 构建时依赖项
 [build-dependencies]

@@ -3,9 +3,10 @@
 
 extern crate alloc;
 
-use allocator::{Allocator, NEWALLOCATOR};
+use crate::platform::allocator::{Allocator, NEWALLOCATOR};
 
-mod allocator;
+mod platform;
+mod header;
 
 #[global_allocator]
 static ALLOCATOR: Allocator = NEWALLOCATOR;
