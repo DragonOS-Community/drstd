@@ -1,14 +1,18 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+#![no_std]
+#![feature(allocator_api)]
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+extern crate alloc;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+use allocator::{Allocator, NEWALLOCATOR};
+
+mod allocator;
+
+#[global_allocator]
+static ALLOCATOR: Allocator = NEWALLOCATOR;
+
+#[panic_handler]
+#[no_mangle]
+#[cfg(not(target_os = "linux"))]
+fn panic_handle_func(info: &PanicInfo) -> ! {
+    loop {}
 }
