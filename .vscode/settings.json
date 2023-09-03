@@ -1,0 +1,14 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./Cargo.toml",
+        "./Cargo.toml",
+        "./Cargo.toml",
+        "./Cargo.toml"
+    ],
+
+    "rust-analyzer.cargo.target": "x86_64-unknown-dragonos",
+    "files.associations": {
+        "errno.h": "c",
+        "stdint.h": "c"
+    }
+}
