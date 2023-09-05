@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use crate::platform::allocator::Allocator;
+    use crate::platform::allocator::{Allocator, NEWALLOCATOR};
     use core::alloc::{GlobalAlloc, Layout};
 
     #[test]
     fn test_allocation_and_deallocation() {
-        let allocator = Allocator;
+        let allocator = NEWALLOCATOR;
 
         let size = 1024; // 分配 1024 字节的内存
 
@@ -23,7 +23,7 @@ mod tests {
 
     #[test]
     fn test_alignment() {
-        let allocator = Allocator;
+        let allocator = NEWALLOCATOR;
 
         let size = 1024;
         let align = 16;
@@ -41,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_multiple_allocations() {
-        let allocator = Allocator;
+        let allocator = NEWALLOCATOR;
 
         let sizes = [100, 200, 300, 400, 500];
 
@@ -59,7 +59,7 @@ mod tests {
 
     #[test]
     fn test_large_allocation() {
-        let allocator = Allocator;
+        let allocator = NEWALLOCATOR;
 
         let size = 1024 * 1024; // 1MB
 

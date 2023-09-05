@@ -1,7 +1,7 @@
 #ifndef _RELIBC_ERRNO_H
 #define _RELIBC_ERRNO_H
 
-#include <bits/errno.h>
+#include "bits/errno.h"
 
 #define EPERM 1
 
@@ -83,7 +83,7 @@
 
 #define ELOOP 40
 
-#define EWOULDBLOCK 41
+//#define EWOULDBLOCK 41
 
 #define EWOULDBLOCK EAGAIN
 

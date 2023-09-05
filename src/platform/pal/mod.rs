@@ -1,7 +1,18 @@
-use core::ffi::CStr;
-use crate::header::{sys_stat::stat, sys_statvfs::statvfs, dirent::dirent, sys_resource::rlimit, sys_time::{timeval, timezone}, sys_utsname::utsname};
+use crate::header::{
+    dirent::dirent,
+    sys_resource::rlimit,
+    sys_stat::stat,
+    sys_statvfs::statvfs,
+    sys_time::{timeval, timezone},
+    sys_utsname::utsname,
+};
+use crate::c_str::CStr;
 
-use super::{types::*, time::timespec};
+use super::{time::timespec, types::*};
+
+pub use self::signal::PalSignal;
+mod signal;
+
 pub trait Pal {
     fn access(path: &CStr, mode: c_int) -> c_int;
     fn brk(addr: *mut c_void) -> *mut c_void;

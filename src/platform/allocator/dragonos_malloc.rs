@@ -1,4 +1,6 @@
-use core::{alloc::GlobalAlloc, ffi::c_void, ptr::null_mut};
+use core::{alloc::GlobalAlloc, ptr::null_mut, sync::atomic::{AtomicUsize, Ordering}};
+
+use super::types::c_void;
 
 extern "C" {
     fn _dragonos_free(ptr: *mut c_void) -> *mut c_void;
@@ -6,19 +8,32 @@ extern "C" {
     fn _dragonos_chunk_length(ptr: *mut c_void) -> usize;
 }
 
-pub struct Allocator;
+pub struct Allocator{
+    mstate: AtomicUsize,
+}
 
-pub const NEWALLOCATOR: Allocator = Allocator;
+impl Allocator {
+    pub fn set_book_keeper(&self, mstate: usize) {
+        self.mstate.store(mstate, Ordering::Relaxed);
+    }
+    pub fn get_book_keeper(&self) -> usize {
+        self.mstate.load(Ordering::Relaxed)
+    }
+}
+
+pub const NEWALLOCATOR: Allocator = Allocator{
+    mstate: AtomicUsize::new(0),
+};
 
 unsafe impl GlobalAlloc for Allocator {
     unsafe fn alloc(&self, layout: core::alloc::Layout) -> *mut u8 {
         let size = align_up(layout.size(), layout.align());
 
-        return alloc(size);
+        return alloc(size) as *mut u8;
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: core::alloc::Layout) {
-        free(ptr);
+        free(ptr as *mut c_void);
     }
     unsafe fn realloc(
         &self,
@@ -27,23 +42,23 @@ unsafe impl GlobalAlloc for Allocator {
         new_size: usize,
     ) -> *mut u8 {
         let size = align_up(new_size, layout.align());
-        return realloc(ptr, size);
+        return realloc(ptr as *mut c_void, size) as *mut u8;
     }
 }
 
-pub unsafe fn alloc(size: usize) -> *mut u8 {
-    return _dragonos_malloc(size) as *mut u8;
+pub unsafe fn alloc(size: usize) -> *mut c_void {
+    return _dragonos_malloc(size);
 }
 
-pub unsafe fn free(ptr: *mut u8) {
-    _dragonos_free(ptr as *mut c_void);
+pub unsafe fn free(ptr: *mut c_void) {
+    _dragonos_free(ptr);
 }
 
 fn align_up(addr: usize, align: usize) -> usize {
     return (addr + align - 1) & !(align - 1);
 }
 
-pub unsafe fn realloc(ptr: *mut u8, size: usize) -> *mut u8 {
+pub unsafe fn realloc(ptr: *mut c_void, size: usize) -> *mut c_void {
     if ptr.is_null() {
         return alloc(size);
     }
@@ -67,4 +82,18 @@ pub unsafe fn realloc(ptr: *mut u8, size: usize) -> *mut u8 {
     free(ptr);
 
     return new_ptr;
+}
+
+pub unsafe fn alloc_align(mut size: usize, alignment: usize) -> *mut c_void {
+    // println!("alloc align size: {}, alignment: {}", size, alignment);
+    size = align_up(size, alignment);
+
+    // TODO: 实现对齐分配
+    _dragonos_malloc(size)
+    //mspace_memalign(ALLOCATOR.get_book_keeper(), alignment, size)
+}
+
+pub fn new_mspace() -> usize {
+    // dbg!("new_mspace");
+    1
 }
