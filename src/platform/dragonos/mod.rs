@@ -39,7 +39,7 @@ pub struct Sys;
 
 impl Sys {
     pub unsafe fn ioctl(fd: c_int, request: c_ulong, out: *mut c_void) {
-        unimplemented!();
+      
     }
 }
 

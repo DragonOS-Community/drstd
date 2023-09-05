@@ -2,7 +2,6 @@ pub mod dragonos_malloc;
 mod test;
 pub use dragonos_malloc::Allocator;
 pub use dragonos_malloc::NEWALLOCATOR;
-
 use crate::io::{self, Read, Write};
 use alloc::{boxed::Box, vec::Vec};
 use core::{fmt, ptr};

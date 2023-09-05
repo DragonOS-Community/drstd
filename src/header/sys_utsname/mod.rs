@@ -11,7 +11,6 @@ pub struct utsname {
     pub release: [c_char; UTSLENGTH],
     pub version: [c_char; UTSLENGTH],
     pub machine: [c_char; UTSLENGTH],
-    pub domainname: [c_char; UTSLENGTH],
 }
 
 #[no_mangle]

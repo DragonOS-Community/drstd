@@ -28,7 +28,6 @@ pub const NEWALLOCATOR: Allocator = Allocator{
 unsafe impl GlobalAlloc for Allocator {
     unsafe fn alloc(&self, layout: core::alloc::Layout) -> *mut u8 {
         let size = align_up(layout.size(), layout.align());
-
         return alloc(size) as *mut u8;
     }
 

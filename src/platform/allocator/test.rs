@@ -43,6 +43,7 @@ mod tests {
     fn test_multiple_allocations() {
         let allocator = NEWALLOCATOR;
 
+
         let sizes = [100, 200, 300, 400, 500];
 
         unsafe {
