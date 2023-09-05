@@ -1,12 +1,45 @@
+use core::{arch::asm, ptr};
+use core_io::Write;
+
+use crate::c_str::CStr;
+
+use super::{errno, types::*, Pal, PalSignal};
+use crate::{
+    header::{dirent::dirent, errno::ENOSYS, signal::SIGCHLD, sys_stat::S_IFIFO},
+};
+use crate::header::{
+    sys_resource::rlimit,
+    sys_stat::stat,
+    sys_statvfs::statvfs,
+    sys_time::{timeval, timezone},
+};
+// use header::sys_times::tms;
+use crate::header::{sys_utsname::utsname, time::timespec};
 use dsc::syscall;
 
-use super::{pal::Pal, types::{c_void, c_int}};
+use memoffset::mem;
+
+use crate::header::{
+    signal::{sigaction, sigset_t, stack_t},
+    sys_time::itimerval,
+};
+
+const AT_FDCWD: c_int = -100;
+const AT_EMPTY_PATH: c_int = 0x1000;
+const AT_REMOVEDIR: c_int = 0x200;
+
+const SYS_CLONE: usize = 56;
+const CLONE_VM: usize = 0x0100;
+const CLONE_FS: usize = 0x0200;
+const CLONE_FILES: usize = 0x0400;
+const CLONE_SIGHAND: usize = 0x0800;
+const CLONE_THREAD: usize = 0x00010000;
 
 pub struct Sys;
 
 impl Sys {
-    pub unsafe fn ioctl() {
-        unimplemented!();
+    pub unsafe fn ioctl(fd: c_int, request: c_ulong, out: *mut c_void) {
+      
     }
 }
 
@@ -331,5 +364,57 @@ impl Pal for Sys {
 
     fn verify() -> bool {
         return true;
+    }
+}
+
+impl PalSignal for Sys {
+    fn getitimer(which: c_int, out: *mut itimerval) -> c_int {
+        // e(unsafe { syscall!(GETITIMER, which, out) }) as c_int
+        unimplemented!()
+    }
+
+    fn kill(pid: pid_t, sig: c_int) -> c_int {
+        e(unsafe { syscall!(SYS_KILL, pid, sig) }) as c_int
+    }
+
+    fn killpg(pgrp: pid_t, sig: c_int) -> c_int {
+        e(unsafe { syscall!(SYS_KILL, -(pgrp as isize) as pid_t, sig) }) as c_int
+    }
+
+    fn raise(sig: c_int) -> c_int {
+        let tid = e(unsafe { syscall!(SYS_GETPID) }) as pid_t;
+        if tid == !0 {
+            -1
+        } else {
+            // e(unsafe { syscall!(TKILL, tid, sig) }) as c_int
+            Self::kill(tid, sig)
+        }
+    }
+
+    fn setitimer(which: c_int, new: *const itimerval, old: *mut itimerval) -> c_int {
+        // e(unsafe { syscall!(SETITIMER, which, new, old) }) as c_int
+        unimplemented!()
+    }
+
+    fn sigaction(sig: c_int, act: Option<&sigaction>, oact: Option<&mut sigaction>) -> c_int {
+        e(unsafe {
+            syscall!(
+                SYS_SIGACTION,
+                sig,
+                act.map_or_else(core::ptr::null, |x| x as *const _),
+                oact.map_or_else(core::ptr::null_mut, |x| x as *mut _),
+                mem::size_of::<sigset_t>()
+            )
+        }) as c_int
+    }
+
+    fn sigaltstack(ss: *const stack_t, old_ss: *mut stack_t) -> c_int {
+        // e(unsafe { syscall!(SIGALTSTACK, ss, old_ss) }) as c_int
+        unimplemented!()
+    }
+
+    fn sigprocmask(how: c_int, set: *const sigset_t, oset: *mut sigset_t) -> c_int {
+        // e(unsafe { syscall!(RT_SIGPROCMASK, how, set, oset, mem::size_of::<sigset_t>()) }) as c_int
+        unimplemented!()
     }
 }

@@ -1,10 +1,10 @@
 #ifndef _RELIBC_STDIO_H
 #define _RELIBC_STDIO_H
 
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <sys/types.h>
+#include "stdarg.h"
+#include "stddef.h"
+#include "stdint.h"
+#include "sys/types.h"
 
 #define EOF -1
 
@@ -330,4 +330,4 @@ int __fwriting(FILE *stream);
 
 #endif /* _RELIBC_STDIO_H */
 
-#include <bits/stdio.h>
+#include "bits/stdio.h"
