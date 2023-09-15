@@ -9,9 +9,8 @@ edition = "2021"
 #name = "drstd"
 #crate-type = ["staticlib"]
 
-[workspace]
-members = ["src/ld_so"]
-exclude = ["core_io"]
+#[workspace]
+#members = [ "src/ld_so"]
 
 [build-dependencies]
 cbindgen = "0.24.3"
@@ -19,13 +18,15 @@ cc = "1.0.25"
 
 [dependencies]
 cbitset = "0.1.0"
-core_io = { path = "core_io", features = ["collections"] }
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 memoffset = "0.5.1"
 rand = { version = "0.5.5", default-features = false }
 memchr = { version = "2.2.0", default-features = false }
 plain = "0.2"
 unicode-width = "0.1"
+hashbrown = { version = "0.14", default-features = false}
+cfg-if = { version = "1.0"}
+dlibc = {path = "dlibc"}
 
 [dependencies.goblin]
 version = "0.0.21"
