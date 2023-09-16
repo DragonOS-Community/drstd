@@ -40,7 +40,9 @@ impl Thread {
         );
         let ret = HandleOrNull::from_raw_handle(ret);
         return if let Ok(handle) = ret.try_into() {
-            Ok(Thread { handle: Handle::from_inner(handle) })
+            Ok(Thread {
+                handle: Handle::from_inner(handle),
+            })
         } else {
             // The thread failed to start and as a result p was not consumed. Therefore, it is
             // safe to reconstruct the box so that it gets deallocated.

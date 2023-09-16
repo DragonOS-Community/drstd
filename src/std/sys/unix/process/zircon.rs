@@ -36,7 +36,11 @@ where
     T: TryInto<zx_status_t> + Copy,
 {
     if let Ok(status) = TryInto::try_into(t) {
-        if status < 0 { Err(io::Error::from_raw_os_error(status)) } else { Ok(t) }
+        if status < 0 {
+            Err(io::Error::from_raw_os_error(status))
+        } else {
+            Ok(t)
+        }
     } else {
         Err(io::Error::last_os_error())
     }

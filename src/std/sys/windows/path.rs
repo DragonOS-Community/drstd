@@ -26,8 +26,16 @@ pub(crate) fn is_file_name(path: &OsStr) -> bool {
 }
 pub(crate) fn has_trailing_slash(path: &OsStr) -> bool {
     let is_verbatim = path.as_encoded_bytes().starts_with(br"\\?\");
-    let is_separator = if is_verbatim { is_verbatim_sep } else { is_sep_byte };
-    if let Some(&c) = path.as_encoded_bytes().last() { is_separator(c) } else { false }
+    let is_separator = if is_verbatim {
+        is_verbatim_sep
+    } else {
+        is_sep_byte
+    };
+    if let Some(&c) = path.as_encoded_bytes().last() {
+        is_separator(c)
+    } else {
+        false
+    }
 }
 
 /// Appends a suffix to a path.
@@ -56,7 +64,10 @@ impl<'a, const LEN: usize> PrefixParser<'a, LEN> {
     }
 
     fn new(path: &'a OsStr) -> Self {
-        Self { path, prefix: Self::get_prefix(path) }
+        Self {
+            path,
+            prefix: Self::get_prefix(path),
+        }
     }
 
     fn as_slice(&self) -> PrefixParserSlice<'a, '_> {
@@ -78,7 +89,10 @@ impl<'a> PrefixParserSlice<'a, '_> {
     fn strip_prefix(&self, prefix: &str) -> Option<Self> {
         self.prefix[self.index..]
             .starts_with(prefix.as_bytes())
-            .then(|| Self { index: self.index + prefix.len(), ..*self })
+            .then(|| Self {
+                index: self.index + prefix.len(),
+                ..*self
+            })
     }
 
     fn prefix_bytes(&self) -> &'a [u8] {
@@ -171,7 +185,12 @@ fn parse_drive(path: &OsStr) -> Option<u8> {
 // Parses a drive prefix exactly, e.g. "C:"
 fn parse_drive_exact(path: &OsStr) -> Option<u8> {
     // only parse two bytes: the drive letter and the drive separator
-    if path.as_encoded_bytes().get(2).map(|&x| is_sep_byte(x)).unwrap_or(true) {
+    if path
+        .as_encoded_bytes()
+        .get(2)
+        .map(|&x| is_sep_byte(x))
+        .unwrap_or(true)
+    {
         parse_drive(path)
     } else {
         None
@@ -183,7 +202,11 @@ fn parse_drive_exact(path: &OsStr) -> Option<u8> {
 // Returns the next component and the rest of the path excluding the component and separator.
 // Does not recognize `/` as a separator character if `verbatim` is true.
 fn parse_next_component(path: &OsStr, verbatim: bool) -> (&OsStr, &OsStr) {
-    let separator = if verbatim { is_verbatim_sep } else { is_sep_byte };
+    let separator = if verbatim {
+        is_verbatim_sep
+    } else {
+        is_sep_byte
+    };
 
     match path.as_encoded_bytes().iter().position(|&x| separator(x)) {
         Some(separator_start) => {

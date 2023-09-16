@@ -27,7 +27,9 @@ unsafe impl Sync for AllocatedCondvar {}
 
 impl LazyInit for AllocatedCondvar {
     fn init() -> Box<Self> {
-        let condvar = Box::new(AllocatedCondvar(UnsafeCell::new(dlibc::PTHREAD_COND_INITIALIZER)));
+        let condvar = Box::new(AllocatedCondvar(UnsafeCell::new(
+            dlibc::PTHREAD_COND_INITIALIZER,
+        )));
 
         cfg_if::cfg_if! {
             if #[cfg(any(
@@ -85,14 +87,20 @@ impl Drop for AllocatedCondvar {
 
 impl Condvar {
     pub const fn new() -> Condvar {
-        Condvar { inner: LazyBox::new(), mutex: AtomicPtr::new(ptr::null_mut()) }
+        Condvar {
+            inner: LazyBox::new(),
+            mutex: AtomicPtr::new(ptr::null_mut()),
+        }
     }
 
     #[inline]
     fn verify(&self, mutex: *mut dlibc::pthread_mutex_t) {
         // Relaxed is okay here because we never read through `self.addr`, and only use it to
         // compare addresses.
-        match self.mutex.compare_exchange(ptr::null_mut(), mutex, Relaxed, Relaxed) {
+        match self
+            .mutex
+            .compare_exchange(ptr::null_mut(), mutex, Relaxed, Relaxed)
+        {
             Ok(_) => {}                // Stored the address
             Err(n) if n == mutex => {} // Lost a race to store the same address
             _ => panic!("attempted to use a condition variable with two mutexes"),

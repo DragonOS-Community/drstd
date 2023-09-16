@@ -53,7 +53,9 @@ fn test_command_fork_no_unwind() {
     dbg!(&got);
     let status = got.expect("panic unexpectedly propagated");
     dbg!(status);
-    let signal = status.signal().expect("expected child process to die of signal");
+    let signal = status
+        .signal()
+        .expect("expected child process to die of signal");
     assert!(
         signal == dlibc::SIGABRT
             || signal == dlibc::SIGILL

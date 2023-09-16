@@ -16,6 +16,9 @@ fn test_c_rwlock_initializer() {
         // If the assertion fails, that not necessarily an issue with the value
         // of C_RWLOCK_INIT. It might just be an issue with the way padding
         // bytes are initialized in the test code.
-        assert_eq!(crate::std::mem::transmute_copy::<_, *mut ()>(&RUST_RWLOCK_INIT), C_RWLOCK_INIT);
+        assert_eq!(
+            crate::std::mem::transmute_copy::<_, *mut ()>(&RUST_RWLOCK_INIT),
+            C_RWLOCK_INIT
+        );
     };
 }

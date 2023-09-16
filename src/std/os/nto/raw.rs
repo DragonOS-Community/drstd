@@ -20,10 +20,10 @@ pub use self::arch::{blkcnt_t, blksize_t, ino_t, nlink_t, off_t, time_t};
 mod arch {
     use crate::std::os::raw::c_long;
 
-        pub type blkcnt_t = i64;
-        pub type blksize_t = i32;
-        pub type ino_t = u64;
-        pub type nlink_t = u32;
-        pub type off_t = i64;
-        pub type time_t = c_long;
+    pub type blkcnt_t = i64;
+    pub type blksize_t = i32;
+    pub type ino_t = u64;
+    pub type nlink_t = u32;
+    pub type off_t = i64;
+    pub type time_t = c_long;
 }

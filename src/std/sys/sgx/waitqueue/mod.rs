@@ -48,7 +48,10 @@ pub struct WaitVariable<T> {
 
 impl<T> WaitVariable<T> {
     pub const fn new(var: T) -> Self {
-        WaitVariable { queue: WaitQueue::new(), lock: var }
+        WaitVariable {
+            queue: WaitQueue::new(),
+            lock: var,
+        }
     }
 
     pub fn queue_empty(&self) -> bool {
@@ -137,7 +140,9 @@ impl<'a, T> Drop for WaitGuard<'a, T> {
 
 impl WaitQueue {
     pub const fn new() -> Self {
-        WaitQueue { inner: UnsafeList::new() }
+        WaitQueue {
+            inner: UnsafeList::new(),
+        }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -214,7 +219,10 @@ impl WaitQueue {
             });
 
             if let Some(tcs) = tcs {
-                Ok(WaitGuard { mutex_guard: Some(guard), notified_tcs: NotifiedTcs::Single(tcs) })
+                Ok(WaitGuard {
+                    mutex_guard: Some(guard),
+                    notified_tcs: NotifiedTcs::Single(tcs),
+                })
             } else {
                 Err(guard)
             }
@@ -241,7 +249,10 @@ impl WaitQueue {
             }
 
             if let Some(count) = NonZeroUsize::new(count) {
-                Ok(WaitGuard { mutex_guard: Some(guard), notified_tcs: NotifiedTcs::All { count } })
+                Ok(WaitGuard {
+                    mutex_guard: Some(guard),
+                    notified_tcs: NotifiedTcs::All { count },
+                })
             } else {
                 Err(guard)
             }

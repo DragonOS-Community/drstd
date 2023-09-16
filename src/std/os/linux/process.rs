@@ -2,7 +2,6 @@
 //!
 //! [`std::process`]: crate::std::process
 
-
 use crate::std::io::Result;
 use crate::std::os::unix::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
 use crate::std::process;

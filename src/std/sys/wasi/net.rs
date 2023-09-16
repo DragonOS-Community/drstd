@@ -204,7 +204,9 @@ impl FromInner<Socket> for TcpStream {
 
 impl fmt::Debug for TcpStream {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("TcpStream").field("fd", &self.inner.as_raw_fd()).finish()
+        f.debug_struct("TcpStream")
+            .field("fd", &self.inner.as_raw_fd())
+            .finish()
     }
 }
 
@@ -308,7 +310,9 @@ impl FromInner<Socket> for TcpListener {
 
 impl fmt::Debug for TcpListener {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("TcpListener").field("fd", &self.inner.as_raw_fd()).finish()
+        f.debug_struct("TcpListener")
+            .field("fd", &self.inner.as_raw_fd())
+            .finish()
     }
 }
 
@@ -472,7 +476,9 @@ impl FromInner<Socket> for UdpSocket {
 
 impl fmt::Debug for UdpSocket {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("UdpSocket").field("fd", &self.inner.as_raw_fd()).finish()
+        f.debug_struct("UdpSocket")
+            .field("fd", &self.inner.as_raw_fd())
+            .finish()
     }
 }
 

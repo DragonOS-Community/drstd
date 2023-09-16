@@ -17,7 +17,11 @@ pub unsafe fn init(argc: isize, argv: *const *const u8) {
         let args = unsafe { alloc::User::<[ByteBuffer]>::from_raw_parts(argv as _, argc as _) };
         let args = args
             .iter()
-            .map(|a| OsString::from_inner(Buf { inner: a.copy_user_buffer() }))
+            .map(|a| {
+                OsString::from_inner(Buf {
+                    inner: a.copy_user_buffer(),
+                })
+            })
             .collect::<ArgsStore>();
         ARGS.store(Box::into_raw(Box::new(args)) as _, Ordering::Relaxed);
     }
@@ -25,7 +29,11 @@ pub unsafe fn init(argc: isize, argv: *const *const u8) {
 
 pub fn args() -> Args {
     let args = unsafe { (ARGS.load(Ordering::Relaxed) as *const ArgsStore).as_ref() };
-    if let Some(args) = args { Args(args.iter()) } else { Args([].iter()) }
+    if let Some(args) = args {
+        Args(args.iter())
+    } else {
+        Args([].iter())
+    }
 }
 
 pub struct Args(slice::Iter<'static, OsString>);

@@ -1,4 +1,3 @@
-
 use crate::std::cmp;
 use crate::std::io;
 use crate::std::mem::MaybeUninit;
@@ -243,7 +242,10 @@ fn write_u16s(handle: c::HANDLE, data: &[u16]) -> io::Result<usize> {
 
 impl Stdin {
     pub const fn new() -> Stdin {
-        Stdin { surrogate: 0, incomplete_utf8: IncompleteUtf8::new() }
+        Stdin {
+            surrogate: 0,
+            incomplete_utf8: IncompleteUtf8::new(),
+        }
     }
 }
 
@@ -415,13 +417,18 @@ fn utf16_to_utf8(utf16: &[u16], utf8: &mut [u8]) -> io::Result<usize> {
 
 impl IncompleteUtf8 {
     pub const fn new() -> IncompleteUtf8 {
-        IncompleteUtf8 { bytes: [0; 4], len: 0 }
+        IncompleteUtf8 {
+            bytes: [0; 4],
+            len: 0,
+        }
     }
 }
 
 impl Stdout {
     pub const fn new() -> Stdout {
-        Stdout { incomplete_utf8: IncompleteUtf8::new() }
+        Stdout {
+            incomplete_utf8: IncompleteUtf8::new(),
+        }
     }
 }
 
@@ -437,7 +444,9 @@ impl io::Write for Stdout {
 
 impl Stderr {
     pub const fn new() -> Stderr {
-        Stderr { incomplete_utf8: IncompleteUtf8::new() }
+        Stderr {
+            incomplete_utf8: IncompleteUtf8::new(),
+        }
     }
 }
 

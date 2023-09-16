@@ -15,11 +15,18 @@ pub struct UnsafeListEntry<T> {
 
 impl<T> UnsafeListEntry<T> {
     fn dummy() -> Self {
-        UnsafeListEntry { next: NonNull::dangling(), prev: NonNull::dangling(), value: None }
+        UnsafeListEntry {
+            next: NonNull::dangling(),
+            prev: NonNull::dangling(),
+            value: None,
+        }
     }
 
     pub fn new(value: T) -> Self {
-        UnsafeListEntry { value: Some(value), ..Self::dummy() }
+        UnsafeListEntry {
+            value: Some(value),
+            ..Self::dummy()
+        }
     }
 }
 
@@ -31,7 +38,12 @@ pub struct UnsafeList<T> {
 
 impl<T> UnsafeList<T> {
     pub const fn new() -> Self {
-        unsafe { UnsafeList { head_tail: NonNull::new_unchecked(1 as _), head_tail_entry: None } }
+        unsafe {
+            UnsafeList {
+                head_tail: NonNull::new_unchecked(1 as _),
+                head_tail_entry: None,
+            }
+        }
     }
 
     /// # Safety

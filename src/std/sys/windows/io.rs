@@ -17,7 +17,10 @@ impl<'a> IoSlice<'a> {
     pub fn new(buf: &'a [u8]) -> IoSlice<'a> {
         assert!(buf.len() <= c::ULONG::MAX as usize);
         IoSlice {
-            vec: c::WSABUF { len: buf.len() as c::ULONG, buf: buf.as_ptr() as *mut u8 },
+            vec: c::WSABUF {
+                len: buf.len() as c::ULONG,
+                buf: buf.as_ptr() as *mut u8,
+            },
             _p: PhantomData,
         }
     }
@@ -51,7 +54,10 @@ impl<'a> IoSliceMut<'a> {
     pub fn new(buf: &'a mut [u8]) -> IoSliceMut<'a> {
         assert!(buf.len() <= c::ULONG::MAX as usize);
         IoSliceMut {
-            vec: c::WSABUF { len: buf.len() as c::ULONG, buf: buf.as_mut_ptr() },
+            vec: c::WSABUF {
+                len: buf.len() as c::ULONG,
+                buf: buf.as_mut_ptr(),
+            },
             _p: PhantomData,
         }
     }
@@ -101,7 +107,11 @@ unsafe fn handle_is_console(handle: BorrowedHandle<'_>) -> bool {
     // negative if we can detect the presence of a console on any of the standard I/O streams. If
     // another stream has a console, then we know we're in a Windows console and can therefore
     // trust the negative.
-    for std_handle in [c::STD_INPUT_HANDLE, c::STD_OUTPUT_HANDLE, c::STD_ERROR_HANDLE] {
+    for std_handle in [
+        c::STD_INPUT_HANDLE,
+        c::STD_OUTPUT_HANDLE,
+        c::STD_ERROR_HANDLE,
+    ] {
         let std_handle = c::GetStdHandle(std_handle);
         if !std_handle.is_null()
             && std_handle != handle
@@ -131,7 +141,10 @@ unsafe fn msys_tty_on(handle: c::HANDLE) -> bool {
         FileNameLength: u32,
         FileName: [u16; c::MAX_PATH as usize],
     }
-    let mut name_info = FILE_NAME_INFO { FileNameLength: 0, FileName: [0; c::MAX_PATH as usize] };
+    let mut name_info = FILE_NAME_INFO {
+        FileNameLength: 0,
+        FileName: [0; c::MAX_PATH as usize],
+    };
     // Safety: buffer length is fixed.
     let res = c::GetFileInformationByHandleEx(
         handle,
@@ -144,7 +157,10 @@ unsafe fn msys_tty_on(handle: c::HANDLE) -> bool {
     }
 
     // Use `get` because `FileNameLength` can be out of range.
-    let s = match name_info.FileName.get(..name_info.FileNameLength as usize / 2) {
+    let s = match name_info
+        .FileName
+        .get(..name_info.FileNameLength as usize / 2)
+    {
         None => return false,
         Some(s) => s,
     };

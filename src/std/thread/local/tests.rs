@@ -103,8 +103,14 @@ fn smoke_dtor() {
 
 #[test]
 fn circular() {
-    struct S1(&'static LocalKey<UnsafeCell<Option<S1>>>, &'static LocalKey<UnsafeCell<Option<S2>>>);
-    struct S2(&'static LocalKey<UnsafeCell<Option<S1>>>, &'static LocalKey<UnsafeCell<Option<S2>>>);
+    struct S1(
+        &'static LocalKey<UnsafeCell<Option<S1>>>,
+        &'static LocalKey<UnsafeCell<Option<S2>>>,
+    );
+    struct S2(
+        &'static LocalKey<UnsafeCell<Option<S1>>>,
+        &'static LocalKey<UnsafeCell<Option<S2>>>,
+    );
     thread_local!(static K1: UnsafeCell<Option<S1>> = UnsafeCell::new(None));
     thread_local!(static K2: UnsafeCell<Option<S2>> = UnsafeCell::new(None));
     thread_local!(static K3: UnsafeCell<Option<S1>> = const { UnsafeCell::new(None) });

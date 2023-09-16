@@ -1,4 +1,3 @@
-
 use crate::std::fs::Metadata;
 use crate::std::sys_common::AsInner;
 use dlibc;
@@ -10,7 +9,7 @@ use crate::std::os::espidf::raw;
 ///
 /// [`fs::Metadata`]: crate::std::fs::Metadata
 pub trait MetadataExt {
-        #[deprecated(
+    #[deprecated(
         since = "1.8.0",
         note = "deprecated in favor of the accessor \
                 methods of this trait"
@@ -18,23 +17,23 @@ pub trait MetadataExt {
     #[allow(deprecated)]
     fn as_raw_stat(&self) -> &raw::stat;
 
-        fn st_dev(&self) -> u64;
-        fn st_ino(&self) -> u64;
-        fn st_mode(&self) -> u32;
-        fn st_nlink(&self) -> u64;
-        fn st_uid(&self) -> u32;
-        fn st_gid(&self) -> u32;
-        fn st_rdev(&self) -> u64;
-        fn st_size(&self) -> u64;
-        fn st_atime(&self) -> i64;
-        fn st_atime_nsec(&self) -> i64;
-        fn st_mtime(&self) -> i64;
-        fn st_mtime_nsec(&self) -> i64;
-        fn st_ctime(&self) -> i64;
-        fn st_ctime_nsec(&self) -> i64;
-        fn st_blksize(&self) -> u64;
-        fn st_blocks(&self) -> u64;
-        fn st_spare4(&self) -> [u32; 2];
+    fn st_dev(&self) -> u64;
+    fn st_ino(&self) -> u64;
+    fn st_mode(&self) -> u32;
+    fn st_nlink(&self) -> u64;
+    fn st_uid(&self) -> u32;
+    fn st_gid(&self) -> u32;
+    fn st_rdev(&self) -> u64;
+    fn st_size(&self) -> u64;
+    fn st_atime(&self) -> i64;
+    fn st_atime_nsec(&self) -> i64;
+    fn st_mtime(&self) -> i64;
+    fn st_mtime_nsec(&self) -> i64;
+    fn st_ctime(&self) -> i64;
+    fn st_ctime_nsec(&self) -> i64;
+    fn st_blksize(&self) -> u64;
+    fn st_blocks(&self) -> u64;
+    fn st_spare4(&self) -> [u32; 2];
 }
 
 impl MetadataExt for Metadata {

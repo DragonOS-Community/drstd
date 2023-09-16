@@ -94,7 +94,11 @@ fn test_os_string_join() {
 
     assert_eq!("dear world", strings[1..].join(&OsString::from(" ")));
 
-    let strings_abc = [OsString::from("a"), OsString::from("b"), OsString::from("c")];
+    let strings_abc = [
+        OsString::from("a"),
+        OsString::from("b"),
+        OsString::from("c"),
+    ];
     assert_eq!("a b c", strings_abc.join(OsStr::new(" ")));
 }
 

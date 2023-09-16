@@ -18,7 +18,9 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
         abi::futex_wait(
             futex.as_ptr(),
             expected,
-            timespec.as_ref().map_or(null(), |t| t as *const abi::timespec),
+            timespec
+                .as_ref()
+                .map_or(null(), |t| t as *const abi::timespec),
             abi::FUTEX_RELATIVE_TIMEOUT,
         )
     };

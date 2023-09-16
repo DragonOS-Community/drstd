@@ -66,17 +66,22 @@ impl BorrowedFd<'_> {
     /// The resource pointed to by `fd` must remain open for the duration of
     /// the returned `BorrowedFd`, and it must not have the value `-1`.
     #[inline]
-            pub const unsafe fn borrow_raw(fd: RawFd) -> Self {
+    pub const unsafe fn borrow_raw(fd: RawFd) -> Self {
         assert!(fd != u32::MAX as RawFd);
         // SAFETY: we just asserted that the value is in the valid range and isn't `-1` (the only value bigger than `0xFF_FF_FF_FE` unsigned)
-        unsafe { Self { fd, _phantom: PhantomData } }
+        unsafe {
+            Self {
+                fd,
+                _phantom: PhantomData,
+            }
+        }
     }
 }
 
 impl OwnedFd {
     /// Creates a new `OwnedFd` instance that shares the same underlying file
     /// description as the existing `OwnedFd` instance.
-        pub fn try_clone(&self) -> crate::std::io::Result<Self> {
+    pub fn try_clone(&self) -> crate::std::io::Result<Self> {
         self.as_fd().try_clone_to_owned()
     }
 }
@@ -85,7 +90,7 @@ impl BorrowedFd<'_> {
     /// Creates a new `OwnedFd` instance that shares the same underlying file
     /// description as the existing `BorrowedFd` instance.
     #[cfg(not(any(target_arch = "wasm32", target_os = "hermit")))]
-        pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedFd> {
+    pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedFd> {
         // We want to atomically duplicate this file descriptor and set the
         // CLOEXEC flag, and currently that's done via F_DUPFD_CLOEXEC. This
         // is a POSIX flag that was added to Linux in 2.6.24.
@@ -107,7 +112,7 @@ impl BorrowedFd<'_> {
     /// Creates a new `OwnedFd` instance that shares the same underlying file
     /// description as the existing `BorrowedFd` instance.
     #[cfg(any(target_arch = "wasm32", target_os = "hermit"))]
-        pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedFd> {
+    pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedFd> {
         Err(crate::std::io::const_io_error!(
             crate::std::io::ErrorKind::Unsupported,
             "operation not supported on WASI yet",
@@ -218,7 +223,7 @@ pub trait AsFd {
     /// let borrowed_fd: BorrowedFd<'_> = f.as_fd();
     /// # Ok::<(), io::Error>(())
     /// ```
-        fn as_fd(&self) -> BorrowedFd<'_>;
+    fn as_fd(&self) -> BorrowedFd<'_>;
 }
 
 impl<T: AsFd> AsFd for &T {
@@ -283,16 +288,21 @@ impl AsFd for crate::std::net::TcpStream {
 impl From<crate::std::net::TcpStream> for OwnedFd {
     #[inline]
     fn from(tcp_stream: crate::std::net::TcpStream) -> OwnedFd {
-        tcp_stream.into_inner().into_socket().into_inner().into_inner().into()
+        tcp_stream
+            .into_inner()
+            .into_socket()
+            .into_inner()
+            .into_inner()
+            .into()
     }
 }
 
 impl From<OwnedFd> for crate::std::net::TcpStream {
     #[inline]
     fn from(owned_fd: OwnedFd) -> Self {
-        Self::from_inner(FromInner::from_inner(FromInner::from_inner(FromInner::from_inner(
-            owned_fd,
-        ))))
+        Self::from_inner(FromInner::from_inner(FromInner::from_inner(
+            FromInner::from_inner(owned_fd),
+        )))
     }
 }
 
@@ -306,16 +316,21 @@ impl AsFd for crate::std::net::TcpListener {
 impl From<crate::std::net::TcpListener> for OwnedFd {
     #[inline]
     fn from(tcp_listener: crate::std::net::TcpListener) -> OwnedFd {
-        tcp_listener.into_inner().into_socket().into_inner().into_inner().into()
+        tcp_listener
+            .into_inner()
+            .into_socket()
+            .into_inner()
+            .into_inner()
+            .into()
     }
 }
 
 impl From<OwnedFd> for crate::std::net::TcpListener {
     #[inline]
     fn from(owned_fd: OwnedFd) -> Self {
-        Self::from_inner(FromInner::from_inner(FromInner::from_inner(FromInner::from_inner(
-            owned_fd,
-        ))))
+        Self::from_inner(FromInner::from_inner(FromInner::from_inner(
+            FromInner::from_inner(owned_fd),
+        )))
     }
 }
 
@@ -329,16 +344,21 @@ impl AsFd for crate::std::net::UdpSocket {
 impl From<crate::std::net::UdpSocket> for OwnedFd {
     #[inline]
     fn from(udp_socket: crate::std::net::UdpSocket) -> OwnedFd {
-        udp_socket.into_inner().into_socket().into_inner().into_inner().into()
+        udp_socket
+            .into_inner()
+            .into_socket()
+            .into_inner()
+            .into_inner()
+            .into()
     }
 }
 
 impl From<OwnedFd> for crate::std::net::UdpSocket {
     #[inline]
     fn from(owned_fd: OwnedFd) -> Self {
-        Self::from_inner(FromInner::from_inner(FromInner::from_inner(FromInner::from_inner(
-            owned_fd,
-        ))))
+        Self::from_inner(FromInner::from_inner(FromInner::from_inner(
+            FromInner::from_inner(owned_fd),
+        )))
     }
 }
 

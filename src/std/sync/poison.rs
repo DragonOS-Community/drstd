@@ -21,20 +21,32 @@ pub struct Flag {
 impl Flag {
     #[inline]
     pub const fn new() -> Flag {
-        Flag { failed: AtomicBool::new(false) }
+        Flag {
+            failed: AtomicBool::new(false),
+        }
     }
 
     /// Check the flag for an unguarded borrow, where we only care about existing poison.
     #[inline]
     pub fn borrow(&self) -> LockResult<()> {
-        if self.get() { Err(PoisonError::new(())) } else { Ok(()) }
+        if self.get() {
+            Err(PoisonError::new(()))
+        } else {
+            Ok(())
+        }
     }
 
     /// Check the flag for a guarded borrow, where we may also set poison when `done`.
     #[inline]
     pub fn guard(&self) -> LockResult<Guard> {
-        let ret = Guard { panicking: thread::panicking() };
-        if self.get() { Err(PoisonError::new(ret)) } else { Ok(ret) }
+        let ret = Guard {
+            panicking: thread::panicking(),
+        };
+        if self.get() {
+            Err(PoisonError::new(ret))
+        } else {
+            Ok(ret)
+        }
     }
 
     #[inline]
@@ -108,10 +120,10 @@ pub struct PoisonError<T> {
 pub enum TryLockError<T> {
     /// The lock could not be acquired because another thread failed while holding
     /// the lock.
-        Poisoned( PoisonError<T>),
+    Poisoned(PoisonError<T>),
     /// The lock could not be acquired at this time because the operation would
     /// otherwise block.
-        WouldBlock,
+    WouldBlock,
 }
 
 /// A type alias for the result of a lock method which can be poisoned.
@@ -156,7 +168,7 @@ impl<T> PoisonError<T> {
     ///
     /// This is generally created by methods like [`Mutex::lock`](crate::std::sync::Mutex::lock)
     /// or [`RwLock::read`](crate::std::sync::RwLock::read).
-        pub fn new(guard: T) -> PoisonError<T> {
+    pub fn new(guard: T) -> PoisonError<T> {
         PoisonError { guard }
     }
 
@@ -184,19 +196,19 @@ impl<T> PoisonError<T> {
     /// let data = p_err.into_inner();
     /// println!("recovered {} items", data.len());
     /// ```
-        pub fn into_inner(self) -> T {
+    pub fn into_inner(self) -> T {
         self.guard
     }
 
     /// Reaches into this error indicating that a lock is poisoned, returning a
     /// reference to the underlying guard to allow access regardless.
-        pub fn get_ref(&self) -> &T {
+    pub fn get_ref(&self) -> &T {
         &self.guard
     }
 
     /// Reaches into this error indicating that a lock is poisoned, returning a
     /// mutable reference to the underlying guard to allow access regardless.
-        pub fn get_mut(&mut self) -> &mut T {
+    pub fn get_mut(&mut self) -> &mut T {
         &mut self.guard
     }
 }

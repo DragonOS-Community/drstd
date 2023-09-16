@@ -27,7 +27,10 @@ unsafe impl<'a, T: Sync> Sync for SpinMutexGuard<'a, T> {}
 
 impl<T> SpinMutex<T> {
     pub const fn new(value: T) -> Self {
-        SpinMutex { value: UnsafeCell::new(value), lock: AtomicBool::new(false) }
+        SpinMutex {
+            value: UnsafeCell::new(value),
+            lock: AtomicBool::new(false),
+        }
     }
 
     #[inline(always)]
@@ -46,7 +49,11 @@ impl<T> SpinMutex<T> {
 
     #[inline(always)]
     pub fn try_lock(&self) -> Option<SpinMutexGuard<'_, T>> {
-        if self.lock.compare_exchange(false, true, Ordering::Acquire, Ordering::Acquire).is_ok() {
+        if self
+            .lock
+            .compare_exchange(false, true, Ordering::Acquire, Ordering::Acquire)
+            .is_ok()
+        {
             Some(SpinMutexGuard { mutex: self })
         } else {
             None
@@ -56,7 +63,11 @@ impl<T> SpinMutex<T> {
 
 /// Lock the Mutex or return false.
 pub macro try_lock_or_false($e:expr) {
-    if let Some(v) = $e.try_lock() { v } else { return false }
+    if let Some(v) = $e.try_lock() {
+        v
+    } else {
+        return false;
+    }
 }
 
 impl<'a, T> Deref for SpinMutexGuard<'a, T> {

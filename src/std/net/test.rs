@@ -13,7 +13,12 @@ pub fn next_test_ip4() -> SocketAddr {
 
 pub fn next_test_ip6() -> SocketAddr {
     let port = PORT.fetch_add(1, Ordering::SeqCst) as u16 + base_port();
-    SocketAddr::V6(SocketAddrV6::new(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1), port, 0, 0))
+    SocketAddr::V6(SocketAddrV6::new(
+        Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1),
+        port,
+        0,
+        0,
+    ))
 }
 
 pub fn sa4(a: Ipv4Addr, p: u16) -> SocketAddr {
@@ -38,7 +43,11 @@ fn base_port() -> u16 {
     let cwd = if cfg!(target_env = "sgx") {
         String::from("sgx")
     } else {
-        env::current_dir().unwrap().into_os_string().into_string().unwrap()
+        env::current_dir()
+            .unwrap()
+            .into_os_string()
+            .into_string()
+            .unwrap()
     };
     let dirs = [
         "32-opt",
@@ -54,7 +63,11 @@ fn base_port() -> u16 {
         "dist",
         "sgx",
     ];
-    dirs.iter().enumerate().find(|&(_, dir)| cwd.contains(dir)).map(|p| p.0).unwrap_or(0) as u16
+    dirs.iter()
+        .enumerate()
+        .find(|&(_, dir)| cwd.contains(dir))
+        .map(|p| p.0)
+        .unwrap_or(0) as u16
         * 1000
         + 19600
 }

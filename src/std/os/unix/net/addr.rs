@@ -51,7 +51,11 @@ pub(super) fn sockaddr_un(path: &Path) -> io::Result<(dlibc::sockaddr_un, dlibc:
     // NOTE: We zeroed the memory above, so the path is already null
     // terminated.
     unsafe {
-        ptr::copy_nonoverlapping(bytes.as_ptr(), addr.sun_path.as_mut_ptr().cast(), bytes.len())
+        ptr::copy_nonoverlapping(
+            bytes.as_ptr(),
+            addr.sun_path.as_mut_ptr().cast(),
+            bytes.len(),
+        )
     };
 
     let mut len = sun_path_offset(&addr) + bytes.len();
@@ -148,7 +152,7 @@ impl SocketAddr {
     ///
     /// assert!(SocketAddr::from_pathname("/path/with/\0/bytes").is_err());
     /// ```
-        pub fn from_pathname<P>(path: P) -> io::Result<SocketAddr>
+    pub fn from_pathname<P>(path: P) -> io::Result<SocketAddr>
     where
         P: AsRef<Path>,
     {
@@ -185,7 +189,7 @@ impl SocketAddr {
     /// }
     /// ```
     #[must_use]
-        pub fn is_unnamed(&self) -> bool {
+    pub fn is_unnamed(&self) -> bool {
         matches!(self.address(), AddressKind::Unnamed)
     }
 
@@ -219,9 +223,13 @@ impl SocketAddr {
     ///     Ok(())
     /// }
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn as_pathname(&self) -> Option<&Path> {
-        if let AddressKind::Pathname(path) = self.address() { Some(path) } else { None }
+        if let AddressKind::Pathname(path) = self.address() {
+            Some(path)
+        } else {
+            None
+        }
     }
 
     fn address(&self) -> AddressKind<'_> {
@@ -248,7 +256,11 @@ impl Sealed for SocketAddr {}
 #[cfg(any(doc, target_os = "android", target_os = "linux"))]
 impl linux_ext::addr::SocketAddrExt for SocketAddr {
     fn as_abstract_name(&self) -> Option<&[u8]> {
-        if let AddressKind::Abstract(name) = self.address() { Some(name) } else { None }
+        if let AddressKind::Abstract(name) = self.address() {
+            Some(name)
+        } else {
+            None
+        }
     }
 
     fn from_abstract_name<N>(name: N) -> crate::std::io::Result<Self>

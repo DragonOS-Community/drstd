@@ -35,7 +35,10 @@ impl Waker {
     /// Creates a new `Waker`.
     #[inline]
     pub(crate) fn new() -> Self {
-        Waker { selectors: Vec::new(), observers: Vec::new() }
+        Waker {
+            selectors: Vec::new(),
+            observers: Vec::new(),
+        }
     }
 
     /// Registers a select operation.
@@ -47,14 +50,21 @@ impl Waker {
     /// Registers a select operation and a packet.
     #[inline]
     pub(crate) fn register_with_packet(&mut self, oper: Operation, packet: *mut (), cx: &Context) {
-        self.selectors.push(Entry { oper, packet, cx: cx.clone() });
+        self.selectors.push(Entry {
+            oper,
+            packet,
+            cx: cx.clone(),
+        });
     }
 
     /// Unregisters a select operation.
     #[inline]
     pub(crate) fn unregister(&mut self, oper: Operation) -> Option<Entry> {
-        if let Some((i, _)) =
-            self.selectors.iter().enumerate().find(|&(_, entry)| entry.oper == oper)
+        if let Some((i, _)) = self
+            .selectors
+            .iter()
+            .enumerate()
+            .find(|&(_, entry)| entry.oper == oper)
         {
             let entry = self.selectors.remove(i);
             Some(entry)
@@ -145,7 +155,10 @@ impl SyncWaker {
     /// Creates a new `SyncWaker`.
     #[inline]
     pub(crate) fn new() -> Self {
-        SyncWaker { inner: Mutex::new(Waker::new()), is_empty: AtomicBool::new(true) }
+        SyncWaker {
+            inner: Mutex::new(Waker::new()),
+            is_empty: AtomicBool::new(true),
+        }
     }
 
     /// Registers the current thread with an operation.
@@ -153,8 +166,10 @@ impl SyncWaker {
     pub(crate) fn register(&self, oper: Operation, cx: &Context) {
         let mut inner = self.inner.lock().unwrap();
         inner.register(oper, cx);
-        self.is_empty
-            .store(inner.selectors.is_empty() && inner.observers.is_empty(), Ordering::SeqCst);
+        self.is_empty.store(
+            inner.selectors.is_empty() && inner.observers.is_empty(),
+            Ordering::SeqCst,
+        );
     }
 
     /// Unregisters an operation previously registered by the current thread.
@@ -162,8 +177,10 @@ impl SyncWaker {
     pub(crate) fn unregister(&self, oper: Operation) -> Option<Entry> {
         let mut inner = self.inner.lock().unwrap();
         let entry = inner.unregister(oper);
-        self.is_empty
-            .store(inner.selectors.is_empty() && inner.observers.is_empty(), Ordering::SeqCst);
+        self.is_empty.store(
+            inner.selectors.is_empty() && inner.observers.is_empty(),
+            Ordering::SeqCst,
+        );
         entry
     }
 
@@ -188,8 +205,10 @@ impl SyncWaker {
     pub(crate) fn disconnect(&self) {
         let mut inner = self.inner.lock().unwrap();
         inner.disconnect();
-        self.is_empty
-            .store(inner.selectors.is_empty() && inner.observers.is_empty(), Ordering::SeqCst);
+        self.is_empty.store(
+            inner.selectors.is_empty() && inner.observers.is_empty(),
+            Ordering::SeqCst,
+        );
     }
 }
 

@@ -79,7 +79,9 @@ impl Context {
     /// Resets `select` and `packet`.
     #[inline]
     fn reset(&self) {
-        self.inner.select.store(Selected::Waiting.into(), Ordering::Release);
+        self.inner
+            .select
+            .store(Selected::Waiting.into(), Ordering::Release);
         self.inner.packet.store(ptr::null_mut(), Ordering::Release);
     }
 

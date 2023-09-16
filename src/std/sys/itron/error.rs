@@ -13,13 +13,21 @@ impl ItronError {
     /// error code does not represent a failure or warning.
     #[inline]
     pub fn new(er: abi::ER) -> Option<Self> {
-        if er < 0 { Some(Self { er }) } else { None }
+        if er < 0 {
+            Some(Self { er })
+        } else {
+            None
+        }
     }
 
     /// Returns `Ok(er)` if `er` represents a success or `Err(_)` otherwise.
     #[inline]
     pub fn err_if_negative(er: abi::ER) -> Result<abi::ER, Self> {
-        if let Some(error) = Self::new(er) { Err(error) } else { Ok(er) }
+        if let Some(error) = Self::new(er) {
+            Err(error)
+        } else {
+            Ok(er)
+        }
     }
 
     /// Get the raw error code.

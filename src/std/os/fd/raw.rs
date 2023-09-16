@@ -1,21 +1,21 @@
 //! Raw Unix-like file descriptors.
 
-use dlibc;
 use crate::std::fs;
 use crate::std::io;
-#[cfg(target_os = "dragonos")]
-use crate::std::os::unix::io::OwnedFd;
 #[cfg(target_os = "hermit")]
 use crate::std::os::hermit::io::OwnedFd;
 #[cfg(not(target_os = "hermit"))]
 use crate::std::os::raw;
 #[cfg(all(doc, not(target_arch = "wasm32")))]
 use crate::std::os::unix::io::AsFd;
+#[cfg(target_os = "dragonos")]
+use crate::std::os::unix::io::OwnedFd;
 #[cfg(unix)]
 use crate::std::os::unix::io::OwnedFd;
 #[cfg(target_os = "wasi")]
 use crate::std::os::wasi::io::OwnedFd;
 use crate::std::sys_common::{AsInner, IntoInner};
+use dlibc;
 #[cfg(target_os = "hermit")]
 use hermit_abi as libc;
 
@@ -59,7 +59,7 @@ pub trait AsRawFd {
     /// let raw_fd: RawFd = f.as_raw_fd();
     /// # Ok::<(), io::Error>(())
     /// ```
-        fn as_raw_fd(&self) -> RawFd;
+    fn as_raw_fd(&self) -> RawFd;
 }
 
 /// A trait to express the ability to construct an object from a raw file
@@ -99,7 +99,7 @@ pub trait FromRawFd {
     /// let f = unsafe { File::from_raw_fd(raw_fd) };
     /// # Ok::<(), io::Error>(())
     /// ```
-        unsafe fn from_raw_fd(fd: RawFd) -> Self;
+    unsafe fn from_raw_fd(fd: RawFd) -> Self;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership of
@@ -129,7 +129,7 @@ pub trait IntoRawFd {
     /// let raw_fd: RawFd = f.into_raw_fd();
     /// # Ok::<(), io::Error>(())
     /// ```
-        fn into_raw_fd(self) -> RawFd;
+    fn into_raw_fd(self) -> RawFd;
 }
 
 impl AsRawFd for RawFd {

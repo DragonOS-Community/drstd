@@ -64,9 +64,11 @@ pub const ONCE_INIT: Once = Once::new();
 impl Once {
     /// Creates a new `Once` value.
     #[inline]
-            #[must_use]
+    #[must_use]
     pub const fn new() -> Once {
-        Once { inner: sys::Once::new() }
+        Once {
+            inner: sys::Once::new(),
+        }
     }
 
     /// Performs an initialization routine once and only once. The given closure
@@ -127,7 +129,7 @@ impl Once {
     ///
     /// [poison]: struct.Mutex.html#poisoning
     #[inline]
-        #[track_caller]
+    #[track_caller]
     pub fn call_once<F>(&self, f: F)
     where
         F: FnOnce(),
@@ -186,7 +188,7 @@ impl Once {
     /// INIT.call_once(|| {});
     /// ```
     #[inline]
-        pub fn call_once_force<F>(&self, f: F)
+    pub fn call_once_force<F>(&self, f: F)
     where
         F: FnOnce(&OnceState),
     {
@@ -240,7 +242,7 @@ impl Once {
     /// assert!(handle.join().is_err());
     /// assert_eq!(INIT.is_completed(), false);
     /// ```
-        #[inline]
+    #[inline]
     pub fn is_completed(&self) -> bool {
         self.inner.is_completed()
     }
@@ -297,7 +299,7 @@ impl OnceState {
     /// INIT.call_once_force(|state| {
     ///     assert!(!state.is_poisoned());
     /// });
-        #[inline]
+    #[inline]
     pub fn is_poisoned(&self) -> bool {
         self.inner.is_poisoned()
     }
@@ -312,6 +314,8 @@ impl OnceState {
 
 impl fmt::Debug for OnceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("OnceState").field("poisoned", &self.is_poisoned()).finish()
+        f.debug_struct("OnceState")
+            .field("poisoned", &self.is_poisoned())
+            .finish()
     }
 }

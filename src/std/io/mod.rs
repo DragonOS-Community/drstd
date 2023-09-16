@@ -246,7 +246,6 @@
 //! [`Result`]: crate::std::result::Result
 //! [`.unwrap()`]: crate::std::result::Result::unwrap
 
-
 #[cfg(test)]
 mod tests;
 
@@ -328,7 +327,10 @@ pub(crate) unsafe fn append_to_string<F>(buf: &mut String, f: F) -> Result<usize
 where
     F: FnOnce(&mut Vec<u8>) -> Result<usize>,
 {
-    let mut g = Guard { len: buf.len(), buf: buf.as_mut_vec() };
+    let mut g = Guard {
+        len: buf.len(),
+        buf: buf.as_mut_vec(),
+    };
     let ret = f(g.buf);
     if str::from_utf8(&g.buf[g.len..]).is_err() {
         ret.and_then(|_| {
@@ -358,8 +360,10 @@ pub(crate) fn default_read_to_end<R: Read + ?Sized>(
     let start_cap = buf.capacity();
     // Optionally limit the maximum bytes read on each iteration.
     // This adds an arbitrary fiddle factor to allow for more data than we expect.
-    let max_read_size =
-        size_hint.and_then(|s| s.checked_add(1024)?.checked_next_multiple_of(DEFAULT_BUF_SIZE));
+    let max_read_size = size_hint.and_then(|s| {
+        s.checked_add(1024)?
+            .checked_next_multiple_of(DEFAULT_BUF_SIZE)
+    });
 
     let mut initialized = 0; // Extra initialized bytes from previous loop iteration
     loop {
@@ -442,7 +446,10 @@ pub(crate) fn default_read_vectored<F>(read: F, bufs: &mut [IoSliceMut<'_>]) -> 
 where
     F: FnOnce(&mut [u8]) -> Result<usize>,
 {
-    let buf = bufs.iter_mut().find(|b| !b.is_empty()).map_or(&mut [][..], |b| &mut **b);
+    let buf = bufs
+        .iter_mut()
+        .find(|b| !b.is_empty())
+        .map_or(&mut [][..], |b| &mut **b);
     read(buf)
 }
 
@@ -450,7 +457,10 @@ pub(crate) fn default_write_vectored<F>(write: F, bufs: &[IoSlice<'_>]) -> Resul
 where
     F: FnOnce(&[u8]) -> Result<usize>,
 {
-    let buf = bufs.iter().find(|b| !b.is_empty()).map_or(&[][..], |b| &**b);
+    let buf = bufs
+        .iter()
+        .find(|b| !b.is_empty())
+        .map_or(&[][..], |b| &**b);
     write(buf)
 }
 
@@ -467,7 +477,10 @@ pub(crate) fn default_read_exact<R: Read + ?Sized>(this: &mut R, mut buf: &mut [
         }
     }
     if !buf.is_empty() {
-        Err(error::const_io_error!(ErrorKind::UnexpectedEof, "failed to fill whole buffer"))
+        Err(error::const_io_error!(
+            ErrorKind::UnexpectedEof,
+            "failed to fill whole buffer"
+        ))
     } else {
         Ok(())
     }
@@ -637,7 +650,7 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn read(&mut self, buf: &mut [u8]) -> Result<usize>;
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize>;
 
     /// Like `read`, except that it reads into a slice of buffers.
     ///
@@ -648,7 +661,7 @@ pub trait Read {
     ///
     /// The default implementation calls `read` with either the first nonempty
     /// buffer provided, or an empty one if none exists.
-        fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> Result<usize> {
+    fn read_vectored(&mut self, bufs: &mut [IoSliceMut<'_>]) -> Result<usize> {
         default_read_vectored(|b| self.read(b), bufs)
     }
 
@@ -660,7 +673,7 @@ pub trait Read {
     /// and coalesce writes into a single buffer for higher performance.
     ///
     /// The default implementation returns `false`.
-        fn is_read_vectored(&self) -> bool {
+    fn is_read_vectored(&self) -> bool {
         false
     }
 
@@ -710,7 +723,7 @@ pub trait Read {
     /// file.)
     ///
     /// [`std::fs::read`]: crate::std::fs::read
-        fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> Result<usize> {
         default_read_to_end(self, buf, None)
     }
 
@@ -752,7 +765,7 @@ pub trait Read {
     /// reading from a file.)
     ///
     /// [`std::fs::read_to_string`]: crate::std::fs::read_to_string
-        fn read_to_string(&mut self, buf: &mut String) -> Result<usize> {
+    fn read_to_string(&mut self, buf: &mut String) -> Result<usize> {
         default_read_to_string(self, buf, None)
     }
 
@@ -806,7 +819,7 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn read_exact(&mut self, buf: &mut [u8]) -> Result<()> {
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<()> {
         default_read_exact(self, buf)
     }
 
@@ -816,7 +829,7 @@ pub trait Read {
     /// with uninitialized buffers. The new data will be appended to any existing contents of `buf`.
     ///
     /// The default implementation delegates to `read`.
-        fn read_buf(&mut self, buf: BorrowedCursor<'_>) -> Result<()> {
+    fn read_buf(&mut self, buf: BorrowedCursor<'_>) -> Result<()> {
         default_read_buf(|b| self.read(b), buf)
     }
 
@@ -838,7 +851,7 @@ pub trait Read {
     /// returns.
     ///
     /// If this function returns an error, all bytes read will be appended to `cursor`.
-        fn read_buf_exact(&mut self, mut cursor: BorrowedCursor<'_>) -> Result<()> {
+    fn read_buf_exact(&mut self, mut cursor: BorrowedCursor<'_>) -> Result<()> {
         while cursor.capacity() > 0 {
             let prev_written = cursor.written();
             match self.read_buf(cursor.reborrow()) {
@@ -848,7 +861,10 @@ pub trait Read {
             }
 
             if cursor.written() == prev_written {
-                return Err(Error::new(ErrorKind::UnexpectedEof, "failed to fill buffer"));
+                return Err(Error::new(
+                    ErrorKind::UnexpectedEof,
+                    "failed to fill buffer",
+                ));
             }
         }
 
@@ -889,7 +905,7 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn by_ref(&mut self) -> &mut Self
+    fn by_ref(&mut self) -> &mut Self
     where
         Self: Sized,
     {
@@ -931,7 +947,7 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn bytes(self) -> Bytes<Self>
+    fn bytes(self) -> Bytes<Self>
     where
         Self: Sized,
     {
@@ -968,11 +984,15 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn chain<R: Read>(self, next: R) -> Chain<Self, R>
+    fn chain<R: Read>(self, next: R) -> Chain<Self, R>
     where
         Self: Sized,
     {
-        Chain { first: self, second: next, done_first: false }
+        Chain {
+            first: self,
+            second: next,
+            done_first: false,
+        }
     }
 
     /// Creates an adapter which will read at most `limit` bytes from it.
@@ -1006,7 +1026,7 @@ pub trait Read {
     ///     Ok(())
     /// }
     /// ```
-        fn take(self, limit: u64) -> Take<Self>
+    fn take(self, limit: u64) -> Take<Self>
     where
         Self: Sized,
     {
@@ -1088,7 +1108,7 @@ impl<'a> IoSliceMut<'a> {
     /// # Panics
     ///
     /// Panics on Windows if the slice is larger than 4GB.
-        #[inline]
+    #[inline]
     pub fn new(buf: &'a mut [u8]) -> IoSliceMut<'a> {
         IoSliceMut(sys::io::IoSliceMut::new(buf))
     }
@@ -1117,7 +1137,7 @@ impl<'a> IoSliceMut<'a> {
     /// buf.advance(3);
     /// assert_eq!(buf.deref(), [1; 5].as_ref());
     /// ```
-        #[inline]
+    #[inline]
     pub fn advance(&mut self, n: usize) {
         self.0.advance(n)
     }
@@ -1157,7 +1177,7 @@ impl<'a> IoSliceMut<'a> {
     /// assert_eq!(bufs[0].deref(), [2; 14].as_ref());
     /// assert_eq!(bufs[1].deref(), [3; 8].as_ref());
     /// ```
-        #[inline]
+    #[inline]
     pub fn advance_slices(bufs: &mut &mut [IoSliceMut<'a>], n: usize) {
         // Number of buffers to remove.
         let mut remove = 0;
@@ -1174,7 +1194,10 @@ impl<'a> IoSliceMut<'a> {
 
         *bufs = &mut take(bufs)[remove..];
         if bufs.is_empty() {
-            assert!(n == accumulated_len, "advancing io slices beyond their length");
+            assert!(
+                n == accumulated_len,
+                "advancing io slices beyond their length"
+            );
         } else {
             bufs[0].advance(n - accumulated_len)
         }
@@ -1222,7 +1245,7 @@ impl<'a> IoSlice<'a> {
     /// # Panics
     ///
     /// Panics on Windows if the slice is larger than 4GB.
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn new(buf: &'a [u8]) -> IoSlice<'a> {
         IoSlice(sys::io::IoSlice::new(buf))
@@ -1252,7 +1275,7 @@ impl<'a> IoSlice<'a> {
     /// buf.advance(3);
     /// assert_eq!(buf.deref(), [1; 5].as_ref());
     /// ```
-        #[inline]
+    #[inline]
     pub fn advance(&mut self, n: usize) {
         self.0.advance(n)
     }
@@ -1291,7 +1314,7 @@ impl<'a> IoSlice<'a> {
     /// IoSlice::advance_slices(&mut bufs, 10);
     /// assert_eq!(bufs[0].deref(), [2; 14].as_ref());
     /// assert_eq!(bufs[1].deref(), [3; 8].as_ref());
-        #[inline]
+    #[inline]
     pub fn advance_slices(bufs: &mut &mut [IoSlice<'a>], n: usize) {
         // Number of buffers to remove.
         let mut remove = 0;
@@ -1308,7 +1331,10 @@ impl<'a> IoSlice<'a> {
 
         *bufs = &mut take(bufs)[remove..];
         if bufs.is_empty() {
-            assert!(n == accumulated_len, "advancing io slices beyond their length");
+            assert!(
+                n == accumulated_len,
+                "advancing io slices beyond their length"
+            );
         } else {
             bufs[0].advance(n - accumulated_len)
         }
@@ -1417,7 +1443,7 @@ pub trait Write {
     /// ```
     ///
     /// [`Ok(n)`]: Ok
-        fn write(&mut self, buf: &[u8]) -> Result<usize>;
+    fn write(&mut self, buf: &[u8]) -> Result<usize>;
 
     /// Like [`write`], except that it writes from a slice of buffers.
     ///
@@ -1450,7 +1476,7 @@ pub trait Write {
     /// ```
     ///
     /// [`write`]: Write::write
-        fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize> {
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize> {
         default_write_vectored(|b| self.write(b), bufs)
     }
 
@@ -1464,7 +1490,7 @@ pub trait Write {
     /// The default implementation returns `false`.
     ///
     /// [`write_vectored`]: Write::write_vectored
-        fn is_write_vectored(&self) -> bool {
+    fn is_write_vectored(&self) -> bool {
         false
     }
 
@@ -1491,7 +1517,7 @@ pub trait Write {
     ///     Ok(())
     /// }
     /// ```
-        fn flush(&mut self) -> Result<()>;
+    fn flush(&mut self) -> Result<()>;
 
     /// Attempts to write an entire buffer into this writer.
     ///
@@ -1524,7 +1550,7 @@ pub trait Write {
     ///     Ok(())
     /// }
     /// ```
-        fn write_all(&mut self, mut buf: &[u8]) -> Result<()> {
+    fn write_all(&mut self, mut buf: &[u8]) -> Result<()> {
         while !buf.is_empty() {
             match self.write(buf) {
                 Ok(0) => {
@@ -1588,7 +1614,7 @@ pub trait Write {
     /// assert_eq!(writer, &[1, 2, 3, 4, 5, 6]);
     /// # Ok(()) }
     /// ```
-        fn write_all_vectored(&mut self, mut bufs: &mut [IoSlice<'_>]) -> Result<()> {
+    fn write_all_vectored(&mut self, mut bufs: &mut [IoSlice<'_>]) -> Result<()> {
         // Guarantee that bufs is empty if it contains no data,
         // to avoid calling write_vectored if there is no data to be written.
         IoSlice::advance_slices(&mut bufs, 0);
@@ -1643,7 +1669,7 @@ pub trait Write {
     ///     Ok(())
     /// }
     /// ```
-        fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<()> {
+    fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<()> {
         // Create a shim which translates a Write to a fmt::Write and saves
         // off I/O errors. instead of discarding them
         struct Adapter<'a, T: ?Sized + 'a> {
@@ -1663,7 +1689,10 @@ pub trait Write {
             }
         }
 
-        let mut output = Adapter { inner: self, error: Ok(()) };
+        let mut output = Adapter {
+            inner: self,
+            error: Ok(()),
+        };
         match fmt::write(&mut output, fmt) {
             Ok(()) => Ok(()),
             Err(..) => {
@@ -1671,7 +1700,10 @@ pub trait Write {
                 if output.error.is_err() {
                     output.error
                 } else {
-                    Err(error::const_io_error!(ErrorKind::Uncategorized, "formatter error"))
+                    Err(error::const_io_error!(
+                        ErrorKind::Uncategorized,
+                        "formatter error"
+                    ))
                 }
             }
         }
@@ -1698,7 +1730,7 @@ pub trait Write {
     ///     Ok(())
     /// }
     /// ```
-        fn by_ref(&mut self) -> &mut Self
+    fn by_ref(&mut self) -> &mut Self
     where
         Self: Sized,
     {
@@ -1747,7 +1779,7 @@ pub trait Seek {
     /// Seeking can fail, for example because it might involve flushing a buffer.
     ///
     /// Seeking to a negative offset is considered an error.
-        fn seek(&mut self, pos: SeekFrom) -> Result<u64>;
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64>;
 
     /// Rewind to the beginning of a stream.
     ///
@@ -1777,7 +1809,7 @@ pub trait Seek {
     /// f.read_to_string(&mut buf).unwrap();
     /// assert_eq!(&buf, hello);
     /// ```
-        fn rewind(&mut self) -> Result<()> {
+    fn rewind(&mut self) -> Result<()> {
         self.seek(SeekFrom::Start(0))?;
         Ok(())
     }
@@ -1816,7 +1848,7 @@ pub trait Seek {
     ///     Ok(())
     /// }
     /// ```
-        fn stream_len(&mut self) -> Result<u64> {
+    fn stream_len(&mut self) -> Result<u64> {
         let old_pos = self.stream_position()?;
         let len = self.seek(SeekFrom::End(0))?;
 
@@ -1852,7 +1884,7 @@ pub trait Seek {
     ///     Ok(())
     /// }
     /// ```
-        fn stream_position(&mut self) -> Result<u64> {
+    fn stream_position(&mut self) -> Result<u64> {
         self.seek(SeekFrom::Current(0))
     }
 }
@@ -1863,21 +1895,21 @@ pub trait Seek {
 #[derive(Copy, PartialEq, Eq, Clone, Debug)]
 pub enum SeekFrom {
     /// Sets the offset to the provided number of bytes.
-        Start( u64),
+    Start(u64),
 
     /// Sets the offset to the size of this object plus the specified number of
     /// bytes.
     ///
     /// It is possible to seek beyond the end of an object, but it's an error to
     /// seek before byte 0.
-        End( i64),
+    End(i64),
 
     /// Sets the offset to the current position plus the specified number of
     /// bytes.
     ///
     /// It is possible to seek beyond the end of an object, but it's an error to
     /// seek before byte 0.
-        Current( i64),
+    Current(i64),
 }
 
 fn read_until<R: BufRead + ?Sized>(r: &mut R, delim: u8, buf: &mut Vec<u8>) -> Result<usize> {
@@ -1995,7 +2027,7 @@ pub trait BufRead: Read {
     /// let length = buffer.len();
     /// stdin.consume(length);
     /// ```
-        fn fill_buf(&mut self) -> Result<&[u8]>;
+    fn fill_buf(&mut self) -> Result<&[u8]>;
 
     /// Tells this buffer that `amt` bytes have been consumed from the buffer,
     /// so they should no longer be returned in calls to `read`.
@@ -2016,7 +2048,7 @@ pub trait BufRead: Read {
     /// that method's example includes an example of `consume()`.
     ///
     /// [`fill_buf`]: BufRead::fill_buf
-        fn consume(&mut self, amt: usize);
+    fn consume(&mut self, amt: usize);
 
     /// Check if the underlying `Read` has any data left to be read.
     ///
@@ -2044,7 +2076,7 @@ pub trait BufRead: Read {
     ///     println!("{line:?}");
     /// }
     /// ```
-        fn has_data_left(&mut self) -> Result<bool> {
+    fn has_data_left(&mut self) -> Result<bool> {
         self.fill_buf().map(|b| !b.is_empty())
     }
 
@@ -2102,7 +2134,7 @@ pub trait BufRead: Read {
     /// assert_eq!(num_bytes, 0);
     /// assert_eq!(buf, b"");
     /// ```
-        fn read_until(&mut self, byte: u8, buf: &mut Vec<u8>) -> Result<usize> {
+    fn read_until(&mut self, byte: u8, buf: &mut Vec<u8>) -> Result<usize> {
         read_until(self, byte, buf)
     }
 
@@ -2169,7 +2201,7 @@ pub trait BufRead: Read {
     /// assert_eq!(num_bytes, 0);
     /// assert_eq!(buf, "");
     /// ```
-        fn read_line(&mut self, buf: &mut String) -> Result<usize> {
+    fn read_line(&mut self, buf: &mut String) -> Result<usize> {
         // Note that we are not calling the `.read_until` method here, but
         // rather our hardcoded implementation. For more details as to why, see
         // the comments in `read_to_end`.
@@ -2206,11 +2238,14 @@ pub trait BufRead: Read {
     /// assert_eq!(split_iter.next(), Some(b"dolor".to_vec()));
     /// assert_eq!(split_iter.next(), None);
     /// ```
-        fn split(self, byte: u8) -> Split<Self>
+    fn split(self, byte: u8) -> Split<Self>
     where
         Self: Sized,
     {
-        Split { buf: self, delim: byte }
+        Split {
+            buf: self,
+            delim: byte,
+        }
     }
 
     /// Returns an iterator over the lines of this reader.
@@ -2242,7 +2277,7 @@ pub trait BufRead: Read {
     /// # Errors
     ///
     /// Each line of the iterator has the same error semantics as [`BufRead::read_line`].
-        fn lines(self) -> Lines<Self>
+    fn lines(self) -> Lines<Self>
     where
         Self: Sized,
     {
@@ -2282,7 +2317,7 @@ impl<T, U> Chain<T, U> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn into_inner(self) -> (T, U) {
+    pub fn into_inner(self) -> (T, U) {
         (self.first, self.second)
     }
 
@@ -2304,7 +2339,7 @@ impl<T, U> Chain<T, U> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_ref(&self) -> (&T, &U) {
+    pub fn get_ref(&self) -> (&T, &U) {
         (&self.first, &self.second)
     }
 
@@ -2330,7 +2365,7 @@ impl<T, U> Chain<T, U> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_mut(&mut self) -> (&mut T, &mut U) {
+    pub fn get_mut(&mut self) -> (&mut T, &mut U) {
         (&mut self.first, &mut self.second)
     }
 }
@@ -2371,7 +2406,11 @@ impl<T: BufRead, U: BufRead> BufRead for Chain<T, U> {
     }
 
     fn consume(&mut self, amt: usize) {
-        if !self.done_first { self.first.consume(amt) } else { self.second.consume(amt) }
+        if !self.done_first {
+            self.first.consume(amt)
+        } else {
+            self.second.consume(amt)
+        }
     }
 }
 
@@ -2383,7 +2422,10 @@ impl<T, U> SizeHint for Chain<T, U> {
 
     #[inline]
     fn upper_bound(&self) -> Option<usize> {
-        match (SizeHint::upper_bound(&self.first), SizeHint::upper_bound(&self.second)) {
+        match (
+            SizeHint::upper_bound(&self.first),
+            SizeHint::upper_bound(&self.second),
+        ) {
             (Some(first), Some(second)) => first.checked_add(second),
             _ => None,
         }
@@ -2428,7 +2470,7 @@ impl<T> Take<T> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn limit(&self) -> u64 {
+    pub fn limit(&self) -> u64 {
         self.limit
     }
 
@@ -2455,7 +2497,7 @@ impl<T> Take<T> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_limit(&mut self, limit: u64) {
+    pub fn set_limit(&mut self, limit: u64) {
         self.limit = limit;
     }
 
@@ -2479,7 +2521,7 @@ impl<T> Take<T> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn into_inner(self) -> T {
+    pub fn into_inner(self) -> T {
         self.inner
     }
 
@@ -2503,7 +2545,7 @@ impl<T> Take<T> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_ref(&self) -> &T {
+    pub fn get_ref(&self) -> &T {
         &self.inner
     }
 
@@ -2531,7 +2573,7 @@ impl<T> Take<T> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_mut(&mut self) -> &mut T {
+    pub fn get_mut(&mut self) -> &mut T {
         &mut self.inner
     }
 }

@@ -2,7 +2,6 @@
 #[allow(unused)]
 use prelude::rust_2021::*;
 
-
 // FIXME: #94122 this extern crate definition only exist here to stop
 // miniz_oxide docs leaking into std docs. Find better way to do it.
 // Remove exclusion from tidy platform check when this removed.
@@ -133,10 +132,10 @@ pub mod task {
     //! Types and Traits for working with asynchronous tasks.
 
     #[doc(inline)]
-        pub use core::task::*;
+    pub use core::task::*;
 
     #[doc(inline)]
-        pub use alloc::task::*;
+    pub use alloc::task::*;
 }
 
 // #[doc = include_str!("../../stdarch/crates/core_arch/src/core_arch_docs.md")]
@@ -173,7 +172,7 @@ pub use panicking::panic_hook_with_disk_dump;
 // Re-export macros defined in core.
 #[allow(deprecated, deprecated_in_future)]
 pub use core::{
-    assert_eq, assert_ne, debug_assert, debug_assert_eq, debug_assert_ne, matches, todo, r#try,
+    assert_eq, assert_ne, debug_assert, debug_assert_eq, debug_assert_ne, matches, r#try, todo,
     unimplemented, unreachable, write, writeln,
 };
 
@@ -208,6 +207,6 @@ mod sealed {
     /// This trait being unreachable from outside the crate
     /// prevents outside implementations of our extension traits.
     /// This allows adding more trait methods in the future.
-        pub trait Sealed {}
+    pub trait Sealed {}
 }
 //pub use dlibc as libc;

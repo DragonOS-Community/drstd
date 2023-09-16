@@ -52,7 +52,9 @@ impl<C> Sender<C> {
             process::abort();
         }
 
-        Sender { counter: self.counter }
+        Sender {
+            counter: self.counter,
+        }
     }
 
     /// Releases the sender reference.
@@ -105,7 +107,9 @@ impl<C> Receiver<C> {
             process::abort();
         }
 
-        Receiver { counter: self.counter }
+        Receiver {
+            counter: self.counter,
+        }
     }
 
     /// Releases the receiver reference.

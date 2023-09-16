@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests;
 
@@ -115,7 +114,11 @@ impl FileDesc {
 
     #[inline]
     pub fn is_read_vectored(&self) -> bool {
-        cfg!(not(any(target_os = "espidf", target_os = "horizon", target_os = "vita")))
+        cfg!(not(any(
+            target_os = "espidf",
+            target_os = "horizon",
+            target_os = "vita"
+        )))
     }
 
     pub fn read_to_end(&self, buf: &mut Vec<u8>) -> io::Result<usize> {
@@ -277,7 +280,11 @@ impl FileDesc {
 
     #[inline]
     pub fn is_write_vectored(&self) -> bool {
-        cfg!(not(any(target_os = "espidf", target_os = "horizon", target_os = "vita")))
+        cfg!(not(any(
+            target_os = "espidf",
+            target_os = "horizon",
+            target_os = "vita"
+        )))
     }
 
     pub fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize> {

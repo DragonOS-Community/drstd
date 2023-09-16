@@ -291,7 +291,11 @@ macro_rules! impl_is_zero {
 impl_is_zero! { i8 i16 i32 i64 isize u8 u16 u32 u64 usize }
 
 pub fn cvt<I: IsZero>(i: I) -> crate::std::io::Result<I> {
-    if i.is_zero() { Err(crate::std::io::Error::last_os_error()) } else { Ok(i) }
+    if i.is_zero() {
+        Err(crate::std::io::Error::last_os_error())
+    } else {
+        Ok(i)
+    }
 }
 
 pub fn dur2timeout(dur: Duration) -> c::DWORD {
@@ -305,8 +309,20 @@ pub fn dur2timeout(dur: Duration) -> c::DWORD {
     dur.as_secs()
         .checked_mul(1000)
         .and_then(|ms| ms.checked_add((dur.subsec_nanos() as u64) / 1_000_000))
-        .and_then(|ms| ms.checked_add(if dur.subsec_nanos() % 1_000_000 > 0 { 1 } else { 0 }))
-        .map(|ms| if ms > <c::DWORD>::MAX as u64 { c::INFINITE } else { ms as c::DWORD })
+        .and_then(|ms| {
+            ms.checked_add(if dur.subsec_nanos() % 1_000_000 > 0 {
+                1
+            } else {
+                0
+            })
+        })
+        .map(|ms| {
+            if ms > <c::DWORD>::MAX as u64 {
+                c::INFINITE
+            } else {
+                ms as c::DWORD
+            }
+        })
         .unwrap_or(c::INFINITE)
 }
 

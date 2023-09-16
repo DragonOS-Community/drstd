@@ -71,7 +71,7 @@ pub trait FileExt {
     /// If this function returns an error, it is unspecified how many bytes it
     /// has read, but it will never read more than would be necessary to
     /// completely fill the buffer.
-        fn read_exact_at(&self, mut buf: &mut [u8], mut offset: u64) -> io::Result<()> {
+    fn read_exact_at(&self, mut buf: &mut [u8], mut offset: u64) -> io::Result<()> {
         while !buf.is_empty() {
             match self.read_at(buf, offset) {
                 Ok(0) => break,
@@ -85,7 +85,10 @@ pub trait FileExt {
             }
         }
         if !buf.is_empty() {
-            Err(io::const_io_error!(io::ErrorKind::UnexpectedEof, "failed to fill whole buffer"))
+            Err(io::const_io_error!(
+                io::ErrorKind::UnexpectedEof,
+                "failed to fill whole buffer"
+            ))
         } else {
             Ok(())
         }
@@ -146,7 +149,7 @@ pub trait FileExt {
     /// non-[`io::ErrorKind::Interrupted`] kind that [`write_at`] returns.
     ///
     /// [`write_at`]: FileExt::write_at
-        fn write_all_at(&self, mut buf: &[u8], mut offset: u64) -> io::Result<()> {
+    fn write_all_at(&self, mut buf: &[u8], mut offset: u64) -> io::Result<()> {
         while !buf.is_empty() {
             match self.write_at(buf, offset) {
                 Ok(0) => {
@@ -270,7 +273,9 @@ impl FileExt for fs::File {
     }
 
     fn create_directory<P: AsRef<Path>>(&self, dir: P) -> io::Result<()> {
-        self.as_inner().as_inner().create_directory(osstr2str(dir.as_ref().as_ref())?)
+        self.as_inner()
+            .as_inner()
+            .create_directory(osstr2str(dir.as_ref().as_ref())?)
     }
 
     fn read_link<P: AsRef<Path>>(&self, path: P) -> io::Result<PathBuf> {
@@ -283,11 +288,15 @@ impl FileExt for fs::File {
     }
 
     fn remove_file<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
-        self.as_inner().as_inner().unlink_file(osstr2str(path.as_ref().as_ref())?)
+        self.as_inner()
+            .as_inner()
+            .unlink_file(osstr2str(path.as_ref().as_ref())?)
     }
 
     fn remove_directory<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
-        self.as_inner().as_inner().remove_directory(osstr2str(path.as_ref().as_ref())?)
+        self.as_inner()
+            .as_inner()
+            .remove_directory(osstr2str(path.as_ref().as_ref())?)
     }
 }
 
@@ -536,9 +545,10 @@ pub fn symlink<P: AsRef<Path>, U: AsRef<Path>>(
     fd: &File,
     new_path: U,
 ) -> io::Result<()> {
-    fd.as_inner()
-        .as_inner()
-        .symlink(osstr2str(old_path.as_ref().as_ref())?, osstr2str(new_path.as_ref().as_ref())?)
+    fd.as_inner().as_inner().symlink(
+        osstr2str(old_path.as_ref().as_ref())?,
+        osstr2str(new_path.as_ref().as_ref())?,
+    )
 }
 
 /// Create a symbolic link.

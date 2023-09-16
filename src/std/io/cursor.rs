@@ -3,9 +3,9 @@ mod tests;
 
 use crate::std::io::prelude::*;
 
-use core::alloc::Allocator;
 use crate::std::cmp;
 use crate::std::io::{self, BorrowedCursor, ErrorKind, IoSlice, IoSliceMut, SeekFrom};
+use core::alloc::Allocator;
 
 /// A `Cursor` wraps an in-memory buffer and provides it with a
 /// [`Seek`] implementation.
@@ -91,7 +91,7 @@ impl<T> Cursor<T> {
     /// # fn force_inference(_: &Cursor<Vec<u8>>) {}
     /// # force_inference(&buff);
     /// ```
-            pub const fn new(inner: T) -> Cursor<T> {
+    pub const fn new(inner: T) -> Cursor<T> {
         Cursor { pos: 0, inner }
     }
 
@@ -108,7 +108,7 @@ impl<T> Cursor<T> {
     ///
     /// let vec = buff.into_inner();
     /// ```
-        pub fn into_inner(self) -> T {
+    pub fn into_inner(self) -> T {
         self.inner
     }
 
@@ -125,7 +125,7 @@ impl<T> Cursor<T> {
     ///
     /// let reference = buff.get_ref();
     /// ```
-            pub const fn get_ref(&self) -> &T {
+    pub const fn get_ref(&self) -> &T {
         &self.inner
     }
 
@@ -145,7 +145,7 @@ impl<T> Cursor<T> {
     ///
     /// let reference = buff.get_mut();
     /// ```
-        pub fn get_mut(&mut self) -> &mut T {
+    pub fn get_mut(&mut self) -> &mut T {
         &mut self.inner
     }
 
@@ -168,7 +168,7 @@ impl<T> Cursor<T> {
     /// buff.seek(SeekFrom::Current(-1)).unwrap();
     /// assert_eq!(buff.position(), 1);
     /// ```
-            pub const fn position(&self) -> u64 {
+    pub const fn position(&self) -> u64 {
         self.pos
     }
 
@@ -189,7 +189,7 @@ impl<T> Cursor<T> {
     /// buff.set_position(4);
     /// assert_eq!(buff.position(), 4);
     /// ```
-        pub fn set_position(&mut self, pos: u64) {
+    pub fn set_position(&mut self, pos: u64) {
         self.pos = pos;
     }
 }
@@ -219,7 +219,7 @@ where
     /// buff.set_position(6);
     /// assert_eq!(buff.remaining_slice(), &[]);
     /// ```
-        pub fn remaining_slice(&self) -> &[u8] {
+    pub fn remaining_slice(&self) -> &[u8] {
         let len = self.pos.min(self.inner.as_ref().len() as u64);
         &self.inner.as_ref()[(len as usize)..]
     }
@@ -243,7 +243,7 @@ where
     /// buff.set_position(10);
     /// assert!(buff.is_empty());
     /// ```
-        pub fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.pos >= self.inner.as_ref().len() as u64
     }
 }
@@ -254,7 +254,10 @@ where
 {
     #[inline]
     fn clone(&self) -> Self {
-        Cursor { inner: self.inner.clone(), pos: self.pos }
+        Cursor {
+            inner: self.inner.clone(),
+            pos: self.pos,
+        }
     }
 
     #[inline]
@@ -414,7 +417,9 @@ fn reserve_and_pad<A: Allocator>(
         // Safety: we have allocated enough capacity for this.
         // And we are only writing, not reading
         unsafe {
-            spare.get_unchecked_mut(..diff).fill(core::mem::MaybeUninit::new(0));
+            spare
+                .get_unchecked_mut(..diff)
+                .fill(core::mem::MaybeUninit::new(0));
             vec.set_len(pos);
         }
     }

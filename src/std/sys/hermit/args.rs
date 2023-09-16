@@ -23,7 +23,11 @@ pub fn args() -> Args {
     // Synchronize with the store above.
     let argv = ARGV.load(Acquire);
     // If argv has not been initialized yet, do not return any arguments.
-    let argc = if argv.is_null() { 0 } else { ARGC.load(Relaxed) };
+    let argc = if argv.is_null() {
+        0
+    } else {
+        ARGC.load(Relaxed)
+    };
     let args: Vec<OsString> = (0..argc)
         .map(|i| unsafe {
             let cstr = CStr::from_ptr(*argv.offset(i) as *const c_char);
@@ -31,7 +35,9 @@ pub fn args() -> Args {
         })
         .collect();
 
-    Args { iter: args.into_iter() }
+    Args {
+        iter: args.into_iter(),
+    }
 }
 
 pub struct Args {

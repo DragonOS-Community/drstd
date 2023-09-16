@@ -5,7 +5,7 @@ pub struct Condvar {}
 
 impl Condvar {
     #[inline]
-        pub const fn new() -> Condvar {
+    pub const fn new() -> Condvar {
         Condvar {}
     }
 

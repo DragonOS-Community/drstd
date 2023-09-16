@@ -32,7 +32,6 @@
 //! assert_eq!(bytes, b"foo");
 //! ```
 
-
 #[path = "../unix/ffi/os_str.rs"]
 mod os_str;
 

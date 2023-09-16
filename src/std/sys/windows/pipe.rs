@@ -78,7 +78,10 @@ pub fn anon_pipe(ours_readable: bool, their_handle_inheritable: bool) -> io::Res
                 c::GetCurrentProcessId(),
                 random_number()
             );
-            let wide_name = OsStr::new(&name).encode_wide().chain(Some(0)).collect::<Vec<_>>();
+            let wide_name = OsStr::new(&name)
+                .encode_wide()
+                .chain(Some(0))
+                .collect::<Vec<_>>();
             let mut flags = c::FILE_FLAG_FIRST_PIPE_INSTANCE | c::FILE_FLAG_OVERLAPPED;
             if ours_readable {
                 flags |= c::PIPE_ACCESS_INBOUND;
@@ -156,11 +159,15 @@ pub fn anon_pipe(ours_readable: bool, their_handle_inheritable: bool) -> io::Res
         };
         opts.security_attributes(&mut sa);
         let theirs = File::open(Path::new(&name), &opts)?;
-        let theirs = AnonPipe { inner: theirs.into_inner() };
+        let theirs = AnonPipe {
+            inner: theirs.into_inner(),
+        };
 
         Ok(Pipes {
             ours: AnonPipe { inner: ours },
-            theirs: AnonPipe { inner: theirs.into_inner() },
+            theirs: AnonPipe {
+                inner: theirs.into_inner(),
+            },
         })
     }
 }
@@ -183,7 +190,11 @@ pub fn spawn_pipe_relay(
 
     // Spawn a thread that passes messages from one pipe to the other.
     // Any errors will simply cause the thread to exit.
-    let (reader, writer) = if ours_readable { (ours, source) } else { (source, ours) };
+    let (reader, writer) = if ours_readable {
+        (ours, source)
+    } else {
+        (source, ours)
+    };
     crate::std::thread::spawn(move || {
         let mut buf = [0_u8; 4096];
         'reader: while let Ok(len) = reader.read(&mut buf) {
@@ -233,7 +244,9 @@ impl AnonPipe {
         self.inner
     }
     fn duplicate(&self) -> io::Result<Self> {
-        self.inner.duplicate(0, false, c::DUPLICATE_SAME_ACCESS).map(|inner| AnonPipe { inner })
+        self.inner
+            .duplicate(0, false, c::DUPLICATE_SAME_ACCESS)
+            .map(|inner| AnonPipe { inner })
     }
 
     pub fn read(&self, buf: &mut [u8]) -> io::Result<usize> {
@@ -360,8 +373,10 @@ impl AnonPipe {
             lpOverlapped: *mut c::OVERLAPPED,
         ) {
             // Set `async_result` using a pointer smuggled through `hEvent`.
-            let result =
-                AsyncResult { error: dwErrorCode, transferred: dwNumberOfBytesTransferred };
+            let result = AsyncResult {
+                error: dwErrorCode,
+                transferred: dwNumberOfBytesTransferred,
+            };
             *(*lpOverlapped).hEvent.cast::<Option<AsyncResult>>() = Some(result);
         }
 
@@ -373,7 +388,13 @@ impl AnonPipe {
 
         // Asynchronous read of the pipe.
         // If successful, `callback` will be called once it completes.
-        let result = io(self.inner.as_handle(), buf, len, &mut overlapped, Some(callback));
+        let result = io(
+            self.inner.as_handle(),
+            buf,
+            len,
+            &mut overlapped,
+            Some(callback),
+        );
         if result == c::FALSE {
             // We can return here because the call failed.
             // After this we must not return until the I/O completes.
@@ -460,7 +481,13 @@ impl<'a> AsyncPipe<'a> {
         let event = Handle::new_event(true, true)?;
         let mut overlapped: Box<c::OVERLAPPED> = unsafe { Box::new(mem::zeroed()) };
         overlapped.hEvent = event.as_raw_handle();
-        Ok(AsyncPipe { pipe, overlapped, event, dst, state: State::NotReading })
+        Ok(AsyncPipe {
+            pipe,
+            overlapped,
+            event,
+            dst,
+            state: State::NotReading,
+        })
     }
 
     /// Executes an overlapped read operation.

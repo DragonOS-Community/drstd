@@ -182,12 +182,14 @@ impl<'scope, 'env> Scope<'scope, 'env> {
     /// to recover from such errors.
     ///
     /// [`join`]: ScopedJoinHandle::join
-        pub fn spawn<F, T>(&'scope self, f: F) -> ScopedJoinHandle<'scope, T>
+    pub fn spawn<F, T>(&'scope self, f: F) -> ScopedJoinHandle<'scope, T>
     where
         F: FnOnce() -> T + Send + 'scope,
         T: Send + 'scope,
     {
-        Builder::new().spawn_scoped(self, f).expect("failed to spawn thread")
+        Builder::new()
+            .spawn_scoped(self, f)
+            .expect("failed to spawn thread")
     }
 }
 
@@ -238,7 +240,7 @@ impl Builder {
     /// a.push(4);
     /// assert_eq!(x, a.len());
     /// ```
-        pub fn spawn_scoped<'scope, 'env, F, T>(
+    pub fn spawn_scoped<'scope, 'env, F, T>(
         self,
         scope: &'scope Scope<'scope, 'env>,
         f: F,
@@ -247,7 +249,9 @@ impl Builder {
         F: FnOnce() -> T + Send + 'scope,
         T: Send + 'scope,
     {
-        Ok(ScopedJoinHandle(unsafe { self.spawn_unchecked_(f, Some(scope.data.clone())) }?))
+        Ok(ScopedJoinHandle(unsafe {
+            self.spawn_unchecked_(f, Some(scope.data.clone()))
+        }?))
     }
 }
 
@@ -267,7 +271,7 @@ impl<'scope, T> ScopedJoinHandle<'scope, T> {
     /// });
     /// ```
     #[must_use]
-        pub fn thread(&self) -> &Thread {
+    pub fn thread(&self) -> &Thread {
         &self.0.thread
     }
 
@@ -297,7 +301,7 @@ impl<'scope, T> ScopedJoinHandle<'scope, T> {
     ///     assert!(t.join().is_err());
     /// });
     /// ```
-        pub fn join(self) -> Result<T> {
+    pub fn join(self) -> Result<T> {
         self.0.join()
     }
 
@@ -311,7 +315,7 @@ impl<'scope, T> ScopedJoinHandle<'scope, T> {
     /// function has returned, but before the thread itself has stopped running.
     /// However, once this returns `true`, [`join`][Self::join] can be expected
     /// to return quickly, without blocking for any significant amount of time.
-        pub fn is_finished(&self) -> bool {
+    pub fn is_finished(&self) -> bool {
         Arc::strong_count(&self.0.packet) == 1
     }
 }
@@ -319,8 +323,14 @@ impl<'scope, T> ScopedJoinHandle<'scope, T> {
 impl fmt::Debug for Scope<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Scope")
-            .field("num_running_threads", &self.data.num_running_threads.load(Ordering::Relaxed))
-            .field("a_thread_panicked", &self.data.a_thread_panicked.load(Ordering::Relaxed))
+            .field(
+                "num_running_threads",
+                &self.data.num_running_threads.load(Ordering::Relaxed),
+            )
+            .field(
+                "a_thread_panicked",
+                &self.data.a_thread_panicked.load(Ordering::Relaxed),
+            )
             .field("main_thread", &self.data.main_thread)
             .finish_non_exhaustive()
     }

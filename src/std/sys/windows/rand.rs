@@ -12,7 +12,11 @@ pub fn hashmap_random_keys() -> (u64, u64) {
             c::BCRYPT_USE_SYSTEM_PREFERRED_RNG,
         )
     };
-    if c::nt_success(ret) { v } else { fallback_rng() }
+    if c::nt_success(ret) {
+        v
+    } else {
+        fallback_rng()
+    }
 }
 
 /// Generate random numbers using the fallback RNG function (RtlGenRandom)
@@ -28,10 +32,17 @@ fn fallback_rng() -> (u64, u64) {
 
     let mut v = (0, 0);
     let ret = unsafe {
-        c::RtlGenRandom(&mut v as *mut _ as *mut c_void, mem::size_of_val(&v) as c::ULONG)
+        c::RtlGenRandom(
+            &mut v as *mut _ as *mut c_void,
+            mem::size_of_val(&v) as c::ULONG,
+        )
     };
 
-    if ret != 0 { v } else { panic!("fallback RNG broken: {}", io::Error::last_os_error()) }
+    if ret != 0 {
+        v
+    } else {
+        panic!("fallback RNG broken: {}", io::Error::last_os_error())
+    }
 }
 
 /// We can't use RtlGenRandom with UWP, so there is no fallback

@@ -90,7 +90,9 @@ impl FileAttr {
     }
 
     pub fn file_type(&self) -> FileType {
-        FileType { bits: self.meta.filetype }
+        FileType {
+            bits: self.meta.filetype,
+        }
     }
 
     pub fn modified(&self) -> io::Result<SystemTime> {
@@ -253,11 +255,17 @@ impl DirEntry {
     }
 
     pub fn metadata(&self) -> io::Result<FileAttr> {
-        metadata_at(&self.inner.dir.fd, 0, OsStr::from_bytes(&self.name).as_ref())
+        metadata_at(
+            &self.inner.dir.fd,
+            0,
+            OsStr::from_bytes(&self.name).as_ref(),
+        )
     }
 
     pub fn file_type(&self) -> io::Result<FileType> {
-        Ok(FileType { bits: self.meta.d_type })
+        Ok(FileType {
+            bits: self.meta.d_type,
+        })
     }
 
     pub fn ino(&self) -> wasi::Inode {
@@ -538,7 +546,11 @@ impl IntoRawFd for File {
 
 impl FromRawFd for File {
     unsafe fn from_raw_fd(raw_fd: RawFd) -> Self {
-        unsafe { Self { fd: FromRawFd::from_raw_fd(raw_fd) } }
+        unsafe {
+            Self {
+                fd: FromRawFd::from_raw_fd(raw_fd),
+            }
+        }
     }
 }
 
@@ -555,7 +567,9 @@ impl DirBuilder {
 
 impl fmt::Debug for File {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("File").field("fd", &self.as_raw_fd()).finish()
+        f.debug_struct("File")
+            .field("fd", &self.as_raw_fd())
+            .finish()
     }
 }
 
@@ -575,7 +589,11 @@ pub fn unlink(p: &Path) -> io::Result<()> {
 pub fn rename(old: &Path, new: &Path) -> io::Result<()> {
     let (old, old_file) = open_parent(old)?;
     let (new, new_file) = open_parent(new)?;
-    old.rename(osstr2str(old_file.as_ref())?, &new, osstr2str(new_file.as_ref())?)
+    old.rename(
+        osstr2str(old_file.as_ref())?,
+        &new,
+        osstr2str(new_file.as_ref())?,
+    )
 }
 
 pub fn set_perm(_p: &Path, _perm: FilePermissions) -> io::Result<()> {
@@ -627,14 +645,22 @@ fn read_link(fd: &WasiFd, file: &Path) -> io::Result<PathBuf> {
 
 pub fn symlink(original: &Path, link: &Path) -> io::Result<()> {
     let (link, link_file) = open_parent(link)?;
-    link.symlink(osstr2str(original.as_ref())?, osstr2str(link_file.as_ref())?)
+    link.symlink(
+        osstr2str(original.as_ref())?,
+        osstr2str(link_file.as_ref())?,
+    )
 }
 
 pub fn link(original: &Path, link: &Path) -> io::Result<()> {
     let (original, original_file) = open_parent(original)?;
     let (link, link_file) = open_parent(link)?;
     // Pass 0 as the flags argument, meaning don't follow symlinks.
-    original.link(0, osstr2str(original_file.as_ref())?, &link, osstr2str(link_file.as_ref())?)
+    original.link(
+        0,
+        osstr2str(original_file.as_ref())?,
+        &link,
+        osstr2str(link_file.as_ref())?,
+    )
 }
 
 pub fn stat(p: &Path) -> io::Result<FileAttr> {
@@ -794,7 +820,10 @@ fn remove_dir_all_recursive(parent: &WasiFd, path: &Path) -> io::Result<()> {
     for entry in ReadDir::new(fd, dummy_root) {
         let entry = entry?;
         let path = crate::std::str::from_utf8(&entry.name).map_err(|_| {
-            io::const_io_error!(io::ErrorKind::Uncategorized, "invalid utf-8 file name found")
+            io::const_io_error!(
+                io::ErrorKind::Uncategorized,
+                "invalid utf-8 file name found"
+            )
         })?;
 
         if entry.file_type()?.is_dir() {

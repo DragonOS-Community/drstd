@@ -470,7 +470,9 @@ pub unsafe fn r#try<R, F: FnOnce() -> R>(f: F) -> Result<R, Box<dyn Any + Send>>
     //
     // Once we stack all that together we should have the "most efficient'
     // method of calling a catch panic whilst juggling ownership.
-    let mut data = Data { f: ManuallyDrop::new(f) };
+    let mut data = Data {
+        f: ManuallyDrop::new(f),
+    };
 
     let data_ptr = &mut data as *mut _ as *mut u8;
     // SAFETY:

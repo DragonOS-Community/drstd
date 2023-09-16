@@ -130,7 +130,10 @@ pub(crate) struct ListToken {
 impl Default for ListToken {
     #[inline]
     fn default() -> Self {
-        ListToken { block: ptr::null(), offset: 0 }
+        ListToken {
+            block: ptr::null(),
+            offset: 0,
+        }
     }
 }
 
@@ -400,7 +403,10 @@ impl<T> Channel<T> {
     ) -> Result<(), SendTimeoutError<T>> {
         let token = &mut Token::default();
         assert!(self.start_send(token));
-        unsafe { self.write(token, msg).map_err(SendTimeoutError::Disconnected) }
+        unsafe {
+            self.write(token, msg)
+                .map_err(SendTimeoutError::Disconnected)
+        }
     }
 
     /// Attempts to receive a message without blocking.

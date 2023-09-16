@@ -67,8 +67,11 @@ pub(super) fn send_vectored_with_ancillary_to(
     ancillary: &mut SocketAncillary<'_>,
 ) -> io::Result<usize> {
     unsafe {
-        let (mut msg_name, msg_namelen) =
-            if let Some(path) = path { sockaddr_un(path)? } else { (zeroed(), 0) };
+        let (mut msg_name, msg_namelen) = if let Some(path) = path {
+            sockaddr_un(path)?
+        } else {
+            (zeroed(), 0)
+        };
 
         let mut msg: dlibc::msghdr = zeroed();
         msg.msg_name = &mut msg_name as *mut _ as *mut _;
@@ -171,7 +174,10 @@ impl<'a, T> AncillaryDataIter<'a, T> {
     ///
     /// `data` must contain a valid control message.
     unsafe fn new(data: &'a [u8]) -> AncillaryDataIter<'a, T> {
-        AncillaryDataIter { data, phantom: PhantomData }
+        AncillaryDataIter {
+            data,
+            phantom: PhantomData,
+        }
     }
 }
 
@@ -220,41 +226,45 @@ impl SocketCred {
     /// Create a Unix credential struct.
     ///
     /// PID, UID and GID is set to 0.
-        #[must_use]
+    #[must_use]
     pub fn new() -> SocketCred {
-        SocketCred(dlibc::ucred { pid: 0, uid: 0, gid: 0 })
+        SocketCred(dlibc::ucred {
+            pid: 0,
+            uid: 0,
+            gid: 0,
+        })
     }
 
     /// Set the PID.
-        pub fn set_pid(&mut self, pid: dlibc::pid_t) {
+    pub fn set_pid(&mut self, pid: dlibc::pid_t) {
         self.0.pid = pid;
     }
 
     /// Get the current PID.
     #[must_use]
-        pub fn get_pid(&self) -> dlibc::pid_t {
+    pub fn get_pid(&self) -> dlibc::pid_t {
         self.0.pid
     }
 
     /// Set the UID.
-        pub fn set_uid(&mut self, uid: dlibc::uid_t) {
+    pub fn set_uid(&mut self, uid: dlibc::uid_t) {
         self.0.uid = uid;
     }
 
     /// Get the current UID.
     #[must_use]
-        pub fn get_uid(&self) -> dlibc::uid_t {
+    pub fn get_uid(&self) -> dlibc::uid_t {
         self.0.uid
     }
 
     /// Set the GID.
-        pub fn set_gid(&mut self, gid: dlibc::gid_t) {
+    pub fn set_gid(&mut self, gid: dlibc::gid_t) {
         self.0.gid = gid;
     }
 
     /// Get the current GID.
     #[must_use]
-        pub fn get_gid(&self) -> dlibc::gid_t {
+    pub fn get_gid(&self) -> dlibc::gid_t {
         self.0.gid
     }
 }
@@ -264,7 +274,7 @@ impl SocketCred {
     /// Create a Unix credential struct.
     ///
     /// PID, UID and GID is set to 0.
-        #[must_use]
+    #[must_use]
     pub fn new() -> SocketCred {
         SocketCred(dlibc::sockcred2 {
             sc_version: 0,
@@ -279,35 +289,35 @@ impl SocketCred {
     }
 
     /// Set the PID.
-        pub fn set_pid(&mut self, pid: dlibc::pid_t) {
+    pub fn set_pid(&mut self, pid: dlibc::pid_t) {
         self.0.sc_pid = pid;
     }
 
     /// Get the current PID.
     #[must_use]
-        pub fn get_pid(&self) -> dlibc::pid_t {
+    pub fn get_pid(&self) -> dlibc::pid_t {
         self.0.sc_pid
     }
 
     /// Set the UID.
-        pub fn set_uid(&mut self, uid: dlibc::uid_t) {
+    pub fn set_uid(&mut self, uid: dlibc::uid_t) {
         self.0.sc_euid = uid;
     }
 
     /// Get the current UID.
     #[must_use]
-        pub fn get_uid(&self) -> dlibc::uid_t {
+    pub fn get_uid(&self) -> dlibc::uid_t {
         self.0.sc_euid
     }
 
     /// Set the GID.
-        pub fn set_gid(&mut self, gid: dlibc::gid_t) {
+    pub fn set_gid(&mut self, gid: dlibc::gid_t) {
         self.0.sc_egid = gid;
     }
 
     /// Get the current GID.
     #[must_use]
-        pub fn get_gid(&self) -> dlibc::gid_t {
+    pub fn get_gid(&self) -> dlibc::gid_t {
         self.0.sc_egid
     }
 }
@@ -317,7 +327,7 @@ impl SocketCred {
     /// Create a Unix credential struct.
     ///
     /// PID, UID and GID is set to 0.
-        pub fn new() -> SocketCred {
+    pub fn new() -> SocketCred {
         SocketCred(dlibc::sockcred {
             sc_pid: 0,
             sc_uid: 0,
@@ -330,35 +340,35 @@ impl SocketCred {
     }
 
     /// Set the PID.
-        pub fn set_pid(&mut self, pid: dlibc::pid_t) {
+    pub fn set_pid(&mut self, pid: dlibc::pid_t) {
         self.0.sc_pid = pid;
     }
 
     /// Get the current PID.
     #[must_use]
-        pub fn get_pid(&self) -> dlibc::pid_t {
+    pub fn get_pid(&self) -> dlibc::pid_t {
         self.0.sc_pid
     }
 
     /// Set the UID.
-        pub fn set_uid(&mut self, uid: dlibc::uid_t) {
+    pub fn set_uid(&mut self, uid: dlibc::uid_t) {
         self.0.sc_uid = uid;
     }
 
     /// Get the current UID.
     #[must_use]
-        pub fn get_uid(&self) -> dlibc::uid_t {
+    pub fn get_uid(&self) -> dlibc::uid_t {
         self.0.sc_uid
     }
 
     /// Set the GID.
-        pub fn set_gid(&mut self, gid: dlibc::gid_t) {
+    pub fn set_gid(&mut self, gid: dlibc::gid_t) {
         self.0.sc_gid = gid;
     }
 
     /// Get the current GID.
     #[must_use]
-        pub fn get_gid(&self) -> dlibc::gid_t {
+    pub fn get_gid(&self) -> dlibc::gid_t {
         self.0.sc_gid
     }
 }
@@ -480,13 +490,15 @@ impl<'a> AncillaryData<'a> {
                     dlibc::SCM_CREDS2 => Ok(AncillaryData::as_credentials(data)),
                     #[cfg(target_os = "netbsd")]
                     dlibc::SCM_CREDS => Ok(AncillaryData::as_credentials(data)),
-                    cmsg_type => {
-                        Err(AncillaryError::Unknown { cmsg_level: dlibc::SOL_SOCKET, cmsg_type })
-                    }
+                    cmsg_type => Err(AncillaryError::Unknown {
+                        cmsg_level: dlibc::SOL_SOCKET,
+                        cmsg_type,
+                    }),
                 },
-                cmsg_level => {
-                    Err(AncillaryError::Unknown { cmsg_level, cmsg_type: (*cmsg).cmsg_type })
-                }
+                cmsg_level => Err(AncillaryError::Unknown {
+                    cmsg_level,
+                    cmsg_type: (*cmsg).cmsg_type,
+                }),
             }
         }
     }
@@ -580,31 +592,38 @@ impl<'a> SocketAncillary<'a> {
     /// let mut ancillary_buffer = [0; 128];
     /// let mut ancillary = SocketAncillary::new(&mut ancillary_buffer[..]);
     /// ```
-        pub fn new(buffer: &'a mut [u8]) -> Self {
-        SocketAncillary { buffer, length: 0, truncated: false }
+    pub fn new(buffer: &'a mut [u8]) -> Self {
+        SocketAncillary {
+            buffer,
+            length: 0,
+            truncated: false,
+        }
     }
 
     /// Returns the capacity of the buffer.
     #[must_use]
-        pub fn capacity(&self) -> usize {
+    pub fn capacity(&self) -> usize {
         self.buffer.len()
     }
 
     /// Returns `true` if the ancillary data is empty.
     #[must_use]
-        pub fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.length == 0
     }
 
     /// Returns the number of used bytes.
     #[must_use]
-        pub fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.length
     }
 
     /// Returns the iterator of the control messages.
-        pub fn messages(&self) -> Messages<'_> {
-        Messages { buffer: &self.buffer[..self.length], current: None }
+    pub fn messages(&self) -> Messages<'_> {
+        Messages {
+            buffer: &self.buffer[..self.length],
+            current: None,
+        }
     }
 
     /// Is `true` if during a recv operation the ancillary was truncated.
@@ -631,7 +650,7 @@ impl<'a> SocketAncillary<'a> {
     /// }
     /// ```
     #[must_use]
-        pub fn truncated(&self) -> bool {
+    pub fn truncated(&self) -> bool {
         self.truncated
     }
 
@@ -663,7 +682,7 @@ impl<'a> SocketAncillary<'a> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn add_fds(&mut self, fds: &[RawFd]) -> bool {
+    pub fn add_fds(&mut self, fds: &[RawFd]) -> bool {
         self.truncated = false;
         add_to_ancillary_data(
             &mut self.buffer,
@@ -688,7 +707,7 @@ impl<'a> SocketAncillary<'a> {
         target_os = "netbsd",
         target_os = "freebsd"
     ))]
-        pub fn add_creds(&mut self, creds: &[SocketCred]) -> bool {
+    pub fn add_creds(&mut self, creds: &[SocketCred]) -> bool {
         self.truncated = false;
         add_to_ancillary_data(
             &mut self.buffer,
@@ -746,7 +765,7 @@ impl<'a> SocketAncillary<'a> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.length = 0;
         self.truncated = false;
     }

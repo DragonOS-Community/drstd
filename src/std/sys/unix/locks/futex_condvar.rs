@@ -13,7 +13,9 @@ pub struct Condvar {
 impl Condvar {
     #[inline]
     pub const fn new() -> Self {
-        Self { futex: AtomicU32::new(0) }
+        Self {
+            futex: AtomicU32::new(0),
+        }
     }
 
     // All the memory orderings here are `Relaxed`,

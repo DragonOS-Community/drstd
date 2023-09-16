@@ -2,8 +2,8 @@ use crate::std::marker::PhantomData;
 use crate::std::slice;
 
 use super::abi::sockets::iovec;
-use dlibc::c_void;
 use dlibc;
+use dlibc::c_void;
 
 #[derive(Copy, Clone)]
 #[repr(transparent)]
@@ -16,7 +16,10 @@ impl<'a> IoSlice<'a> {
     #[inline]
     pub fn new(buf: &'a [u8]) -> IoSlice<'a> {
         IoSlice {
-            vec: iovec { iov_base: buf.as_ptr() as *mut u8 as *mut c_void, iov_len: buf.len() },
+            vec: iovec {
+                iov_base: buf.as_ptr() as *mut u8 as *mut c_void,
+                iov_len: buf.len(),
+            },
             _p: PhantomData,
         }
     }
@@ -49,7 +52,10 @@ impl<'a> IoSliceMut<'a> {
     #[inline]
     pub fn new(buf: &'a mut [u8]) -> IoSliceMut<'a> {
         IoSliceMut {
-            vec: iovec { iov_base: buf.as_mut_ptr() as *mut c_void, iov_len: buf.len() },
+            vec: iovec {
+                iov_base: buf.as_mut_ptr() as *mut c_void,
+                iov_len: buf.len(),
+            },
             _p: PhantomData,
         }
     }

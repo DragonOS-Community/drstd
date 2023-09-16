@@ -89,13 +89,19 @@ fn wtf8buf_new() {
 #[test]
 fn wtf8buf_from_str() {
     assert_eq!(Wtf8Buf::from_str("").bytes, b"");
-    assert_eq!(Wtf8Buf::from_str("aé 💩").bytes, b"a\xC3\xA9 \xF0\x9F\x92\xA9");
+    assert_eq!(
+        Wtf8Buf::from_str("aé 💩").bytes,
+        b"a\xC3\xA9 \xF0\x9F\x92\xA9"
+    );
 }
 
 #[test]
 fn wtf8buf_from_string() {
     assert_eq!(Wtf8Buf::from_string(String::from("")).bytes, b"");
-    assert_eq!(Wtf8Buf::from_string(String::from("aé 💩")).bytes, b"a\xC3\xA9 \xF0\x9F\x92\xA9");
+    assert_eq!(
+        Wtf8Buf::from_string(String::from("aé 💩")).bytes,
+        b"a\xC3\xA9 \xF0\x9F\x92\xA9"
+    );
 }
 
 #[test]
@@ -355,35 +361,62 @@ fn wtf8buf_into_string_lossy() {
 #[test]
 fn wtf8buf_from_iterator() {
     fn f(values: &[u32]) -> Wtf8Buf {
-        values.iter().map(|&c| CodePoint::from_u32(c).unwrap()).collect::<Wtf8Buf>()
+        values
+            .iter()
+            .map(|&c| CodePoint::from_u32(c).unwrap())
+            .collect::<Wtf8Buf>()
     }
     assert_eq!(
         f(&[0x61, 0xE9, 0x20, 0x1F4A9]),
-        Wtf8Buf { bytes: b"a\xC3\xA9 \xF0\x9F\x92\xA9".to_vec(), is_known_utf8: true }
+        Wtf8Buf {
+            bytes: b"a\xC3\xA9 \xF0\x9F\x92\xA9".to_vec(),
+            is_known_utf8: true
+        }
     );
 
     assert_eq!(f(&[0xD83D, 0xDCA9]).bytes, b"\xF0\x9F\x92\xA9"); // Magic!
     assert_eq!(
         f(&[0xD83D, 0x20, 0xDCA9]),
-        Wtf8Buf { bytes: b"\xED\xA0\xBD \xED\xB2\xA9".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\xBD \xED\xB2\xA9".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         f(&[0xD800, 0xDBFF]),
-        Wtf8Buf { bytes: b"\xED\xA0\x80\xED\xAF\xBF".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\x80\xED\xAF\xBF".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         f(&[0xD800, 0xE000]),
-        Wtf8Buf { bytes: b"\xED\xA0\x80\xEE\x80\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\x80\xEE\x80\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         f(&[0xD7FF, 0xDC00]),
-        Wtf8Buf { bytes: b"\xED\x9F\xBF\xED\xB0\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\x9F\xBF\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         f(&[0x61, 0xDC00]),
-        Wtf8Buf { bytes: b"\x61\xED\xB0\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\x61\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
-    assert_eq!(f(&[0xDC00]), Wtf8Buf { bytes: b"\xED\xB0\x80".to_vec(), is_known_utf8: false });
+    assert_eq!(
+        f(&[0xDC00]),
+        Wtf8Buf {
+            bytes: b"\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
+    );
 }
 
 #[test]
@@ -399,33 +432,54 @@ fn wtf8buf_extend() {
 
     assert_eq!(
         e(&[0x61, 0xE9], &[0x20, 0x1F4A9]),
-        Wtf8Buf { bytes: b"a\xC3\xA9 \xF0\x9F\x92\xA9".to_vec(), is_known_utf8: true }
+        Wtf8Buf {
+            bytes: b"a\xC3\xA9 \xF0\x9F\x92\xA9".to_vec(),
+            is_known_utf8: true
+        }
     );
 
     assert_eq!(e(&[0xD83D], &[0xDCA9]).bytes, b"\xF0\x9F\x92\xA9"); // Magic!
     assert_eq!(
         e(&[0xD83D, 0x20], &[0xDCA9]),
-        Wtf8Buf { bytes: b"\xED\xA0\xBD \xED\xB2\xA9".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\xBD \xED\xB2\xA9".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         e(&[0xD800], &[0xDBFF]),
-        Wtf8Buf { bytes: b"\xED\xA0\x80\xED\xAF\xBF".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\x80\xED\xAF\xBF".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         e(&[0xD800], &[0xE000]),
-        Wtf8Buf { bytes: b"\xED\xA0\x80\xEE\x80\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xA0\x80\xEE\x80\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         e(&[0xD7FF], &[0xDC00]),
-        Wtf8Buf { bytes: b"\xED\x9F\xBF\xED\xB0\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\x9F\xBF\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         e(&[0x61], &[0xDC00]),
-        Wtf8Buf { bytes: b"\x61\xED\xB0\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\x61\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
     assert_eq!(
         e(&[], &[0xDC00]),
-        Wtf8Buf { bytes: b"\xED\xB0\x80".to_vec(), is_known_utf8: false }
+        Wtf8Buf {
+            bytes: b"\xED\xB0\x80".to_vec(),
+            is_known_utf8: false
+        }
     );
 }
 
@@ -433,7 +487,10 @@ fn wtf8buf_extend() {
 fn wtf8buf_show() {
     let mut string = Wtf8Buf::from_str("a\té \u{7f}💩\r");
     string.push(CodePoint::from_u32(0xD800).unwrap());
-    assert_eq!(format!("{string:?}"), "\"a\\té \\u{7f}\u{1f4a9}\\r\\u{d800}\"");
+    assert_eq!(
+        format!("{string:?}"),
+        "\"a\\té \\u{7f}\u{1f4a9}\\r\\u{d800}\""
+    );
 }
 
 #[test]
@@ -451,7 +508,10 @@ fn wtf8buf_show_str() {
 #[test]
 fn wtf8_from_str() {
     assert_eq!(&Wtf8::from_str("").bytes, b"");
-    assert_eq!(&Wtf8::from_str("aé 💩").bytes, b"a\xC3\xA9 \xF0\x9F\x92\xA9");
+    assert_eq!(
+        &Wtf8::from_str("aé 💩").bytes,
+        b"a\xC3\xA9 \xF0\x9F\x92\xA9"
+    );
 }
 
 #[test]
@@ -473,7 +533,10 @@ fn wtf8_slice_not_code_point_boundary() {
 
 #[test]
 fn wtf8_slice_from() {
-    assert_eq!(&Wtf8::from_str("aé 💩")[1..].bytes, b"\xC3\xA9 \xF0\x9F\x92\xA9");
+    assert_eq!(
+        &Wtf8::from_str("aé 💩")[1..].bytes,
+        b"\xC3\xA9 \xF0\x9F\x92\xA9"
+    );
 }
 
 #[test]
@@ -509,7 +572,10 @@ fn wtf8_code_points() {
         CodePoint::from_u32(value).unwrap()
     }
     fn cp(string: &Wtf8Buf) -> Vec<Option<char>> {
-        string.code_points().map(|c| c.to_char()).collect::<Vec<_>>()
+        string
+            .code_points()
+            .map(|c| c.to_char())
+            .collect::<Vec<_>>()
     }
     let mut string = Wtf8Buf::from_str("é ");
     assert_eq!(cp(&string), [Some('é'), Some(' ')]);
@@ -531,7 +597,10 @@ fn wtf8_as_str() {
 #[test]
 fn wtf8_to_string_lossy() {
     assert_eq!(Wtf8::from_str("").to_string_lossy(), Cow::Borrowed(""));
-    assert_eq!(Wtf8::from_str("aé 💩").to_string_lossy(), Cow::Borrowed("aé 💩"));
+    assert_eq!(
+        Wtf8::from_str("aé 💩").to_string_lossy(),
+        Cow::Borrowed("aé 💩")
+    );
     let mut string = Wtf8Buf::from_str("aé 💩");
     string.push(CodePoint::from_u32(0xD800).unwrap());
     let expected: Cow<'_, str> = Cow::Owned(String::from("aé 💩�"));

@@ -2,7 +2,6 @@
 //!
 //! [`std::fs`]: crate::std::fs
 
-
 use crate::std::fs::{self, Metadata, OpenOptions};
 use crate::std::io;
 use crate::std::path::Path;
@@ -45,7 +44,7 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn seek_read(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
+    fn seek_read(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
 
     /// Seeks to a given position and writes a number of bytes.
     ///
@@ -77,7 +76,7 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn seek_write(&self, buf: &[u8], offset: u64) -> io::Result<usize>;
+    fn seek_write(&self, buf: &[u8], offset: u64) -> io::Result<usize>;
 }
 
 impl FileExt for fs::File {
@@ -112,7 +111,7 @@ pub trait OpenOptionsExt {
     /// ```
     ///
     /// [`CreateFile`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
-        fn access_mode(&mut self, access: u32) -> &mut Self;
+    fn access_mode(&mut self, access: u32) -> &mut Self;
 
     /// Overrides the `dwShareMode` argument to the call to [`CreateFile`] with
     /// the specified value.
@@ -139,7 +138,7 @@ pub trait OpenOptionsExt {
     /// ```
     ///
     /// [`CreateFile`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
-        fn share_mode(&mut self, val: u32) -> &mut Self;
+    fn share_mode(&mut self, val: u32) -> &mut Self;
 
     /// Sets extra flags for the `dwFileFlags` argument to the call to
     /// [`CreateFile2`] to the specified value (or combines it with
@@ -169,7 +168,7 @@ pub trait OpenOptionsExt {
     ///
     /// [`CreateFile`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
     /// [`CreateFile2`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
-        fn custom_flags(&mut self, flags: u32) -> &mut Self;
+    fn custom_flags(&mut self, flags: u32) -> &mut Self;
 
     /// Sets the `dwFileAttributes` argument to the call to [`CreateFile2`] to
     /// the specified value (or combines it with `custom_flags` and
@@ -206,7 +205,7 @@ pub trait OpenOptionsExt {
     ///
     /// [`CreateFile`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea
     /// [`CreateFile2`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
-        fn attributes(&mut self, val: u32) -> &mut Self;
+    fn attributes(&mut self, val: u32) -> &mut Self;
 
     /// Sets the `dwSecurityQosFlags` argument to the call to [`CreateFile2`] to
     /// the specified value (or combines it with `custom_flags` and `attributes`
@@ -251,7 +250,7 @@ pub trait OpenOptionsExt {
     /// [`CreateFile2`]: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
     /// [Impersonation Levels]:
     ///     https://docs.microsoft.com/en-us/windows/win32/api/winnt/ne-winnt-security_impersonation_level
-        fn security_qos_flags(&mut self, flags: u32) -> &mut Self;
+    fn security_qos_flags(&mut self, flags: u32) -> &mut Self;
 }
 
 impl OpenOptionsExt for OpenOptions {
@@ -311,7 +310,7 @@ pub trait MetadataExt {
     ///
     /// [File Attribute Constants]:
     ///     https://docs.microsoft.com/en-us/windows/win32/fileio/file-attribute-constants
-        fn file_attributes(&self) -> u32;
+    fn file_attributes(&self) -> u32;
 
     /// Returns the value of the `ftCreationTime` field of this metadata.
     ///
@@ -339,7 +338,7 @@ pub trait MetadataExt {
     /// ```
     ///
     /// [`FILETIME`]: https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime
-        fn creation_time(&self) -> u64;
+    fn creation_time(&self) -> u64;
 
     /// Returns the value of the `ftLastAccessTime` field of this metadata.
     ///
@@ -373,7 +372,7 @@ pub trait MetadataExt {
     /// ```
     ///
     /// [`FILETIME`]: https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime
-        fn last_access_time(&self) -> u64;
+    fn last_access_time(&self) -> u64;
 
     /// Returns the value of the `ftLastWriteTime` field of this metadata.
     ///
@@ -405,7 +404,7 @@ pub trait MetadataExt {
     /// ```
     ///
     /// [`FILETIME`]: https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime
-        fn last_write_time(&self) -> u64;
+    fn last_write_time(&self) -> u64;
 
     /// Returns the value of the `nFileSize{High,Low}` fields of this
     /// metadata.
@@ -425,7 +424,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn file_size(&self) -> u64;
+    fn file_size(&self) -> u64;
 
     /// Returns the value of the `dwVolumeSerialNumber` field of this
     /// metadata.
@@ -433,7 +432,7 @@ pub trait MetadataExt {
     /// This will return `None` if the `Metadata` instance was created from a
     /// call to `DirEntry::metadata`. If this `Metadata` was created by using
     /// `fs::metadata` or `File::metadata`, then this will return `Some`.
-        fn volume_serial_number(&self) -> Option<u32>;
+    fn volume_serial_number(&self) -> Option<u32>;
 
     /// Returns the value of the `nNumberOfLinks` field of this
     /// metadata.
@@ -441,7 +440,7 @@ pub trait MetadataExt {
     /// This will return `None` if the `Metadata` instance was created from a
     /// call to `DirEntry::metadata`. If this `Metadata` was created by using
     /// `fs::metadata` or `File::metadata`, then this will return `Some`.
-        fn number_of_links(&self) -> Option<u32>;
+    fn number_of_links(&self) -> Option<u32>;
 
     /// Returns the value of the `nFileIndex{Low,High}` fields of this
     /// metadata.
@@ -449,7 +448,7 @@ pub trait MetadataExt {
     /// This will return `None` if the `Metadata` instance was created from a
     /// call to `DirEntry::metadata`. If this `Metadata` was created by using
     /// `fs::metadata` or `File::metadata`, then this will return `Some`.
-        fn file_index(&self) -> Option<u64>;
+    fn file_index(&self) -> Option<u64>;
 }
 
 impl MetadataExt for Metadata {
@@ -484,9 +483,9 @@ impl MetadataExt for Metadata {
 /// On Windows, a symbolic link knows whether it is a file or directory.
 pub trait FileTypeExt: Sealed {
     /// Returns `true` if this file type is a symbolic link that is also a directory.
-        fn is_symlink_dir(&self) -> bool;
+    fn is_symlink_dir(&self) -> bool;
     /// Returns `true` if this file type is a symbolic link that is also a file.
-        fn is_symlink_file(&self) -> bool;
+    fn is_symlink_file(&self) -> bool;
 }
 
 impl Sealed for fs::FileType {}
@@ -503,7 +502,7 @@ impl FileTypeExt for fs::FileType {
 /// Windows-specific extensions to [`fs::FileTimes`].
 pub trait FileTimesExt: Sealed {
     /// Set the creation time of a file.
-        fn set_created(self, t: SystemTime) -> Self;
+    fn set_created(self, t: SystemTime) -> Self;
 }
 
 impl FileTimesExt for fs::FileTimes {

@@ -38,7 +38,9 @@ const _: () = {
 
 impl RwLock {
     pub const fn new() -> RwLock {
-        RwLock { inner: LazyBox::new() }
+        RwLock {
+            inner: LazyBox::new(),
+        }
     }
 
     #[inline]

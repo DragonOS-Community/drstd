@@ -125,14 +125,20 @@ fn read_exact() {
     let mut buf = [0; 4];
 
     let mut c = Cursor::new(&b""[..]);
-    assert_eq!(c.read_exact(&mut buf).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_exact(&mut buf).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
 
     let mut c = Cursor::new(&b"123"[..]).chain(Cursor::new(&b"456789"[..]));
     c.read_exact(&mut buf).unwrap();
     assert_eq!(&buf, b"1234");
     c.read_exact(&mut buf).unwrap();
     assert_eq!(&buf, b"5678");
-    assert_eq!(c.read_exact(&mut buf).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_exact(&mut buf).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
 }
 
 #[test]
@@ -140,10 +146,16 @@ fn read_exact_slice() {
     let mut buf = [0; 4];
 
     let mut c = &b""[..];
-    assert_eq!(c.read_exact(&mut buf).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_exact(&mut buf).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
 
     let mut c = &b"123"[..];
-    assert_eq!(c.read_exact(&mut buf).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_exact(&mut buf).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
     // make sure the optimized (early returning) method is being used
     assert_eq!(&buf, &[0; 4]);
 
@@ -163,7 +175,10 @@ fn read_buf_exact() {
     let mut buf: BorrowedBuf<'_> = buf.into();
 
     let mut c = Cursor::new(&b""[..]);
-    assert_eq!(c.read_buf_exact(buf.unfilled()).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_buf_exact(buf.unfilled()).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
 
     let mut c = Cursor::new(&b"123456789"[..]);
     c.read_buf_exact(buf.unfilled()).unwrap();
@@ -176,7 +191,10 @@ fn read_buf_exact() {
 
     buf.clear();
 
-    assert_eq!(c.read_buf_exact(buf.unfilled()).unwrap_err().kind(), io::ErrorKind::UnexpectedEof);
+    assert_eq!(
+        c.read_buf_exact(buf.unfilled()).unwrap_err().kind(),
+        io::ErrorKind::UnexpectedEof
+    );
 }
 
 #[test]
@@ -206,7 +224,11 @@ fn cmp_bufread<Br1: BufRead, Br2: BufRead>(mut br1: Br1, mut br2: Br2, exp: &[u8
         let consume = {
             let buf1 = br1.fill_buf().unwrap();
             let buf2 = br2.fill_buf().unwrap();
-            let minlen = if buf1.len() < buf2.len() { buf1.len() } else { buf2.len() };
+            let minlen = if buf1.len() < buf2.len() {
+                buf1.len()
+            } else {
+                buf2.len()
+            };
             assert_eq!(buf1[..minlen], buf2[..minlen]);
             cat.extend_from_slice(&buf1[..minlen]);
             minlen
@@ -225,9 +247,13 @@ fn cmp_bufread<Br1: BufRead, Br2: BufRead>(mut br1: Br1, mut br2: Br2, exp: &[u8
 #[test]
 fn chain_bufread() {
     let testdata = b"ABCDEFGHIJKL";
-    let chain1 =
-        (&testdata[..3]).chain(&testdata[3..6]).chain(&testdata[6..9]).chain(&testdata[9..]);
-    let chain2 = (&testdata[..4]).chain(&testdata[4..8]).chain(&testdata[8..]);
+    let chain1 = (&testdata[..3])
+        .chain(&testdata[3..6])
+        .chain(&testdata[6..9])
+        .chain(&testdata[9..]);
+    let chain2 = (&testdata[..4])
+        .chain(&testdata[4..8])
+        .chain(&testdata[8..]);
     cmp_bufread(chain1, chain2, &testdata[..]);
 }
 
@@ -445,7 +471,11 @@ fn io_slice_advance_slices() {
     let buf1 = [1; 8];
     let buf2 = [2; 16];
     let buf3 = [3; 8];
-    let mut bufs = &mut [IoSlice::new(&buf1), IoSlice::new(&buf2), IoSlice::new(&buf3)][..];
+    let mut bufs = &mut [
+        IoSlice::new(&buf1),
+        IoSlice::new(&buf2),
+        IoSlice::new(&buf3),
+    ][..];
 
     // Only in a single buffer..
     IoSlice::advance_slices(&mut bufs, 1);
@@ -483,7 +513,11 @@ fn io_slice_advance_slices_beyond_total_length() {
 /// Create a new writer that reads from at most `n_bufs` and reads
 /// `per_call` bytes (in total) per call to write.
 fn test_writer(n_bufs: usize, per_call: usize) -> TestWriter {
-    TestWriter { n_bufs, per_call, written: Vec::new() }
+    TestWriter {
+        n_bufs,
+        per_call,
+        written: Vec::new(),
+    }
 }
 
 struct TestWriter {
@@ -542,7 +576,11 @@ fn test_writer_read_from_multiple_bufs() {
     assert_eq!(writer.write_vectored(bufs).unwrap(), 3);
 
     // Read at most 3 bytes from three buffers.
-    let bufs = &[IoSlice::new(&[3]), IoSlice::new(&[4]), IoSlice::new(&[5, 5])];
+    let bufs = &[
+        IoSlice::new(&[3]),
+        IoSlice::new(&[4]),
+        IoSlice::new(&[5, 5]),
+    ];
     assert_eq!(writer.write_vectored(bufs).unwrap(), 3);
 
     assert_eq!(writer.written, &[1, 2, 2, 3, 4, 5]);
@@ -593,7 +631,11 @@ fn test_take_wrong_length() {
     impl Read for LieAboutSize {
         fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
             // Lie about the read size at first time of read.
-            if core::mem::take(&mut self.0) { Ok(buf.len() + 1) } else { Ok(buf.len()) }
+            if core::mem::take(&mut self.0) {
+                Ok(buf.len() + 1)
+            } else {
+                Ok(buf.len())
+            }
         }
     }
 

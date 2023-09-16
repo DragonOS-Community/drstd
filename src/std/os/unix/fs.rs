@@ -55,14 +55,14 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn read_at(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
+    fn read_at(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
 
     /// Like `read_at`, except that it reads into a slice of buffers.
     ///
     /// Data is copied to fill each buffer in order, with the final buffer
     /// written to possibly being only partially filled. This method must behave
     /// equivalently to a single call to read with concatenated buffers.
-        fn read_vectored_at(&self, bufs: &mut [io::IoSliceMut<'_>], offset: u64) -> io::Result<usize> {
+    fn read_vectored_at(&self, bufs: &mut [io::IoSliceMut<'_>], offset: u64) -> io::Result<usize> {
         io::default_read_vectored(|b| self.read_at(b, offset), bufs)
     }
 
@@ -111,7 +111,7 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn read_exact_at(&self, mut buf: &mut [u8], mut offset: u64) -> io::Result<()> {
+    fn read_exact_at(&self, mut buf: &mut [u8], mut offset: u64) -> io::Result<()> {
         while !buf.is_empty() {
             match self.read_at(buf, offset) {
                 Ok(0) => break,
@@ -125,7 +125,10 @@ pub trait FileExt {
             }
         }
         if !buf.is_empty() {
-            Err(io::const_io_error!(io::ErrorKind::UnexpectedEof, "failed to fill whole buffer",))
+            Err(io::const_io_error!(
+                io::ErrorKind::UnexpectedEof,
+                "failed to fill whole buffer",
+            ))
         } else {
             Ok(())
         }
@@ -192,14 +195,14 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize>;
+    fn write_at(&self, buf: &[u8], offset: u64) -> io::Result<usize>;
 
     /// Like `write_at`, except that it writes from a slice of buffers.
     ///
     /// Data is copied from each buffer in order, with the final buffer read
     /// from possibly being only partially consumed. This method must behave as
     /// a call to `write_at` with the buffers concatenated would.
-        fn write_vectored_at(&self, bufs: &[io::IoSlice<'_>], offset: u64) -> io::Result<usize> {
+    fn write_vectored_at(&self, bufs: &[io::IoSlice<'_>], offset: u64) -> io::Result<usize> {
         io::default_write_vectored(|b| self.write_at(b, offset), bufs)
     }
 
@@ -239,7 +242,7 @@ pub trait FileExt {
     ///     Ok(())
     /// }
     /// ```
-        fn write_all_at(&self, mut buf: &[u8], mut offset: u64) -> io::Result<()> {
+    fn write_all_at(&self, mut buf: &[u8], mut offset: u64) -> io::Result<()> {
         while !buf.is_empty() {
             match self.write_at(buf, offset) {
                 Ok(0) => {
@@ -295,7 +298,7 @@ pub trait PermissionsExt {
     ///     Ok(())
     /// }
     /// ```
-        fn mode(&self) -> u32;
+    fn mode(&self) -> u32;
 
     /// Sets the underlying raw bits for this set of permissions.
     ///
@@ -315,7 +318,7 @@ pub trait PermissionsExt {
     ///     Ok(())
     /// }
     /// ```
-        fn set_mode(&mut self, mode: u32);
+    fn set_mode(&mut self, mode: u32);
 
     /// Creates a new instance of `Permissions` from the given set of Unix
     /// permission bits.
@@ -330,7 +333,7 @@ pub trait PermissionsExt {
     /// let permissions = Permissions::from_mode(0o644);
     /// assert_eq!(permissions.mode(), 0o644);
     /// ```
-        fn from_mode(mode: u32) -> Self;
+    fn from_mode(mode: u32) -> Self;
 }
 
 impl PermissionsExt for Permissions {
@@ -369,7 +372,7 @@ pub trait OpenOptionsExt {
     /// let file = options.open("foo.txt");
     /// # }
     /// ```
-        fn mode(&mut self, mode: u32) -> &mut Self;
+    fn mode(&mut self, mode: u32) -> &mut Self;
 
     /// Pass custom flags to the `flags` argument of `open`.
     ///
@@ -396,7 +399,7 @@ pub trait OpenOptionsExt {
     /// let file = options.open("foo.txt");
     /// # }
     /// ```
-        fn custom_flags(&mut self, flags: i32) -> &mut Self;
+    fn custom_flags(&mut self, flags: i32) -> &mut Self;
 }
 
 impl OpenOptionsExt for OpenOptions {
@@ -428,7 +431,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn dev(&self) -> u64;
+    fn dev(&self) -> u64;
     /// Returns the inode number.
     ///
     /// # Examples
@@ -444,7 +447,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn ino(&self) -> u64;
+    fn ino(&self) -> u64;
     /// Returns the rights applied to this file.
     ///
     /// # Examples
@@ -464,7 +467,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn mode(&self) -> u32;
+    fn mode(&self) -> u32;
     /// Returns the number of hard links pointing to this file.
     ///
     /// # Examples
@@ -480,7 +483,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn nlink(&self) -> u64;
+    fn nlink(&self) -> u64;
     /// Returns the user ID of the owner of this file.
     ///
     /// # Examples
@@ -496,7 +499,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn uid(&self) -> u32;
+    fn uid(&self) -> u32;
     /// Returns the group ID of the owner of this file.
     ///
     /// # Examples
@@ -512,7 +515,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn gid(&self) -> u32;
+    fn gid(&self) -> u32;
     /// Returns the device ID of this file (if it is a special one).
     ///
     /// # Examples
@@ -528,7 +531,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn rdev(&self) -> u64;
+    fn rdev(&self) -> u64;
     /// Returns the total size of this file in bytes.
     ///
     /// # Examples
@@ -544,7 +547,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn size(&self) -> u64;
+    fn size(&self) -> u64;
     /// Returns the last access time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -560,7 +563,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn atime(&self) -> i64;
+    fn atime(&self) -> i64;
     /// Returns the last access time of the file, in nanoseconds since [`atime`].
     ///
     /// [`atime`]: MetadataExt::atime
@@ -578,7 +581,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn atime_nsec(&self) -> i64;
+    fn atime_nsec(&self) -> i64;
     /// Returns the last modification time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -594,7 +597,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn mtime(&self) -> i64;
+    fn mtime(&self) -> i64;
     /// Returns the last modification time of the file, in nanoseconds since [`mtime`].
     ///
     /// [`mtime`]: MetadataExt::mtime
@@ -612,7 +615,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn mtime_nsec(&self) -> i64;
+    fn mtime_nsec(&self) -> i64;
     /// Returns the last status change time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -628,7 +631,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn ctime(&self) -> i64;
+    fn ctime(&self) -> i64;
     /// Returns the last status change time of the file, in nanoseconds since [`ctime`].
     ///
     /// [`ctime`]: MetadataExt::ctime
@@ -646,7 +649,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn ctime_nsec(&self) -> i64;
+    fn ctime_nsec(&self) -> i64;
     /// Returns the block size for filesystem I/O.
     ///
     /// # Examples
@@ -662,7 +665,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn blksize(&self) -> u64;
+    fn blksize(&self) -> u64;
     /// Returns the number of blocks allocated to the file, in 512-byte units.
     ///
     /// Please note that this may be smaller than `st_size / 512` when the file has holes.
@@ -680,9 +683,9 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn blocks(&self) -> u64;
+    fn blocks(&self) -> u64;
     #[cfg(target_os = "vxworks")]
-        fn attrib(&self) -> u8;
+    fn attrib(&self) -> u8;
 }
 
 impl MetadataExt for fs::Metadata {
@@ -761,7 +764,7 @@ pub trait FileTypeExt {
     ///     Ok(())
     /// }
     /// ```
-        fn is_block_device(&self) -> bool;
+    fn is_block_device(&self) -> bool;
     /// Returns `true` if this file type is a char device.
     ///
     /// # Examples
@@ -778,7 +781,7 @@ pub trait FileTypeExt {
     ///     Ok(())
     /// }
     /// ```
-        fn is_char_device(&self) -> bool;
+    fn is_char_device(&self) -> bool;
     /// Returns `true` if this file type is a fifo.
     ///
     /// # Examples
@@ -795,7 +798,7 @@ pub trait FileTypeExt {
     ///     Ok(())
     /// }
     /// ```
-        fn is_fifo(&self) -> bool;
+    fn is_fifo(&self) -> bool;
     /// Returns `true` if this file type is a socket.
     ///
     /// # Examples
@@ -812,7 +815,7 @@ pub trait FileTypeExt {
     ///     Ok(())
     /// }
     /// ```
-        fn is_socket(&self) -> bool;
+    fn is_socket(&self) -> bool;
 }
 
 impl FileTypeExt for fs::FileType {
@@ -850,7 +853,7 @@ pub trait DirEntryExt {
     ///     }
     /// }
     /// ```
-        fn ino(&self) -> u64;
+    fn ino(&self) -> u64;
 }
 
 impl DirEntryExt for fs::DirEntry {
@@ -925,7 +928,7 @@ pub trait DirBuilderExt {
     /// let mut builder = DirBuilder::new();
     /// builder.mode(0o755);
     /// ```
-        fn mode(&mut self, mode: u32) -> &mut Self;
+    fn mode(&mut self, mode: u32) -> &mut Self;
 }
 
 impl DirBuilderExt for fs::DirBuilder {
@@ -957,7 +960,11 @@ impl DirBuilderExt for fs::DirBuilder {
 /// }
 /// ```
 pub fn chown<P: AsRef<Path>>(dir: P, uid: Option<u32>, gid: Option<u32>) -> io::Result<()> {
-    sys::fs::chown(dir.as_ref(), uid.unwrap_or(u32::MAX), gid.unwrap_or(u32::MAX))
+    sys::fs::chown(
+        dir.as_ref(),
+        uid.unwrap_or(u32::MAX),
+        gid.unwrap_or(u32::MAX),
+    )
 }
 
 /// Change the owner and group of the file referenced by the specified open file descriptor.
@@ -976,7 +983,11 @@ pub fn chown<P: AsRef<Path>>(dir: P, uid: Option<u32>, gid: Option<u32>) -> io::
 /// }
 /// ```
 pub fn fchown<F: AsFd>(fd: F, uid: Option<u32>, gid: Option<u32>) -> io::Result<()> {
-    sys::fs::fchown(fd.as_fd().as_raw_fd(), uid.unwrap_or(u32::MAX), gid.unwrap_or(u32::MAX))
+    sys::fs::fchown(
+        fd.as_fd().as_raw_fd(),
+        uid.unwrap_or(u32::MAX),
+        gid.unwrap_or(u32::MAX),
+    )
 }
 
 /// Change the owner and group of the specified path, without dereferencing symbolic links.
@@ -995,7 +1006,11 @@ pub fn fchown<F: AsFd>(fd: F, uid: Option<u32>, gid: Option<u32>) -> io::Result<
 /// }
 /// ```
 pub fn lchown<P: AsRef<Path>>(dir: P, uid: Option<u32>, gid: Option<u32>) -> io::Result<()> {
-    sys::fs::lchown(dir.as_ref(), uid.unwrap_or(u32::MAX), gid.unwrap_or(u32::MAX))
+    sys::fs::lchown(
+        dir.as_ref(),
+        uid.unwrap_or(u32::MAX),
+        gid.unwrap_or(u32::MAX),
+    )
 }
 
 /// Change the root directory of the current process to the specified path.

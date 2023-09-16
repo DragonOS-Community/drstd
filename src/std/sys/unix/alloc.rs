@@ -1,7 +1,7 @@
-use core::alloc::{GlobalAlloc, Layout};
 use crate::std::alloc::System;
 use crate::std::ptr;
 use crate::std::sys::common::alloc::{realloc_fallback, MIN_ALIGN};
+use core::alloc::{GlobalAlloc, Layout};
 use dlibc;
 unsafe impl GlobalAlloc for System {
     #[inline]

@@ -1,6 +1,5 @@
 //! WASI-specific networking functionality
 
-
 use crate::std::io;
 use crate::std::net;
 use crate::std::sys_common::AsInner;

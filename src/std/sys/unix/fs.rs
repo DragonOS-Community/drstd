@@ -41,7 +41,12 @@ use dlibc::{c_int, mode_t};
     all(target_os = "linux", target_env = "gnu")
 ))]
 use dlibc::c_char;
-#[cfg(any(target_os = "linux", target_os = "emscripten", target_os = "android",target_os = "dragonos",))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "emscripten",
+    target_os = "android",
+    target_os = "dragonos",
+))]
 use dlibc::dirfd;
 #[cfg(any(target_os = "linux", target_os = "emscripten",))]
 use dlibc::fstatat64;
@@ -264,7 +269,10 @@ pub struct ReadDir {
 
 impl ReadDir {
     fn new(inner: InnerReadDir) -> Self {
-        Self { inner: Arc::new(inner), end_of_stream: false }
+        Self {
+            inner: Arc::new(inner),
+            end_of_stream: false,
+        }
     }
 }
 
@@ -358,7 +366,12 @@ pub struct FilePermissions {
 pub struct FileTimes {
     accessed: Option<SystemTime>,
     modified: Option<SystemTime>,
-    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "watchos", target_os = "tvos"))]
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "watchos",
+        target_os = "tvos"
+    ))]
     created: Option<SystemTime>,
 }
 
@@ -433,26 +446,39 @@ impl FileAttr {
         self.stat.st_size as u64
     }
     pub fn perm(&self) -> FilePermissions {
-        FilePermissions { mode: (self.stat.st_mode as mode_t) }
+        FilePermissions {
+            mode: (self.stat.st_mode as mode_t),
+        }
     }
 
     pub fn file_type(&self) -> FileType {
-        FileType { mode: self.stat.st_mode as mode_t }
+        FileType {
+            mode: self.stat.st_mode as mode_t,
+        }
     }
 }
 
 #[cfg(target_os = "netbsd")]
 impl FileAttr {
     pub fn modified(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_mtime as i64, self.stat.st_mtimensec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_mtime as i64,
+            self.stat.st_mtimensec as i64,
+        ))
     }
 
     pub fn accessed(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_atime as i64, self.stat.st_atimensec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_atime as i64,
+            self.stat.st_atimensec as i64,
+        ))
     }
 
     pub fn created(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_birthtime as i64, self.stat.st_birthtimensec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_birthtime as i64,
+            self.stat.st_birthtimensec as i64,
+        ))
     }
 }
 
@@ -472,7 +498,10 @@ impl FileAttr {
             }
         }
 
-        Ok(SystemTime::new(self.stat.st_mtime as i64, self.stat.st_mtime_nsec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_mtime as i64,
+            self.stat.st_mtime_nsec as i64,
+        ))
     }
 
     #[cfg(any(target_os = "vxworks", target_os = "espidf", target_os = "vita"))]
@@ -499,7 +528,10 @@ impl FileAttr {
             }
         }
 
-        Ok(SystemTime::new(self.stat.st_atime as i64, self.stat.st_atime_nsec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_atime as i64,
+            self.stat.st_atime_nsec as i64,
+        ))
     }
 
     #[cfg(any(target_os = "vxworks", target_os = "espidf", target_os = "vita"))]
@@ -521,7 +553,10 @@ impl FileAttr {
         target_os = "watchos",
     ))]
     pub fn created(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_birthtime as i64, self.stat.st_birthtime_nsec as i64))
+        Ok(SystemTime::new(
+            self.stat.st_birthtime as i64,
+            self.stat.st_birthtime_nsec as i64,
+        ))
     }
 
     #[cfg(not(any(
@@ -563,15 +598,24 @@ impl FileAttr {
 #[cfg(target_os = "nto")]
 impl FileAttr {
     pub fn modified(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_mtim.tv_sec, self.stat.st_mtim.tv_nsec))
+        Ok(SystemTime::new(
+            self.stat.st_mtim.tv_sec,
+            self.stat.st_mtim.tv_nsec,
+        ))
     }
 
     pub fn accessed(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_atim.tv_sec, self.stat.st_atim.tv_nsec))
+        Ok(SystemTime::new(
+            self.stat.st_atim.tv_sec,
+            self.stat.st_atim.tv_nsec,
+        ))
     }
 
     pub fn created(&self) -> io::Result<SystemTime> {
-        Ok(SystemTime::new(self.stat.st_ctim.tv_sec, self.stat.st_ctim.tv_nsec))
+        Ok(SystemTime::new(
+            self.stat.st_ctim.tv_sec,
+            self.stat.st_ctim.tv_nsec,
+        ))
     }
 }
 
@@ -611,7 +655,12 @@ impl FileTimes {
         self.modified = Some(t);
     }
 
-    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "watchos", target_os = "tvos"))]
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "watchos",
+        target_os = "tvos"
+    ))]
     pub fn set_created(&mut self, t: SystemTime) {
         self.created = Some(t);
     }
@@ -639,7 +688,9 @@ impl FileType {
 
 impl FromInner<u32> for FilePermissions {
     fn from_inner(mode: u32) -> FilePermissions {
-        FilePermissions { mode: mode as mode_t }
+        FilePermissions {
+            mode: mode as mode_t,
+        }
     }
 }
 
@@ -772,7 +823,10 @@ impl Iterator for ReadDir {
         }
 
         unsafe {
-            let mut ret = DirEntry { entry: mem::zeroed(), dir: Arc::clone(&self.inner) };
+            let mut ret = DirEntry {
+                entry: mem::zeroed(),
+                dir: Arc::clone(&self.inner),
+            };
             let mut entry_ptr = ptr::null_mut();
             loop {
                 let err = readdir64_r(self.inner.dirp.0, &mut ret.entry, &mut entry_ptr);
@@ -871,13 +925,27 @@ impl DirEntry {
     )))]
     pub fn file_type(&self) -> io::Result<FileType> {
         match self.entry.d_type {
-            dlibc::DT_CHR => Ok(FileType { mode: dlibc::S_IFCHR }),
-            dlibc::DT_FIFO => Ok(FileType { mode: dlibc::S_IFIFO }),
-            dlibc::DT_LNK => Ok(FileType { mode: dlibc::S_IFLNK }),
-            dlibc::DT_REG => Ok(FileType { mode: dlibc::S_IFREG }),
-            dlibc::DT_SOCK => Ok(FileType { mode: dlibc::S_IFSOCK }),
-            dlibc::DT_DIR => Ok(FileType { mode: dlibc::S_IFDIR }),
-            dlibc::DT_BLK => Ok(FileType { mode: dlibc::S_IFBLK }),
+            dlibc::DT_CHR => Ok(FileType {
+                mode: dlibc::S_IFCHR,
+            }),
+            dlibc::DT_FIFO => Ok(FileType {
+                mode: dlibc::S_IFIFO,
+            }),
+            dlibc::DT_LNK => Ok(FileType {
+                mode: dlibc::S_IFLNK,
+            }),
+            dlibc::DT_REG => Ok(FileType {
+                mode: dlibc::S_IFREG,
+            }),
+            dlibc::DT_SOCK => Ok(FileType {
+                mode: dlibc::S_IFSOCK,
+            }),
+            dlibc::DT_DIR => Ok(FileType {
+                mode: dlibc::S_IFDIR,
+            }),
+            dlibc::DT_BLK => Ok(FileType {
+                mode: dlibc::S_IFBLK,
+            }),
             _ => self.metadata().map(|m| m.file_type()),
         }
     }
@@ -1167,8 +1235,9 @@ impl File {
     }
 
     pub fn truncate(&self, size: u64) -> io::Result<()> {
-        let size: off64_t =
-            size.try_into().map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+        let size: off64_t = size
+            .try_into()
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
         cvt_r(|| unsafe { ftruncate64(self.as_raw_fd(), size) }).map(drop)
     }
 
@@ -1336,7 +1405,9 @@ impl DirBuilder {
     }
 
     pub fn mkdir(&self, p: &Path) -> io::Result<()> {
-        run_path_with_cstr(p, |p| cvt(unsafe { dlibc::mkdir(p.as_ptr(), self.mode) }).map(|_| ()))
+        run_path_with_cstr(p, |p| {
+            cvt(unsafe { dlibc::mkdir(p.as_ptr(), self.mode) }).map(|_| ())
+        })
     }
 
     pub fn set_mode(&mut self, mode: u32) {
@@ -1436,7 +1507,11 @@ impl fmt::Debug for File {
             if n == -1 {
                 return None;
             }
-            let buf = unsafe { CStr::from_ptr(info.kf_path.as_mut_ptr()).to_bytes().to_vec() };
+            let buf = unsafe {
+                CStr::from_ptr(info.kf_path.as_mut_ptr())
+                    .to_bytes()
+                    .to_vec()
+            };
             Some(PathBuf::from(OsString::from_vec(buf)))
         }
 
@@ -1519,7 +1594,10 @@ pub fn readdir(path: &Path) -> io::Result<ReadDir> {
         Err(Error::last_os_error())
     } else {
         let root = path.to_path_buf();
-        let inner = InnerReadDir { dirp: Dir(ptr), root };
+        let inner = InnerReadDir {
+            dirp: Dir(ptr),
+            root,
+        };
         Ok(ReadDir::new(inner))
     }
 }
@@ -1537,7 +1615,9 @@ pub fn rename(old: &Path, new: &Path) -> io::Result<()> {
 }
 
 pub fn set_perm(p: &Path, perm: FilePermissions) -> io::Result<()> {
-    run_path_with_cstr(p, |p| cvt_r(|| unsafe { dlibc::chmod(p.as_ptr(), perm.mode) }).map(|_| ()))
+    run_path_with_cstr(p, |p| {
+        cvt_r(|| unsafe { dlibc::chmod(p.as_ptr(), perm.mode) }).map(|_| ())
+    })
 }
 
 pub fn rmdir(p: &Path) -> io::Result<()> {
@@ -1735,7 +1815,7 @@ pub fn copy(from: &Path, to: &Path) -> io::Result<u64> {
     io::copy(&mut reader, &mut writer)
 }
 
-#[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos",))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos",))]
 pub fn copy(from: &Path, to: &Path) -> io::Result<u64> {
     let (mut reader, reader_metadata) = open_from(from)?;
     let max_len = u64::MAX;
@@ -1753,7 +1833,12 @@ pub fn copy(from: &Path, to: &Path) -> io::Result<u64> {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "tvos",
+    target_os = "watchos"
+))]
 pub fn copy(from: &Path, to: &Path) -> io::Result<u64> {
     use crate::std::sync::atomic::{AtomicBool, Ordering};
 
@@ -1849,7 +1934,11 @@ pub fn copy(from: &Path, to: &Path) -> io::Result<u64> {
         FreeOnDrop(state)
     };
 
-    let flags = if writer_metadata.is_file() { COPYFILE_ALL } else { COPYFILE_DATA };
+    let flags = if writer_metadata.is_file() {
+        COPYFILE_ALL
+    } else {
+        COPYFILE_DATA
+    };
 
     cvt(unsafe { fcopyfile(reader.as_raw_fd(), writer.as_raw_fd(), state.0, flags) })?;
 
@@ -1885,7 +1974,9 @@ pub fn lchown(path: &Path, uid: u32, gid: u32) -> io::Result<()> {
 
 #[cfg(not(any(target_os = "fuchsia", target_os = "vxworks")))]
 pub fn chroot(dir: &Path) -> io::Result<()> {
-    run_path_with_cstr(dir, |dir| cvt(unsafe { dlibc::chroot(dir.as_ptr()) }).map(|_| ()))
+    run_path_with_cstr(dir, |dir| {
+        cvt(unsafe { dlibc::chroot(dir.as_ptr()) }).map(|_| ())
+    })
 }
 
 pub use remove_dir_impl::remove_dir_all;
@@ -1950,10 +2041,12 @@ mod remove_dir_impl {
         }
 
         pub unsafe fn openat(dirfd: c_int, pathname: *const c_char, flags: c_int) -> c_int {
-            get_openat_fn().map(|openat| openat(dirfd, pathname, flags)).unwrap_or_else(|| {
-                crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
-                -1
-            })
+            get_openat_fn()
+                .map(|openat| openat(dirfd, pathname, flags))
+                .unwrap_or_else(|| {
+                    crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
+                    -1
+                })
         }
 
         pub unsafe fn fdopendir(fd: c_int) -> *mut DIR {
@@ -1961,18 +2054,24 @@ mod remove_dir_impl {
             weak!(fn fdopendir(c_int) -> *mut DIR, "fdopendir$INODE64$UNIX2003");
             #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
             weak!(fn fdopendir(c_int) -> *mut DIR, "fdopendir$INODE64");
-            fdopendir.get().map(|fdopendir| fdopendir(fd)).unwrap_or_else(|| {
-                crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
-                crate::std::ptr::null_mut()
-            })
+            fdopendir
+                .get()
+                .map(|fdopendir| fdopendir(fd))
+                .unwrap_or_else(|| {
+                    crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
+                    crate::std::ptr::null_mut()
+                })
         }
 
         pub unsafe fn unlinkat(dirfd: c_int, pathname: *const c_char, flags: c_int) -> c_int {
             weak!(fn unlinkat(c_int, *const c_char, c_int) -> c_int);
-            unlinkat.get().map(|unlinkat| unlinkat(dirfd, pathname, flags)).unwrap_or_else(|| {
-                crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
-                -1
-            })
+            unlinkat
+                .get()
+                .map(|unlinkat| unlinkat(dirfd, pathname, flags))
+                .unwrap_or_else(|| {
+                    crate::std::sys::unix::os::set_errno(dlibc::ENOSYS);
+                    -1
+                })
         }
     }
 
@@ -1998,7 +2097,10 @@ mod remove_dir_impl {
         // a valid root is not needed because we do not call any functions involving the full path
         // of the `DirEntry`s.
         let dummy_root = PathBuf::new();
-        let inner = InnerReadDir { dirp, root: dummy_root };
+        let inner = InnerReadDir {
+            dirp,
+            root: dummy_root,
+        };
         Ok((ReadDir::new(inner), new_parent_fd))
     }
 
@@ -2068,7 +2170,11 @@ mod remove_dir_impl {
 
         // unlink the directory after removing its contents
         cvt(unsafe {
-            unlinkat(parent_fd.unwrap_or(dlibc::AT_FDCWD), path.as_ptr(), dlibc::AT_REMOVEDIR)
+            unlinkat(
+                parent_fd.unwrap_or(dlibc::AT_FDCWD),
+                path.as_ptr(),
+                dlibc::AT_REMOVEDIR,
+            )
         })?;
         Ok(())
     }

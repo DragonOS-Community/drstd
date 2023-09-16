@@ -91,7 +91,10 @@ fn get_env_store() -> Option<&'static EnvStore> {
 
 fn create_env_store() -> &'static EnvStore {
     ENV_INIT.call_once(|| {
-        ENV.store(Box::into_raw(Box::new(EnvStore::default())) as _, Ordering::Relaxed)
+        ENV.store(
+            Box::into_raw(Box::new(EnvStore::default())) as _,
+            Ordering::Relaxed,
+        )
     });
     unsafe { &*(ENV.load(Ordering::Relaxed) as *const EnvStore) }
 }
@@ -109,7 +112,11 @@ impl fmt::Debug for EnvStrDebug<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self { slice } = self;
         f.debug_list()
-            .entries(slice.iter().map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())))
+            .entries(
+                slice
+                    .iter()
+                    .map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())),
+            )
             .finish()
     }
 }
@@ -117,7 +124,9 @@ impl fmt::Debug for EnvStrDebug<'_> {
 impl Env {
     pub fn str_debug(&self) -> impl fmt::Debug + '_ {
         let Self { iter } = self;
-        EnvStrDebug { slice: iter.as_slice() }
+        EnvStrDebug {
+            slice: iter.as_slice(),
+        }
     }
 }
 

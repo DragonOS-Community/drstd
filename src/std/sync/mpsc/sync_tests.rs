@@ -38,7 +38,10 @@ fn smoke_shared() {
 #[test]
 fn recv_timeout() {
     let (tx, rx) = sync_channel::<i32>(1);
-    assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Err(RecvTimeoutError::Timeout));
+    assert_eq!(
+        rx.recv_timeout(Duration::from_millis(1)),
+        Err(RecvTimeoutError::Timeout)
+    );
     tx.send(1).unwrap();
     assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Ok(1));
 }
@@ -47,7 +50,10 @@ fn recv_timeout() {
 fn send_timeout() {
     let (tx, _rx) = sync_channel::<i32>(1);
     assert_eq!(tx.send_timeout(1, Duration::from_millis(1)), Ok(()));
-    assert_eq!(tx.send_timeout(1, Duration::from_millis(1)), Err(SendTimeoutError::Timeout(1)));
+    assert_eq!(
+        tx.send_timeout(1, Duration::from_millis(1)),
+        Err(SendTimeoutError::Timeout(1))
+    );
 }
 
 #[test]

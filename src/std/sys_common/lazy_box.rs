@@ -41,19 +41,29 @@ pub(crate) trait LazyInit {
 impl<T: LazyInit> LazyBox<T> {
     #[inline]
     pub const fn new() -> Self {
-        Self { ptr: AtomicPtr::new(null_mut()), _phantom: PhantomData }
+        Self {
+            ptr: AtomicPtr::new(null_mut()),
+            _phantom: PhantomData,
+        }
     }
 
     #[inline]
     fn get_pointer(&self) -> *mut T {
         let ptr = self.ptr.load(Acquire);
-        if ptr.is_null() { self.initialize() } else { ptr }
+        if ptr.is_null() {
+            self.initialize()
+        } else {
+            ptr
+        }
     }
 
     #[cold]
     fn initialize(&self) -> *mut T {
         let new_ptr = Box::into_raw(T::init());
-        match self.ptr.compare_exchange(null_mut(), new_ptr, AcqRel, Acquire) {
+        match self
+            .ptr
+            .compare_exchange(null_mut(), new_ptr, AcqRel, Acquire)
+        {
             Ok(_) => new_ptr,
             Err(ptr) => {
                 // Lost the race to another thread.

@@ -83,7 +83,9 @@ impl<'a> Drop for ActiveTls<'a> {
 
 impl Tls {
     pub fn new() -> Tls {
-        Tls { data: dup!((* * * * * * *) (Cell::new(ptr::null_mut()))) }
+        Tls {
+            data: dup!((* * * * * * *) (Cell::new(ptr::null_mut()))),
+        }
     }
 
     pub unsafe fn activate(&self) -> ActiveTls<'_> {

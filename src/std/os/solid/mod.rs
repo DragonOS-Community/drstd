@@ -1,4 +1,3 @@
-
 pub mod ffi;
 pub mod io;
 
@@ -7,7 +6,7 @@ pub mod io;
 /// Includes all extension traits, and some important type definitions.
 pub mod prelude {
     #[doc(no_inline)]
-        pub use super::ffi::{OsStrExt, OsStringExt};
+    pub use super::ffi::{OsStrExt, OsStringExt};
     #[doc(no_inline)]
-        pub use super::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+    pub use super::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 }

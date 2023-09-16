@@ -5,10 +5,14 @@ use dlibc;
 pub use self::inner::Instant;
 
 const NSEC_PER_SEC: u64 = 1_000_000_000;
-pub const UNIX_EPOCH: SystemTime = SystemTime { t: Timespec::zero() };
+pub const UNIX_EPOCH: SystemTime = SystemTime {
+    t: Timespec::zero(),
+};
 #[allow(dead_code)] // Used for pthread condvar timeouts
-pub const TIMESPEC_MAX: dlibc::timespec =
-    dlibc::timespec { tv_sec: <dlibc::time_t>::MAX, tv_nsec: 1_000_000_000 - 1 };
+pub const TIMESPEC_MAX: dlibc::timespec = dlibc::timespec {
+    tv_sec: <dlibc::time_t>::MAX,
+    tv_nsec: 1_000_000_000 - 1,
+};
 
 // This additional constant is only used when calling
 // `dlibc::pthread_cond_timedwait`.
@@ -38,7 +42,9 @@ pub(in crate::std::sys::unix) struct Timespec {
 impl SystemTime {
     #[cfg_attr(target_os = "horizon", allow(unused))]
     pub fn new(tv_sec: i64, tv_nsec: i64) -> SystemTime {
-        SystemTime { t: Timespec::new(tv_sec, tv_nsec) }
+        SystemTime {
+            t: Timespec::new(tv_sec, tv_nsec),
+        }
     }
 
     pub fn sub_time(&self, other: &SystemTime) -> Result<Duration, Duration> {
@@ -46,17 +52,23 @@ impl SystemTime {
     }
 
     pub fn checked_add_duration(&self, other: &Duration) -> Option<SystemTime> {
-        Some(SystemTime { t: self.t.checked_add_duration(other)? })
+        Some(SystemTime {
+            t: self.t.checked_add_duration(other)?,
+        })
     }
 
     pub fn checked_sub_duration(&self, other: &Duration) -> Option<SystemTime> {
-        Some(SystemTime { t: self.t.checked_sub_duration(other)? })
+        Some(SystemTime {
+            t: self.t.checked_sub_duration(other)?,
+        })
     }
 }
 
 impl From<dlibc::timespec> for SystemTime {
     fn from(t: dlibc::timespec) -> SystemTime {
-        SystemTime { t: Timespec::from(t) }
+        SystemTime {
+            t: Timespec::from(t),
+        }
     }
 }
 
@@ -77,7 +89,10 @@ impl Timespec {
     const fn new(tv_sec: i64, tv_nsec: i64) -> Timespec {
         assert!(tv_nsec >= 0 && tv_nsec < NSEC_PER_SEC as i64);
         // SAFETY: The assert above checks tv_nsec is within the valid range
-        Timespec { tv_sec, tv_nsec: unsafe { Nanoseconds(tv_nsec as u32) } }
+        Timespec {
+            tv_sec,
+            tv_nsec: unsafe { Nanoseconds(tv_nsec as u32) },
+        }
     }
 
     pub fn sub_timespec(&self, other: &Timespec) -> Result<Duration, Duration> {
@@ -96,7 +111,10 @@ impl Timespec {
             // Ideally this code could be rearranged such that it more
             // directly expresses the lower-cost behavior we want from it.
             let (secs, nsec) = if self.tv_nsec.0 >= other.tv_nsec.0 {
-                ((self.tv_sec - other.tv_sec) as u64, self.tv_nsec.0 - other.tv_nsec.0)
+                (
+                    (self.tv_sec - other.tv_sec) as u64,
+                    self.tv_nsec.0 - other.tv_nsec.0,
+                )
             } else {
                 (
                     (self.tv_sec - other.tv_sec - 1) as u64,
@@ -201,7 +219,11 @@ pub(in crate::std::sys::unix) struct __timespec64 {
 ))]
 impl __timespec64 {
     pub(in crate::std::sys::unix) fn new(tv_sec: i64, tv_nsec: i32) -> Self {
-        Self { tv_sec, tv_nsec, _padding: 0 }
+        Self {
+            tv_sec,
+            tv_nsec,
+            _padding: 0,
+        }
     }
 }
 
@@ -250,22 +272,31 @@ mod inner {
             extern "C" {
                 fn mach_absolute_time() -> u64;
             }
-            Instant { t: unsafe { mach_absolute_time() } }
+            Instant {
+                t: unsafe { mach_absolute_time() },
+            }
         }
 
         pub fn checked_sub_instant(&self, other: &Instant) -> Option<Duration> {
             let diff = self.t.checked_sub(other.t)?;
             let info = info();
             let nanos = mul_div_u64(diff, info.numer as u64, info.denom as u64);
-            Some(Duration::new(nanos / NSEC_PER_SEC, (nanos % NSEC_PER_SEC) as u32))
+            Some(Duration::new(
+                nanos / NSEC_PER_SEC,
+                (nanos % NSEC_PER_SEC) as u32,
+            ))
         }
 
         pub fn checked_add_duration(&self, other: &Duration) -> Option<Instant> {
-            Some(Instant { t: self.t.checked_add(checked_dur2intervals(other)?)? })
+            Some(Instant {
+                t: self.t.checked_add(checked_dur2intervals(other)?)?,
+            })
         }
 
         pub fn checked_sub_duration(&self, other: &Duration) -> Option<Instant> {
-            Some(Instant { t: self.t.checked_sub(checked_dur2intervals(other)?)? })
+            Some(Instant {
+                t: self.t.checked_sub(checked_dur2intervals(other)?)?,
+            })
         }
     }
 
@@ -273,7 +304,10 @@ mod inner {
         pub fn now() -> SystemTime {
             use crate::std::ptr;
 
-            let mut s = dlibc::timeval { tv_sec: 0, tv_usec: 0 };
+            let mut s = dlibc::timeval {
+                tv_sec: 0,
+                tv_usec: 0,
+            };
             cvt(unsafe { dlibc::gettimeofday(&mut s, ptr::null_mut()) }).unwrap();
             return SystemTime::from(s);
         }
@@ -287,13 +321,17 @@ mod inner {
 
     impl From<dlibc::timeval> for SystemTime {
         fn from(t: dlibc::timeval) -> SystemTime {
-            SystemTime { t: Timespec::from(t) }
+            SystemTime {
+                t: Timespec::from(t),
+            }
         }
     }
 
     fn checked_dur2intervals(dur: &Duration) -> Option<u64> {
-        let nanos =
-            dur.as_secs().checked_mul(NSEC_PER_SEC)?.checked_add(dur.subsec_nanos() as u64)?;
+        let nanos = dur
+            .as_secs()
+            .checked_mul(NSEC_PER_SEC)?
+            .checked_add(dur.subsec_nanos() as u64)?;
         let info = info();
         Some(mul_div_u64(nanos, info.denom as u64, info.numer as u64))
     }
@@ -334,7 +372,10 @@ mod inner {
 
     #[inline]
     fn info_from_bits(bits: u64) -> mach_timebase_info {
-        mach_timebase_info { numer: bits as u32, denom: (bits >> 32) as u32 }
+        mach_timebase_info {
+            numer: bits as u32,
+            denom: (bits >> 32) as u32,
+        }
     }
 }
 
@@ -364,7 +405,9 @@ mod inner {
             const clock_id: dlibc::clockid_t = dlibc::CLOCK_UPTIME_RAW;
             #[cfg(not(target_os = "macos"))]
             const clock_id: dlibc::clockid_t = dlibc::CLOCK_MONOTONIC;
-            Instant { t: Timespec::now(clock_id) }
+            Instant {
+                t: Timespec::now(clock_id),
+            }
         }
 
         pub fn checked_sub_instant(&self, other: &Instant) -> Option<Duration> {
@@ -372,11 +415,15 @@ mod inner {
         }
 
         pub fn checked_add_duration(&self, other: &Duration) -> Option<Instant> {
-            Some(Instant { t: self.t.checked_add_duration(other)? })
+            Some(Instant {
+                t: self.t.checked_add_duration(other)?,
+            })
         }
 
         pub fn checked_sub_duration(&self, other: &Duration) -> Option<Instant> {
-            Some(Instant { t: self.t.checked_sub_duration(other)? })
+            Some(Instant {
+                t: self.t.checked_sub_duration(other)?,
+            })
         }
     }
 
@@ -391,7 +438,9 @@ mod inner {
 
     impl SystemTime {
         pub fn now() -> SystemTime {
-            SystemTime { t: Timespec::now(dlibc::CLOCK_REALTIME) }
+            SystemTime {
+                t: Timespec::now(dlibc::CLOCK_REALTIME),
+            }
         }
     }
 

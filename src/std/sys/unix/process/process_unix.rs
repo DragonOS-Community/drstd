@@ -263,7 +263,9 @@ impl Command {
                     // environment lock before we try to exec.
                     let _lock = sys::os::env_read_lock();
 
-                    let Err(e) = self.do_exec(theirs, envp.as_ref()) else {todo!()};
+                    let Err(e) = self.do_exec(theirs, envp.as_ref()) else {
+                        todo!()
+                    };
                     e
                 }
             }
@@ -367,7 +369,11 @@ impl Command {
                 {
                     let mut action: dlibc::sigaction = mem::zeroed();
                     action.sa_sigaction = dlibc::SIG_DFL;
-                    cvt(dlibc::sigaction(dlibc::SIGPIPE, &action, crate::std::ptr::null_mut()))?;
+                    cvt(dlibc::sigaction(
+                        dlibc::SIGPIPE,
+                        &action,
+                        crate::std::ptr::null_mut(),
+                    ))?;
                 }
                 #[cfg(not(target_os = "android"))]
                 {
@@ -527,7 +533,11 @@ impl Command {
         }
         let addchdir = match self.get_cwd() {
             Some(cwd) => {
-                if cfg!(any(target_os = "macos", target_os = "tvos", target_os = "watchos")) {
+                if cfg!(any(
+                    target_os = "macos",
+                    target_os = "tvos",
+                    target_os = "watchos"
+                )) {
                     // There is a bug in macOS where a relative executable
                     // path like "../myprogram" will cause `posix_spawn` to
                     // successfully launch the program, but erroneously return
@@ -578,7 +588,9 @@ impl Command {
             let mut flags = 0;
 
             let mut file_actions = MaybeUninit::uninit();
-            cvt_nz(dlibc::posix_spawn_file_actions_init(file_actions.as_mut_ptr()))?;
+            cvt_nz(dlibc::posix_spawn_file_actions_init(
+                file_actions.as_mut_ptr(),
+            ))?;
             let file_actions = PosixSpawnFileActions(&mut file_actions);
 
             if let Some(fd) = stdio.stdin.fd() {
@@ -608,7 +620,10 @@ impl Command {
 
             if let Some(pgroup) = pgroup {
                 flags |= dlibc::POSIX_SPAWN_SETPGROUP;
-                cvt_nz(dlibc::posix_spawnattr_setpgroup(attrs.0.as_mut_ptr(), pgroup))?;
+                cvt_nz(dlibc::posix_spawnattr_setpgroup(
+                    attrs.0.as_mut_ptr(),
+                    pgroup,
+                ))?;
             }
 
             // Inherit the signal mask from this process rather than resetting it (i.e. do not call
@@ -629,11 +644,16 @@ impl Command {
                 flags |= dlibc::POSIX_SPAWN_SETSIGDEF;
             }
 
-            cvt_nz(dlibc::posix_spawnattr_setflags(attrs.0.as_mut_ptr(), flags as _))?;
+            cvt_nz(dlibc::posix_spawnattr_setflags(
+                attrs.0.as_mut_ptr(),
+                flags as _,
+            ))?;
 
             // Make sure we synchronize access to the global `environ` resource
             let _env_lock = sys::os::env_read_lock();
-            let envp = envp.map(|c| c.as_ptr()).unwrap_or_else(|| *sys::os::environ() as *const _);
+            let envp = envp
+                .map(|c| c.as_ptr())
+                .unwrap_or_else(|| *sys::os::environ() as *const _);
 
             #[cfg(not(target_os = "nto"))]
             let spawn_fn = dlibc::posix_spawnp;
@@ -790,7 +810,11 @@ impl Process {
         use crate::std::sys_common::FromInner;
         // Safety: If `pidfd` is nonnegative, we assume it's valid and otherwise unowned.
         let pidfd = (pidfd >= 0).then(|| PidFd::from_inner(sys::fd::FileDesc::from_raw_fd(pidfd)));
-        Process { pid, status: None, pidfd }
+        Process {
+            pid,
+            status: None,
+            pidfd,
+        }
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -1012,7 +1036,10 @@ impl fmt::Display for ExitStatus {
             }
         } else if let Some(signal) = self.stopped_signal() {
             let signal_string = signal_string(signal);
-            write!(f, "stopped (not terminated) by signal: {signal}{signal_string}")
+            write!(
+                f,
+                "stopped (not terminated) by signal: {signal}{signal_string}"
+            )
         } else if self.continued() {
             write!(f, "continued (WIFCONTINUED)")
         } else {
@@ -1038,7 +1065,9 @@ impl fmt::Debug for ExitStatusError {
 
 impl ExitStatusError {
     pub fn code(self) -> Option<NonZeroI32> {
-        ExitStatus(self.0.into()).code().map(|st| st.try_into().unwrap())
+        ExitStatus(self.0.into())
+            .code()
+            .map(|st| st.try_into().unwrap())
     }
 }
 

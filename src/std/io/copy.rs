@@ -1,9 +1,9 @@
 use super::{BorrowedBuf, BufReader, BufWriter, Read, Result, Write, DEFAULT_BUF_SIZE};
-use core::alloc::Allocator;
 use crate::std::cmp;
 use crate::std::collections::VecDeque;
 use crate::std::io::IoSlice;
 use crate::std::mem::MaybeUninit;
+use core::alloc::Allocator;
 
 #[cfg(test)]
 mod tests;

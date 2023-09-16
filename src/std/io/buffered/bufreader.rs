@@ -67,7 +67,7 @@ impl<R: Read> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn new(inner: R) -> BufReader<R> {
+    pub fn new(inner: R) -> BufReader<R> {
         BufReader::with_capacity(DEFAULT_BUF_SIZE, inner)
     }
 
@@ -87,8 +87,11 @@ impl<R: Read> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn with_capacity(capacity: usize, inner: R) -> BufReader<R> {
-        BufReader { inner, buf: Buffer::with_capacity(capacity) }
+    pub fn with_capacity(capacity: usize, inner: R) -> BufReader<R> {
+        BufReader {
+            inner,
+            buf: Buffer::with_capacity(capacity),
+        }
     }
 }
 
@@ -111,7 +114,7 @@ impl<R: ?Sized> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_ref(&self) -> &R {
+    pub fn get_ref(&self) -> &R {
         &self.inner
     }
 
@@ -133,7 +136,7 @@ impl<R: ?Sized> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_mut(&mut self) -> &mut R {
+    pub fn get_mut(&mut self) -> &mut R {
         &mut self.inner
     }
 
@@ -160,7 +163,7 @@ impl<R: ?Sized> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn buffer(&self) -> &[u8] {
+    pub fn buffer(&self) -> &[u8] {
         self.buf.buffer()
     }
 
@@ -182,7 +185,7 @@ impl<R: ?Sized> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn capacity(&self) -> usize {
+    pub fn capacity(&self) -> usize {
         self.buf.capacity()
     }
 
@@ -205,7 +208,7 @@ impl<R: ?Sized> BufReader<R> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn into_inner(self) -> R
+    pub fn into_inner(self) -> R
     where
         R: Sized,
     {
@@ -232,7 +235,7 @@ impl<R: ?Sized + Seek> BufReader<R> {
     /// the buffer will not be flushed, allowing for more efficient seeks.
     /// This method does not return the location of the underlying reader, so the caller
     /// must track this information themselves if it is required.
-        pub fn seek_relative(&mut self, offset: i64) -> io::Result<()> {
+    pub fn seek_relative(&mut self, offset: i64) -> io::Result<()> {
         let pos = self.buf.pos() as u64;
         if offset < 0 {
             if let Some(_) = pos.checked_sub((-offset) as u64) {
@@ -291,7 +294,10 @@ impl<R: ?Sized + Read> Read for BufReader<R> {
     // generation for the common path where the buffer has enough bytes to fill the passed-in
     // buffer.
     fn read_exact(&mut self, buf: &mut [u8]) -> io::Result<()> {
-        if self.buf.consume_with(buf.len(), |claimed| buf.copy_from_slice(claimed)) {
+        if self
+            .buf
+            .consume_with(buf.len(), |claimed| buf.copy_from_slice(claimed))
+        {
             return Ok(());
         }
 

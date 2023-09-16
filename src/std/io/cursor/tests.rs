@@ -9,7 +9,11 @@ fn test_vec_writer() {
     assert_eq!(writer.write(&[4, 5, 6, 7]).unwrap(), 4);
     assert_eq!(
         writer
-            .write_vectored(&[IoSlice::new(&[]), IoSlice::new(&[8, 9]), IoSlice::new(&[10])],)
+            .write_vectored(&[
+                IoSlice::new(&[]),
+                IoSlice::new(&[8, 9]),
+                IoSlice::new(&[10])
+            ],)
             .unwrap(),
         3
     );
@@ -26,7 +30,11 @@ fn test_mem_writer() {
     assert_eq!(writer.write(&[4, 5, 6, 7]).unwrap(), 4);
     assert_eq!(
         writer
-            .write_vectored(&[IoSlice::new(&[]), IoSlice::new(&[8, 9]), IoSlice::new(&[10])],)
+            .write_vectored(&[
+                IoSlice::new(&[]),
+                IoSlice::new(&[8, 9]),
+                IoSlice::new(&[10])
+            ],)
             .unwrap(),
         3
     );
@@ -54,7 +62,11 @@ fn test_mem_mut_writer() {
     assert_eq!(writer.write(&[4, 5, 6, 7]).unwrap(), 4);
     assert_eq!(
         writer
-            .write_vectored(&[IoSlice::new(&[]), IoSlice::new(&[8, 9]), IoSlice::new(&[10])],)
+            .write_vectored(&[
+                IoSlice::new(&[]),
+                IoSlice::new(&[8, 9]),
+                IoSlice::new(&[10])
+            ],)
             .unwrap(),
         3
     );
@@ -91,7 +103,9 @@ where
     assert_eq!(writer.write_vectored(&[IoSlice::new(&[0])]).unwrap(), 1);
     assert_eq!(writer.position(), 1);
     assert_eq!(
-        writer.write_vectored(&[IoSlice::new(&[1, 2, 3]), IoSlice::new(&[4, 5, 6, 7]),]).unwrap(),
+        writer
+            .write_vectored(&[IoSlice::new(&[1, 2, 3]), IoSlice::new(&[4, 5, 6, 7]),])
+            .unwrap(),
         7,
     );
     assert_eq!(writer.position(), 8);
@@ -205,11 +219,18 @@ fn test_mem_reader() {
 fn test_mem_reader_vectored() {
     let mut reader = Cursor::new(vec![0, 1, 2, 3, 4, 5, 6, 7]);
     let mut buf = [];
-    assert_eq!(reader.read_vectored(&mut [IoSliceMut::new(&mut buf)]).unwrap(), 0);
+    assert_eq!(
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut buf)])
+            .unwrap(),
+        0
+    );
     assert_eq!(reader.position(), 0);
     let mut buf = [0];
     assert_eq!(
-        reader.read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),]).unwrap(),
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),])
+            .unwrap(),
         1,
     );
     assert_eq!(reader.position(), 1);
@@ -256,11 +277,18 @@ fn test_boxed_slice_reader() {
 fn test_boxed_slice_reader_vectored() {
     let mut reader = Cursor::new(vec![0, 1, 2, 3, 4, 5, 6, 7].into_boxed_slice());
     let mut buf = [];
-    assert_eq!(reader.read_vectored(&mut [IoSliceMut::new(&mut buf)]).unwrap(), 0);
+    assert_eq!(
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut buf)])
+            .unwrap(),
+        0
+    );
     assert_eq!(reader.position(), 0);
     let mut buf = [0];
     assert_eq!(
-        reader.read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),]).unwrap(),
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),])
+            .unwrap(),
         1,
     );
     assert_eq!(reader.position(), 1);
@@ -316,10 +344,17 @@ fn test_slice_reader_vectored() {
     let in_buf = vec![0, 1, 2, 3, 4, 5, 6, 7];
     let reader = &mut &in_buf[..];
     let mut buf = [];
-    assert_eq!(reader.read_vectored(&mut [IoSliceMut::new(&mut buf)]).unwrap(), 0);
+    assert_eq!(
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut buf)])
+            .unwrap(),
+        0
+    );
     let mut buf = [0];
     assert_eq!(
-        reader.read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),]).unwrap(),
+        reader
+            .read_vectored(&mut [IoSliceMut::new(&mut []), IoSliceMut::new(&mut buf),])
+            .unwrap(),
         1,
     );
     assert_eq!(reader.len(), 7);
@@ -407,7 +442,10 @@ fn seek_past_i64() {
     let buf = [0xff];
     let mut r = Cursor::new(&buf[..]);
     assert_eq!(r.seek(SeekFrom::Start(6)).unwrap(), 6);
-    assert_eq!(r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(), 0x7ffffffffffffff6);
+    assert_eq!(
+        r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(),
+        0x7ffffffffffffff6
+    );
     assert_eq!(r.seek(SeekFrom::Current(0x10)).unwrap(), 0x8000000000000006);
     assert_eq!(r.seek(SeekFrom::Current(0)).unwrap(), 0x8000000000000006);
     assert!(r.seek(SeekFrom::Current(0x7ffffffffffffffd)).is_err());
@@ -415,7 +453,10 @@ fn seek_past_i64() {
 
     let mut r = Cursor::new(vec![10]);
     assert_eq!(r.seek(SeekFrom::Start(6)).unwrap(), 6);
-    assert_eq!(r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(), 0x7ffffffffffffff6);
+    assert_eq!(
+        r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(),
+        0x7ffffffffffffff6
+    );
     assert_eq!(r.seek(SeekFrom::Current(0x10)).unwrap(), 0x8000000000000006);
     assert_eq!(r.seek(SeekFrom::Current(0)).unwrap(), 0x8000000000000006);
     assert!(r.seek(SeekFrom::Current(0x7ffffffffffffffd)).is_err());
@@ -424,7 +465,10 @@ fn seek_past_i64() {
     let mut buf = [0];
     let mut r = Cursor::new(&mut buf[..]);
     assert_eq!(r.seek(SeekFrom::Start(6)).unwrap(), 6);
-    assert_eq!(r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(), 0x7ffffffffffffff6);
+    assert_eq!(
+        r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(),
+        0x7ffffffffffffff6
+    );
     assert_eq!(r.seek(SeekFrom::Current(0x10)).unwrap(), 0x8000000000000006);
     assert_eq!(r.seek(SeekFrom::Current(0)).unwrap(), 0x8000000000000006);
     assert!(r.seek(SeekFrom::Current(0x7ffffffffffffffd)).is_err());
@@ -432,7 +476,10 @@ fn seek_past_i64() {
 
     let mut r = Cursor::new(vec![10].into_boxed_slice());
     assert_eq!(r.seek(SeekFrom::Start(6)).unwrap(), 6);
-    assert_eq!(r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(), 0x7ffffffffffffff6);
+    assert_eq!(
+        r.seek(SeekFrom::Current(0x7ffffffffffffff0)).unwrap(),
+        0x7ffffffffffffff6
+    );
     assert_eq!(r.seek(SeekFrom::Current(0x10)).unwrap(), 0x8000000000000006);
     assert_eq!(r.seek(SeekFrom::Current(0)).unwrap(), 0x8000000000000006);
     assert!(r.seek(SeekFrom::Current(0x7ffffffffffffffd)).is_err());

@@ -14,7 +14,10 @@ pub fn park(_hint: usize) {
 pub fn park_timeout(dur: Duration, _hint: usize) {
     let timeout = u128::min(dur.as_nanos(), WAIT_INDEFINITE as u128 - 1) as u64;
     if let Err(e) = usercalls::wait(EV_UNPARK, timeout) {
-        assert!(matches!(e.kind(), ErrorKind::TimedOut | ErrorKind::WouldBlock))
+        assert!(matches!(
+            e.kind(),
+            ErrorKind::TimedOut | ErrorKind::WouldBlock
+        ))
     }
 }
 

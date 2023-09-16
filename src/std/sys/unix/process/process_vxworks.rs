@@ -29,7 +29,10 @@ impl Command {
             ));
         }
         let (ours, theirs) = self.setup_io(default, needs_stdin)?;
-        let mut p = Process { pid: 0, status: None };
+        let mut p = Process {
+            pid: 0,
+            status: None,
+        };
 
         unsafe {
             macro_rules! t {
@@ -204,11 +207,19 @@ impl ExitStatus {
     }
 
     pub fn code(&self) -> Option<i32> {
-        if self.exited() { Some(dlibc::WEXITSTATUS(self.0)) } else { None }
+        if self.exited() {
+            Some(dlibc::WEXITSTATUS(self.0))
+        } else {
+            None
+        }
     }
 
     pub fn signal(&self) -> Option<i32> {
-        if !self.exited() { Some(dlibc::WTERMSIG(self.0)) } else { None }
+        if !self.exited() {
+            Some(dlibc::WTERMSIG(self.0))
+        } else {
+            None
+        }
     }
 
     pub fn core_dumped(&self) -> bool {
@@ -217,7 +228,11 @@ impl ExitStatus {
     }
 
     pub fn stopped_signal(&self) -> Option<i32> {
-        if dlibc::WIFSTOPPED(self.0) { Some(dlibc::WSTOPSIG(self.0)) } else { None }
+        if dlibc::WIFSTOPPED(self.0) {
+            Some(dlibc::WSTOPSIG(self.0))
+        } else {
+            None
+        }
     }
 
     pub fn continued(&self) -> bool {
@@ -259,6 +274,8 @@ impl Into<ExitStatus> for ExitStatusError {
 
 impl ExitStatusError {
     pub fn code(self) -> Option<NonZeroI32> {
-        ExitStatus(self.0.into()).code().map(|st| st.try_into().unwrap())
+        ExitStatus(self.0.into())
+            .code()
+            .map(|st| st.try_into().unwrap())
     }
 }

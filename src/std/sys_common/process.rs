@@ -18,14 +18,20 @@ pub struct CommandEnv {
 
 impl Default for CommandEnv {
     fn default() -> Self {
-        CommandEnv { clear: false, saw_path: false, vars: Default::default() }
+        CommandEnv {
+            clear: false,
+            saw_path: false,
+            vars: Default::default(),
+        }
     }
 }
 
 impl fmt::Debug for CommandEnv {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug_command_env = f.debug_struct("CommandEnv");
-        debug_command_env.field("clear", &self.clear).field("vars", &self.vars);
+        debug_command_env
+            .field("clear", &self.clear)
+            .field("vars", &self.vars);
         debug_command_env.finish()
     }
 }
@@ -54,7 +60,11 @@ impl CommandEnv {
     }
 
     pub fn capture_if_changed(&self) -> Option<BTreeMap<EnvKey, OsString>> {
-        if self.is_unchanged() { None } else { Some(self.capture()) }
+        if self.is_unchanged() {
+            None
+        } else {
+            Some(self.capture())
+        }
     }
 
     // The following functions build up changes
@@ -109,7 +119,9 @@ pub struct CommandEnvs<'a> {
 impl<'a> Iterator for CommandEnvs<'a> {
     type Item = (&'a OsStr, Option<&'a OsStr>);
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(key, value)| (key.as_ref(), value.as_deref()))
+        self.iter
+            .next()
+            .map(|(key, value)| (key.as_ref(), value.as_deref()))
     }
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()

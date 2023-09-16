@@ -50,8 +50,12 @@ pub use error::*;
 /// This channel has a growable buffer that can hold any number of messages at a time.
 pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
     let (s, r) = counter::new(list::Channel::new());
-    let s = Sender { flavor: SenderFlavor::List(s) };
-    let r = Receiver { flavor: ReceiverFlavor::List(r) };
+    let s = Sender {
+        flavor: SenderFlavor::List(s),
+    };
+    let r = Receiver {
+        flavor: ReceiverFlavor::List(r),
+    };
     (s, r)
 }
 
@@ -64,13 +68,21 @@ pub fn channel<T>() -> (Sender<T>, Receiver<T>) {
 pub fn sync_channel<T>(cap: usize) -> (Sender<T>, Receiver<T>) {
     if cap == 0 {
         let (s, r) = counter::new(zero::Channel::new());
-        let s = Sender { flavor: SenderFlavor::Zero(s) };
-        let r = Receiver { flavor: ReceiverFlavor::Zero(r) };
+        let s = Sender {
+            flavor: SenderFlavor::Zero(s),
+        };
+        let r = Receiver {
+            flavor: ReceiverFlavor::Zero(r),
+        };
         (s, r)
     } else {
         let (s, r) = counter::new(array::Channel::with_capacity(cap));
-        let s = Sender { flavor: SenderFlavor::Array(s) };
-        let r = Receiver { flavor: ReceiverFlavor::Array(r) };
+        let s = Sender {
+            flavor: SenderFlavor::Array(s),
+        };
+        let r = Receiver {
+            flavor: ReceiverFlavor::Array(r),
+        };
         (s, r)
     }
 }

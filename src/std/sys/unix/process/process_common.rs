@@ -334,7 +334,9 @@ impl Command {
     }
 
     pub fn get_current_dir(&self) -> Option<&Path> {
-        self.cwd.as_ref().map(|cs| Path::new(OsStr::from_bytes(cs.as_bytes())))
+        self.cwd
+            .as_ref()
+            .map(|cs| Path::new(OsStr::from_bytes(cs.as_bytes())))
     }
 
     pub fn get_argv(&self) -> &Vec<*const c_char> {
@@ -418,8 +420,16 @@ impl Command {
         let (their_stdin, our_stdin) = stdin.to_child_stdio(true)?;
         let (their_stdout, our_stdout) = stdout.to_child_stdio(false)?;
         let (their_stderr, our_stderr) = stderr.to_child_stdio(false)?;
-        let ours = StdioPipes { stdin: our_stdin, stdout: our_stdout, stderr: our_stderr };
-        let theirs = ChildPipes { stdin: their_stdin, stdout: their_stdout, stderr: their_stderr };
+        let ours = StdioPipes {
+            stdin: our_stdin,
+            stdout: our_stdout,
+            stderr: our_stderr,
+        };
+        let theirs = ChildPipes {
+            stdin: their_stdin,
+            stdout: their_stdout,
+            stderr: their_stderr,
+        };
         Ok((ours, theirs))
     }
 }
@@ -498,7 +508,11 @@ impl Stdio {
 
             Stdio::MakePipe => {
                 let (reader, writer) = pipe::anon_pipe()?;
-                let (ours, theirs) = if readable { (writer, reader) } else { (reader, writer) };
+                let (ours, theirs) = if readable {
+                    (writer, reader)
+                } else {
+                    (reader, writer)
+                };
                 Ok((ChildStdio::Owned(theirs.into_inner()), Some(ours)))
             }
 
@@ -549,7 +563,9 @@ impl fmt::Debug for Command {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if f.alternate() {
             let mut debug_command = f.debug_struct("Command");
-            debug_command.field("program", &self.program).field("args", &self.args);
+            debug_command
+                .field("program", &self.program)
+                .field("args", &self.args);
             if !self.env.is_unchanged() {
                 debug_command.field("env", &self.env);
             }

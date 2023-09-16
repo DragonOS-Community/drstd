@@ -23,7 +23,9 @@ fn new_rwl() -> Result<abi::ID, ItronError> {
 impl RwLock {
     #[inline]
     pub const fn new() -> RwLock {
-        RwLock { rwl: SpinIdOnceCell::new() }
+        RwLock {
+            rwl: SpinIdOnceCell::new(),
+        }
     }
 
     /// Get the inner mutex's ID, which is lazily created.

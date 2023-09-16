@@ -68,7 +68,9 @@ impl Drop for AllocatedRwLock {
 impl RwLock {
     #[inline]
     pub const fn new() -> RwLock {
-        RwLock { inner: LazyBox::new() }
+        RwLock {
+            inner: LazyBox::new(),
+        }
     }
 
     #[inline]

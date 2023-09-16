@@ -36,7 +36,7 @@ pub trait SocketAddrExt: Sealed {
     ///     Ok(())
     /// }
     /// ```
-        fn from_abstract_name<N>(name: N) -> crate::std::io::Result<SocketAddr>
+    fn from_abstract_name<N>(name: N) -> crate::std::io::Result<SocketAddr>
     where
         N: AsRef<[u8]>;
 
@@ -57,5 +57,5 @@ pub trait SocketAddrExt: Sealed {
     ///     Ok(())
     /// }
     /// ```
-        fn as_abstract_name(&self) -> Option<&[u8]>;
+    fn as_abstract_name(&self) -> Option<&[u8]>;
 }

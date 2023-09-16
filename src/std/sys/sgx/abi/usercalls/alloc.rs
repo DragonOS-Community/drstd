@@ -299,7 +299,11 @@ where
 //   | small1 | Chunk smaller than 8 bytes
 //   +--------+
 fn region_as_aligned_chunks(ptr: *const u8, len: usize) -> (usize, usize, usize) {
-    let small0_size = if ptr.is_aligned_to(8) { 0 } else { 8 - ptr.addr() % 8 };
+    let small0_size = if ptr.is_aligned_to(8) {
+        0
+    } else {
+        8 - ptr.addr() % 8
+    };
     let small1_size = (len - small0_size) % 8;
     let big_size = len - small0_size - small1_size;
 
@@ -592,7 +596,11 @@ where
     pub fn to_enclave(&self) -> T {
         unsafe {
             let mut data: T = mem::MaybeUninit::uninit().assume_init();
-            copy_from_userspace(self.0.get() as _, &mut data as *mut T as _, mem::size_of::<T>());
+            copy_from_userspace(
+                self.0.get() as _,
+                &mut data as *mut T as _,
+                mem::size_of::<T>(),
+            );
             data
         }
     }

@@ -10,8 +10,8 @@ use crate::std::sys_common::net::{getsockopt, setsockopt, sockaddr_to_addr};
 use crate::std::sys_common::{AsInner, FromInner, IntoInner};
 use crate::std::time::{Duration, Instant};
 
-use dlibc::{c_int, c_void, size_t, sockaddr, socklen_t, MSG_PEEK};
 use dlibc;
+use dlibc::{c_int, c_void, size_t, sockaddr, socklen_t, MSG_PEEK};
 
 cfg_if::cfg_if! {
     if #[cfg(target_vendor = "apple")] {
@@ -47,7 +47,9 @@ pub fn cvt_gai(err: c_int) -> io::Result<()> {
 
     #[cfg(not(target_os = "espidf"))]
     let detail = unsafe {
-        str::from_utf8(CStr::from_ptr(dlibc::gai_strerror(err)).to_bytes()).unwrap().to_owned()
+        str::from_utf8(CStr::from_ptr(dlibc::gai_strerror(err)).to_bytes())
+            .unwrap()
+            .to_owned()
     };
 
     #[cfg(target_os = "espidf")]
@@ -154,7 +156,11 @@ impl Socket {
             Err(e) => return Err(e),
         }
 
-        let mut pollfd = dlibc::pollfd { fd: self.as_raw_fd(), events: dlibc::POLLOUT, revents: 0 };
+        let mut pollfd = dlibc::pollfd {
+            fd: self.as_raw_fd(),
+            events: dlibc::POLLOUT,
+            revents: 0,
+        };
 
         if timeout.as_secs() == 0 && timeout.subsec_nanos() == 0 {
             return Err(io::const_io_error!(
@@ -168,7 +174,10 @@ impl Socket {
         loop {
             let elapsed = start.elapsed();
             if elapsed >= timeout {
-                return Err(io::const_io_error!(io::ErrorKind::TimedOut, "connection timed out"));
+                return Err(io::const_io_error!(
+                    io::ErrorKind::TimedOut,
+                    "connection timed out"
+                ));
             }
 
             let timeout = timeout - elapsed;
@@ -361,7 +370,10 @@ impl Socket {
                 }
                 timeout
             }
-            None => dlibc::timeval { tv_sec: 0, tv_usec: 0 },
+            None => dlibc::timeval {
+                tv_sec: 0,
+                tv_usec: 0,
+            },
         };
         setsockopt(self, dlibc::SOL_SOCKET, kind, timeout)
     }
@@ -403,7 +415,12 @@ impl Socket {
     }
 
     pub fn set_nodelay(&self, nodelay: bool) -> io::Result<()> {
-        setsockopt(self, dlibc::IPPROTO_TCP, dlibc::TCP_NODELAY, nodelay as c_int)
+        setsockopt(
+            self,
+            dlibc::IPPROTO_TCP,
+            dlibc::TCP_NODELAY,
+            nodelay as c_int,
+        )
     }
 
     pub fn nodelay(&self) -> io::Result<bool> {
@@ -411,23 +428,33 @@ impl Socket {
         Ok(raw != 0)
     }
 
-    #[cfg(any(target_os = "android", target_os = "linux",target_os = "dragonos"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
     pub fn set_quickack(&self, quickack: bool) -> io::Result<()> {
-        setsockopt(self, dlibc::IPPROTO_TCP, dlibc::TCP_QUICKACK, quickack as c_int)
+        setsockopt(
+            self,
+            dlibc::IPPROTO_TCP,
+            dlibc::TCP_QUICKACK,
+            quickack as c_int,
+        )
     }
 
-    #[cfg(any(target_os = "android", target_os = "linux",target_os = "dragonos"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
     pub fn quickack(&self) -> io::Result<bool> {
         let raw: c_int = getsockopt(self, dlibc::IPPROTO_TCP, dlibc::TCP_QUICKACK)?;
         Ok(raw != 0)
     }
 
-    #[cfg(any(target_os = "android", target_os = "linux",target_os = "dragonos"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
-        setsockopt(self, dlibc::SOL_SOCKET, dlibc::SO_PASSCRED, passcred as dlibc::c_int)
+        setsockopt(
+            self,
+            dlibc::SOL_SOCKET,
+            dlibc::SO_PASSCRED,
+            passcred as dlibc::c_int,
+        )
     }
 
-    #[cfg(any(target_os = "android", target_os = "linux",target_os = "dragonos"))]
+    #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
     pub fn passcred(&self) -> io::Result<bool> {
         let passcred: dlibc::c_int = getsockopt(self, dlibc::SOL_SOCKET, dlibc::SO_PASSCRED)?;
         Ok(passcred != 0)
@@ -435,7 +462,12 @@ impl Socket {
 
     #[cfg(target_os = "netbsd")]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
-        setsockopt(self, 0 as dlibc::c_int, dlibc::LOCAL_CREDS, passcred as dlibc::c_int)
+        setsockopt(
+            self,
+            0 as dlibc::c_int,
+            dlibc::LOCAL_CREDS,
+            passcred as dlibc::c_int,
+        )
     }
 
     #[cfg(target_os = "netbsd")]
@@ -446,12 +478,18 @@ impl Socket {
 
     #[cfg(target_os = "freebsd")]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
-        setsockopt(self, dlibc::AF_LOCAL, dlibc::LOCAL_CREDS_PERSISTENT, passcred as dlibc::c_int)
+        setsockopt(
+            self,
+            dlibc::AF_LOCAL,
+            dlibc::LOCAL_CREDS_PERSISTENT,
+            passcred as dlibc::c_int,
+        )
     }
 
     #[cfg(target_os = "freebsd")]
     pub fn passcred(&self) -> io::Result<bool> {
-        let passcred: dlibc::c_int = getsockopt(self, dlibc::AF_LOCAL, dlibc::LOCAL_CREDS_PERSISTENT)?;
+        let passcred: dlibc::c_int =
+            getsockopt(self, dlibc::AF_LOCAL, dlibc::LOCAL_CREDS_PERSISTENT)?;
         Ok(passcred != 0)
     }
 
@@ -487,7 +525,11 @@ impl Socket {
 
     pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         let raw: c_int = getsockopt(self, dlibc::SOL_SOCKET, dlibc::SO_ERROR)?;
-        if raw == 0 { Ok(None) } else { Ok(Some(io::Error::from_raw_os_error(raw as i32))) }
+        if raw == 0 {
+            Ok(None)
+        } else {
+            Ok(Some(io::Error::from_raw_os_error(raw as i32)))
+        }
     }
 
     // This is used by sys_common code to abstract over Windows and Unix.

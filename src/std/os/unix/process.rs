@@ -2,7 +2,6 @@
 //!
 //! [`std::process`]: crate::std::process
 
-use dlibc;
 use crate::std::ffi::OsStr;
 use crate::std::io;
 use crate::std::os::unix::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
@@ -10,6 +9,7 @@ use crate::std::process;
 use crate::std::sealed::Sealed;
 use crate::std::sys;
 use crate::std::sys_common::{AsInner, AsInnerMut, FromInner, IntoInner};
+use dlibc;
 
 use cfg_if::cfg_if;
 
@@ -37,15 +37,15 @@ pub trait CommandExt: Sealed {
     /// Sets the child process's user ID. This translates to a
     /// `setuid` call in the child process. Failure in the `setuid`
     /// call will cause the spawn to fail.
-        fn uid(&mut self, id: UserId) -> &mut process::Command;
+    fn uid(&mut self, id: UserId) -> &mut process::Command;
 
     /// Similar to `uid`, but sets the group ID of the child process. This has
     /// the same semantics as the `uid` field.
-        fn gid(&mut self, id: GroupId) -> &mut process::Command;
+    fn gid(&mut self, id: GroupId) -> &mut process::Command;
 
     /// Sets the supplementary group IDs for the calling process. Translates to
     /// a `setgroups` call in the child process.
-        fn groups(&mut self, groups: &[GroupId]) -> &mut process::Command;
+    fn groups(&mut self, groups: &[GroupId]) -> &mut process::Command;
 
     /// Schedules a closure to be run just before the `exec` function is
     /// invoked.
@@ -91,7 +91,7 @@ pub trait CommandExt: Sealed {
     /// [POSIX fork() specification]:
     ///     https://pubs.opengroup.org/onlinepubs/9699919799/functions/fork.html
     /// [`std::env`]: mod@crate::std::env
-        unsafe fn pre_exec<F>(&mut self, f: F) -> &mut process::Command
+    unsafe fn pre_exec<F>(&mut self, f: F) -> &mut process::Command
     where
         F: FnMut() -> io::Result<()> + Send + Sync + 'static;
 
@@ -102,7 +102,7 @@ pub trait CommandExt: Sealed {
     /// that, it got deprecated in favor of the unsafe [`pre_exec`].
     ///
     /// [`pre_exec`]: CommandExt::pre_exec
-        #[deprecated(since = "1.37.0", note = "should be unsafe, use `pre_exec` instead")]
+    #[deprecated(since = "1.37.0", note = "should be unsafe, use `pre_exec` instead")]
     fn before_exec<F>(&mut self, f: F) -> &mut process::Command
     where
         F: FnMut() -> io::Result<()> + Send + Sync + 'static,
@@ -137,13 +137,13 @@ pub trait CommandExt: Sealed {
     /// file descriptors may have changed. If a "transactional spawn" is
     /// required to gracefully handle errors it is recommended to use the
     /// cross-platform `spawn` instead.
-        fn exec(&mut self) -> io::Error;
+    fn exec(&mut self) -> io::Error;
 
     /// Set executable argument
     ///
     /// Set the first process argument, `argv[0]`, to something other than the
     /// default executable path.
-        fn arg0<S>(&mut self, arg: S) -> &mut process::Command
+    fn arg0<S>(&mut self, arg: S) -> &mut process::Command
     where
         S: AsRef<OsStr>;
 
@@ -176,7 +176,7 @@ pub trait CommandExt: Sealed {
     /// #
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// ```
-        fn process_group(&mut self, pgroup: i32) -> &mut process::Command;
+    fn process_group(&mut self, pgroup: i32) -> &mut process::Command;
 }
 
 impl CommandExt for process::Command {
@@ -248,32 +248,32 @@ pub trait ExitStatusExt: Sealed {
     /// Panics on an attempt to make an `ExitStatusError` from a wait status of `0`.
     ///
     /// Making an `ExitStatus` always succeeds and never panics.
-        fn from_raw(raw: i32) -> Self;
+    fn from_raw(raw: i32) -> Self;
 
     /// If the process was terminated by a signal, returns that signal.
     ///
     /// In other words, if `WIFSIGNALED`, this returns `WTERMSIG`.
-        fn signal(&self) -> Option<i32>;
+    fn signal(&self) -> Option<i32>;
 
     /// If the process was terminated by a signal, says whether it dumped core.
-        fn core_dumped(&self) -> bool;
+    fn core_dumped(&self) -> bool;
 
     /// If the process was stopped by a signal, returns that signal.
     ///
     /// In other words, if `WIFSTOPPED`, this returns `WSTOPSIG`.  This is only possible if the status came from
     /// a `wait` system call which was passed `WUNTRACED`, and was then converted into an `ExitStatus`.
-        fn stopped_signal(&self) -> Option<i32>;
+    fn stopped_signal(&self) -> Option<i32>;
 
     /// Whether the process was continued from a stopped status.
     ///
     /// Ie, `WIFCONTINUED`.  This is only possible if the status came from a `wait` system call
     /// which was passed `WCONTINUED`, and was then converted into an `ExitStatus`.
-        fn continued(&self) -> bool;
+    fn continued(&self) -> bool;
 
     /// Returns the underlying raw `wait` status.
     ///
     /// The returned integer is a **wait status, not an exit status**.
-        fn into_raw(self) -> i32;
+    fn into_raw(self) -> i32;
 }
 
 impl ExitStatusExt for process::ExitStatus {

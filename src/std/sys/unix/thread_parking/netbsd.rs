@@ -41,7 +41,14 @@ pub fn park_timeout(dur: Duration, hint: usize) {
     // Timeout needs to be mutable since it is modified on NetBSD 9.0 and
     // above.
     unsafe {
-        ___lwp_park60(CLOCK_MONOTONIC, 0, &mut timeout, 0, ptr::invalid(hint), ptr::null());
+        ___lwp_park60(
+            CLOCK_MONOTONIC,
+            0,
+            &mut timeout,
+            0,
+            ptr::invalid(hint),
+            ptr::null(),
+        );
     }
 }
 

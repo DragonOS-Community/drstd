@@ -51,7 +51,6 @@
 //! [U+FFFD]: crate::std::char::REPLACEMENT_CHARACTER
 //! [`std::ffi`]: crate::std::ffi
 
-
 use crate::std::ffi::{OsStr, OsString};
 use crate::std::sealed::Sealed;
 use crate::std::sys::os_str::Buf;
@@ -82,12 +81,14 @@ pub trait OsStringExt: Sealed {
     ///
     /// let string = OsString::from_wide(&source[..]);
     /// ```
-        fn from_wide(wide: &[u16]) -> Self;
+    fn from_wide(wide: &[u16]) -> Self;
 }
 
 impl OsStringExt for OsString {
     fn from_wide(wide: &[u16]) -> OsString {
-        FromInner::from_inner(Buf { inner: Wtf8Buf::from_wide(wide) })
+        FromInner::from_inner(Buf {
+            inner: Wtf8Buf::from_wide(wide),
+        })
     }
 }
 
@@ -117,7 +118,7 @@ pub trait OsStrExt: Sealed {
     /// let result: Vec<u16> = string.encode_wide().collect();
     /// assert_eq!(&source[..], &result[..]);
     /// ```
-        fn encode_wide(&self) -> EncodeWide<'_>;
+    fn encode_wide(&self) -> EncodeWide<'_>;
 }
 
 impl OsStrExt for OsStr {

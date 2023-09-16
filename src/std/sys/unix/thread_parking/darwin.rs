@@ -52,7 +52,10 @@ impl Parker {
             !semaphore.is_null(),
             "failed to create dispatch semaphore for thread synchronization"
         );
-        parker.write(Parker { semaphore, state: AtomicI8::new(EMPTY) })
+        parker.write(Parker {
+            semaphore,
+            state: AtomicI8::new(EMPTY),
+        })
     }
 
     // Does not need `Pin`, but other implementation do.

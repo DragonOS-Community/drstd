@@ -58,7 +58,7 @@ impl<T> OnceLock<T> {
     /// Creates a new empty cell.
     #[inline]
     #[must_use]
-            pub const fn new() -> OnceLock<T> {
+    pub const fn new() -> OnceLock<T> {
         OnceLock {
             once: Once::new(),
             value: UnsafeCell::new(MaybeUninit::uninit()),
@@ -71,7 +71,7 @@ impl<T> OnceLock<T> {
     /// Returns `None` if the cell is empty, or being initialized. This
     /// method never blocks.
     #[inline]
-        pub fn get(&self) -> Option<&T> {
+    pub fn get(&self) -> Option<&T> {
         if self.is_initialized() {
             // Safe b/c checked is_initialized
             Some(unsafe { self.get_unchecked() })
@@ -84,7 +84,7 @@ impl<T> OnceLock<T> {
     ///
     /// Returns `None` if the cell is empty. This method never blocks.
     #[inline]
-        pub fn get_mut(&mut self) -> Option<&mut T> {
+    pub fn get_mut(&mut self) -> Option<&mut T> {
         if self.is_initialized() {
             // Safe b/c checked is_initialized and we have a unique access
             Some(unsafe { self.get_unchecked_mut() })
@@ -119,7 +119,7 @@ impl<T> OnceLock<T> {
     /// }
     /// ```
     #[inline]
-        pub fn set(&self, value: T) -> Result<(), T> {
+    pub fn set(&self, value: T) -> Result<(), T> {
         let mut value = Some(value);
         self.get_or_init(|| value.take().unwrap());
         match value {
@@ -156,7 +156,7 @@ impl<T> OnceLock<T> {
     /// assert_eq!(value, &92);
     /// ```
     #[inline]
-        pub fn get_or_init<F>(&self, f: F) -> &T
+    pub fn get_or_init<F>(&self, f: F) -> &T
     where
         F: FnOnce() -> T,
     {
@@ -196,7 +196,7 @@ impl<T> OnceLock<T> {
     /// assert_eq!(cell.get(), Some(&92))
     /// ```
     #[inline]
-        pub fn get_or_try_init<F, E>(&self, f: F) -> Result<&T, E>
+    pub fn get_or_try_init<F, E>(&self, f: F) -> Result<&T, E>
     where
         F: FnOnce() -> Result<T, E>,
     {
@@ -232,7 +232,7 @@ impl<T> OnceLock<T> {
     /// assert_eq!(cell.into_inner(), Some("hello".to_string()));
     /// ```
     #[inline]
-        pub fn into_inner(mut self) -> Option<T> {
+    pub fn into_inner(mut self) -> Option<T> {
         self.take()
     }
 
@@ -256,7 +256,7 @@ impl<T> OnceLock<T> {
     /// assert_eq!(cell.get(), None);
     /// ```
     #[inline]
-        pub fn take(&mut self) -> Option<T> {
+    pub fn take(&mut self) -> Option<T> {
         if self.is_initialized() {
             self.once = Once::new();
             // SAFETY: `self.value` is initialized and contains a valid `T`.

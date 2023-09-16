@@ -104,8 +104,11 @@ struct Value<T: 'static> {
 }
 
 impl<T: 'static> Key<T> {
-        pub const fn new() -> Key<T> {
-        Key { os: OsStaticKey::new(Some(destroy_value::<T>)), marker: marker::PhantomData }
+    pub const fn new() -> Key<T> {
+        Key {
+            os: OsStaticKey::new(Some(destroy_value::<T>)),
+            marker: marker::PhantomData,
+        }
     }
 
     /// It is a requirement for the caller to ensure that no mutable
@@ -140,7 +143,10 @@ impl<T: 'static> Key<T> {
         let ptr = if ptr.is_null() {
             // If the lookup returned null, we haven't initialized our own
             // local copy, so do that now.
-            let ptr = Box::into_raw(Box::new(Value { inner: LazyKeyInner::new(), key: self }));
+            let ptr = Box::into_raw(Box::new(Value {
+                inner: LazyKeyInner::new(),
+                key: self,
+            }));
             // SAFETY: At this point we are sure there is no value inside
             // ptr so setting it will not affect anyone else.
             unsafe {

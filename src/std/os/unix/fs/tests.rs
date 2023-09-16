@@ -15,7 +15,10 @@ fn read_vectored_at() {
         let mut buf0 = [0; 4];
         let mut buf1 = [0; 3];
 
-        let mut iovec = [io::IoSliceMut::new(&mut buf0), io::IoSliceMut::new(&mut buf1)];
+        let mut iovec = [
+            io::IoSliceMut::new(&mut buf0),
+            io::IoSliceMut::new(&mut buf1),
+        ];
 
         let n = file.read_vectored_at(&mut iovec, 4).unwrap();
 
@@ -49,7 +52,11 @@ fn write_vectored_at() {
 
         assert!(n == 4 || n == 11);
 
-        if n == 4 { b"pwritev is     working!" } else { b"pwritev is     great  !" }
+        if n == 4 {
+            b"pwritev is     working!"
+        } else {
+            b"pwritev is     great  !"
+        }
     };
 
     let content = fs::read(&filename).unwrap();

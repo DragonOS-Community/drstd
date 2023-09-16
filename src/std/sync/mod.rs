@@ -152,7 +152,6 @@
 //! [`OnceLock`]: crate::std::sync::OnceLock
 //! [`RwLock`]: crate::std::sync::RwLock
 
-
 pub use alloc::sync::{Arc, Weak};
 pub use core::sync::atomic;
 pub use core::sync::Exclusive;

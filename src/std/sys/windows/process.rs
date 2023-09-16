@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests;
 
@@ -13,7 +12,9 @@ use crate::std::mem;
 use crate::std::mem::MaybeUninit;
 use crate::std::num::NonZeroI32;
 use crate::std::os::windows::ffi::{OsStrExt, OsStringExt};
-use crate::std::os::windows::io::{AsHandle, AsRawHandle, BorrowedHandle, FromRawHandle, IntoRawHandle};
+use crate::std::os::windows::io::{
+    AsHandle, AsRawHandle, BorrowedHandle, FromRawHandle, IntoRawHandle,
+};
 use crate::std::path::{Path, PathBuf};
 use crate::std::ptr;
 use crate::std::sync::Mutex;
@@ -87,7 +88,10 @@ impl Ord for EnvKey {
                 c::CSTR_EQUAL => cmp::Ordering::Equal,
                 c::CSTR_GREATER_THAN => cmp::Ordering::Greater,
                 // `CompareStringOrdinal` should never fail so long as the parameters are correct.
-                _ => panic!("comparing environment keys failed: {}", Error::last_os_error()),
+                _ => panic!(
+                    "comparing environment keys failed: {}",
+                    Error::last_os_error()
+                ),
             }
         }
     }
@@ -125,7 +129,10 @@ impl PartialEq<str> for EnvKey {
 // they are compared using a caseless string mapping.
 impl From<OsString> for EnvKey {
     fn from(k: OsString) -> Self {
-        EnvKey { utf16: k.encode_wide().collect(), os_string: k }
+        EnvKey {
+            utf16: k.encode_wide().collect(),
+            os_string: k,
+        }
     }
 }
 
@@ -149,7 +156,10 @@ impl AsRef<OsStr> for EnvKey {
 
 pub(crate) fn ensure_no_nuls<T: AsRef<OsStr>>(str: T) -> io::Result<T> {
     if str.as_ref().encode_wide().any(|b| b == 0) {
-        Err(io::const_io_error!(ErrorKind::InvalidInput, "nul byte found in provided data"))
+        Err(io::const_io_error!(
+            ErrorKind::InvalidInput,
+            "nul byte found in provided data"
+        ))
     } else {
         Ok(str)
     }
@@ -227,7 +237,8 @@ impl Command {
     }
 
     pub fn raw_arg(&mut self, command_str_to_append: &OsStr) {
-        self.args.push(Arg::Raw(command_str_to_append.to_os_string()))
+        self.args
+            .push(Arg::Raw(command_str_to_append.to_os_string()))
     }
 
     pub fn get_program(&self) -> &OsStr {
@@ -254,7 +265,10 @@ impl Command {
     ) {
         self.proc_thread_attributes.insert(
             attribute,
-            ProcThreadAttributeValue { size: mem::size_of::<T>(), data: Box::new(value) },
+            ProcThreadAttributeValue {
+                size: mem::size_of::<T>(),
+                data: Box::new(value),
+            },
         );
     }
 
@@ -310,7 +324,11 @@ impl Command {
 
         let _guard = CREATE_PROCESS_LOCK.lock();
 
-        let mut pipes = StdioPipes { stdin: None, stdout: None, stderr: None };
+        let mut pipes = StdioPipes {
+            stdin: None,
+            stdout: None,
+            stderr: None,
+        };
         let null = Stdio::Null;
         let default_stdin = if needs_stdin { &default } else { &null };
         let stdin = self.stdin.as_ref().unwrap_or(default_stdin);
@@ -473,7 +491,10 @@ fn resolve_exe<'a>(
         }
     }
     // If we get here then the executable cannot be found.
-    Err(io::const_io_error!(io::ErrorKind::NotFound, "program not found"))
+    Err(io::const_io_error!(
+        io::ErrorKind::NotFound,
+        "program not found"
+    ))
 }
 
 // Calls `f` for every path that should be used to find an executable.
@@ -656,7 +677,10 @@ impl Process {
                 return Err(Error::last_os_error());
             }
             let mut status = 0;
-            cvt(c::GetExitCodeProcess(self.handle.as_raw_handle(), &mut status))?;
+            cvt(c::GetExitCodeProcess(
+                self.handle.as_raw_handle(),
+                &mut status,
+            ))?;
             Ok(ExitStatus(status))
         }
     }
@@ -671,7 +695,10 @@ impl Process {
                 _ => return Err(io::Error::last_os_error()),
             }
             let mut status = 0;
-            cvt(c::GetExitCodeProcess(self.handle.as_raw_handle(), &mut status))?;
+            cvt(c::GetExitCodeProcess(
+                self.handle.as_raw_handle(),
+                &mut status,
+            ))?;
             Ok(Some(ExitStatus(status)))
         }
     }

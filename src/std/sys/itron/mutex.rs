@@ -26,7 +26,9 @@ fn new_mtx() -> Result<abi::ID, ItronError> {
 impl Mutex {
     #[inline]
     pub const fn new() -> Mutex {
-        Mutex { mtx: SpinIdOnceCell::new() }
+        Mutex {
+            mtx: SpinIdOnceCell::new(),
+        }
     }
 
     /// Get the inner mutex's ID, which is lazily created.

@@ -11,8 +11,10 @@ const MAX_STACK_ALLOCATION: usize = 384;
 #[cfg(target_os = "espidf")]
 const MAX_STACK_ALLOCATION: usize = 32;
 
-const NUL_ERR: io::Error =
-    io::const_io_error!(io::ErrorKind::InvalidInput, "file name contained an unexpected NUL byte");
+const NUL_ERR: io::Error = io::const_io_error!(
+    io::ErrorKind::InvalidInput,
+    "file name contained an unexpected NUL byte"
+);
 
 #[inline]
 pub fn run_path_with_cstr<T, F>(path: &Path, f: F) -> io::Result<T>

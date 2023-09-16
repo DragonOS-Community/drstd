@@ -59,12 +59,12 @@ use crate::std::ptr;
 use crate::std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use crate::std::sys::cvt;
 use crate::std::sys::weak::syscall;
+use dlibc;
 #[cfg(not(all(target_os = "linux", target_env = "gnu")))]
 use dlibc::sendfile as sendfile64;
 #[cfg(all(target_os = "linux", target_env = "gnu"))]
 use dlibc::sendfile64;
 use dlibc::{EBADF, EINVAL, ENOSYS, EOPNOTSUPP, EOVERFLOW, EPERM, EXDEV};
-use dlibc;
 #[cfg(test)]
 mod tests;
 
@@ -577,7 +577,14 @@ pub(super) fn copy_regular_files(reader: RawFd, writer: RawFd, max_len: u64) -> 
             // To distinguish these cases we probe with invalid file descriptors which should result in EBADF if the syscall is supported
             // and some other error (ENOSYS or EPERM) if it's not available
             let result = unsafe {
-                cvt(copy_file_range(INVALID_FD, ptr::null_mut(), INVALID_FD, ptr::null_mut(), 1, 0))
+                cvt(copy_file_range(
+                    INVALID_FD,
+                    ptr::null_mut(),
+                    INVALID_FD,
+                    ptr::null_mut(),
+                    1,
+                    0,
+                ))
             };
 
             if matches!(result.map_err(|e| e.raw_os_error()), Err(Some(EBADF))) {
@@ -601,7 +608,14 @@ pub(super) fn copy_regular_files(reader: RawFd, writer: RawFd, max_len: u64) -> 
         let copy_result = unsafe {
             // We actually don't have to adjust the offsets,
             // because copy_file_range adjusts the file offset automatically
-            cvt(copy_file_range(reader, ptr::null_mut(), writer, ptr::null_mut(), bytes_to_copy, 0))
+            cvt(copy_file_range(
+                reader,
+                ptr::null_mut(),
+                writer,
+                ptr::null_mut(),
+                bytes_to_copy,
+                0,
+            ))
         };
 
         match copy_result {
@@ -697,7 +711,14 @@ fn sendfile_splice(mode: SpliceMode, reader: RawFd, writer: RawFd, len: u64) -> 
                 cvt(unsafe { sendfile64(writer, reader, ptr::null_mut(), chunk_size) })
             }
             SpliceMode::Splice => cvt(unsafe {
-                splice(reader, ptr::null_mut(), writer, ptr::null_mut(), chunk_size, 0)
+                splice(
+                    reader,
+                    ptr::null_mut(),
+                    writer,
+                    ptr::null_mut(),
+                    chunk_size,
+                    0,
+                )
             }),
         };
 

@@ -1,6 +1,5 @@
 //! Owned and borrowed OS sockets.
 
-
 use super::raw::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
 use crate::std::fmt;
 use crate::std::io;
@@ -28,7 +27,10 @@ use crate::std::sys::cvt;
 #[repr(transparent)]
 #[rustc_layout_scalar_valid_range_start(0)]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
-#[cfg_attr(target_pointer_width = "32", rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
+#[cfg_attr(
+    target_pointer_width = "32",
+    rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)
+)]
 #[cfg_attr(
     target_pointer_width = "64",
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FF_FF_FF_FF_FE)
@@ -50,7 +52,10 @@ pub struct BorrowedSocket<'socket> {
 #[repr(transparent)]
 #[rustc_layout_scalar_valid_range_start(0)]
 // This is -2, in two's complement. -1 is `INVALID_SOCKET`.
-#[cfg_attr(target_pointer_width = "32", rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE))]
+#[cfg_attr(
+    target_pointer_width = "32",
+    rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FE)
+)]
 #[cfg_attr(
     target_pointer_width = "64",
     rustc_layout_scalar_valid_range_end(0xFF_FF_FF_FF_FF_FF_FF_FE)
@@ -69,16 +74,19 @@ impl BorrowedSocket<'_> {
     /// the returned `BorrowedSocket`, and it must not have the value
     /// `INVALID_SOCKET`.
     #[inline]
-            pub const unsafe fn borrow_raw(socket: RawSocket) -> Self {
+    pub const unsafe fn borrow_raw(socket: RawSocket) -> Self {
         assert!(socket != sys::c::INVALID_SOCKET as RawSocket);
-        Self { socket, _phantom: PhantomData }
+        Self {
+            socket,
+            _phantom: PhantomData,
+        }
     }
 }
 
 impl OwnedSocket {
     /// Creates a new `OwnedSocket` instance that shares the same underlying
     /// object as the existing `OwnedSocket` instance.
-        pub fn try_clone(&self) -> io::Result<Self> {
+    pub fn try_clone(&self) -> io::Result<Self> {
         self.as_socket().try_clone_to_owned()
     }
 
@@ -98,14 +106,17 @@ impl OwnedSocket {
 
     #[cfg(target_vendor = "uwp")]
     pub(crate) fn set_no_inherit(&self) -> io::Result<()> {
-        Err(io::const_io_error!(io::ErrorKind::Unsupported, "Unavailable on UWP"))
+        Err(io::const_io_error!(
+            io::ErrorKind::Unsupported,
+            "Unavailable on UWP"
+        ))
     }
 }
 
 impl BorrowedSocket<'_> {
     /// Creates a new `OwnedSocket` instance that shares the same underlying
     /// object as the existing `BorrowedSocket` instance.
-        pub fn try_clone_to_owned(&self) -> io::Result<OwnedSocket> {
+    pub fn try_clone_to_owned(&self) -> io::Result<OwnedSocket> {
         let mut info = unsafe { mem::zeroed::<sys::c::WSAPROTOCOL_INFOW>() };
         let result = unsafe {
             sys::c::WSADuplicateSocketW(
@@ -206,20 +217,24 @@ impl Drop for OwnedSocket {
 
 impl fmt::Debug for BorrowedSocket<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BorrowedSocket").field("socket", &self.socket).finish()
+        f.debug_struct("BorrowedSocket")
+            .field("socket", &self.socket)
+            .finish()
     }
 }
 
 impl fmt::Debug for OwnedSocket {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("OwnedSocket").field("socket", &self.socket).finish()
+        f.debug_struct("OwnedSocket")
+            .field("socket", &self.socket)
+            .finish()
     }
 }
 
 /// A trait to borrow the socket from an underlying object.
 pub trait AsSocket {
     /// Borrows the socket.
-        fn as_socket(&self) -> BorrowedSocket<'_>;
+    fn as_socket(&self) -> BorrowedSocket<'_>;
 }
 
 impl<T: AsSocket> AsSocket for &T {

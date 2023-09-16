@@ -708,7 +708,12 @@ fn debug() {
 //        no longer has rounding errors.
 // VxWorks ignores SO_SNDTIMEO.
 #[cfg_attr(
-    any(target_os = "netbsd", target_os = "openbsd", target_os = "vxworks", target_os = "nto"),
+    any(
+        target_os = "netbsd",
+        target_os = "openbsd",
+        target_os = "vxworks",
+        target_os = "nto"
+    ),
     ignore
 )]
 #[cfg_attr(target_env = "sgx", ignore)] // FIXME: https://github.com/fortanix/rust-sgx/issues/31
@@ -749,7 +754,11 @@ fn test_read_timeout() {
 
     let mut buf = [0; 10];
     let start = Instant::now();
-    let kind = stream.read_exact(&mut buf).err().expect("expected error").kind();
+    let kind = stream
+        .read_exact(&mut buf)
+        .err()
+        .expect("expected error")
+        .kind();
     assert!(
         kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,
         "unexpected_error: {:?}",
@@ -776,7 +785,11 @@ fn test_read_with_timeout() {
     assert_eq!(b"hello world", &buf[..]);
 
     let start = Instant::now();
-    let kind = stream.read_exact(&mut buf).err().expect("expected error").kind();
+    let kind = stream
+        .read_exact(&mut buf)
+        .err()
+        .expect("expected error")
+        .kind();
     assert!(
         kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,
         "unexpected_error: {:?}",

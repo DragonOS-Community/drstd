@@ -13,7 +13,10 @@ impl SystemTime {
     pub fn now() -> SystemTime {
         let rtc = unsafe {
             let mut out = MaybeUninit::zeroed();
-            expect_success(abi::SOLID_RTC_ReadTime(out.as_mut_ptr()), &"SOLID_RTC_ReadTime");
+            expect_success(
+                abi::SOLID_RTC_ReadTime(out.as_mut_ptr()),
+                &"SOLID_RTC_ReadTime",
+            );
             out.assume_init()
         };
         let t = unsafe {
@@ -41,9 +44,13 @@ impl SystemTime {
 
     pub fn sub_time(&self, other: &SystemTime) -> Result<Duration, Duration> {
         if self.0 >= other.0 {
-            Ok(Duration::from_secs((self.0 as u64).wrapping_sub(other.0 as u64)))
+            Ok(Duration::from_secs(
+                (self.0 as u64).wrapping_sub(other.0 as u64),
+            ))
         } else {
-            Err(Duration::from_secs((other.0 as u64).wrapping_sub(self.0 as u64)))
+            Err(Duration::from_secs(
+                (other.0 as u64).wrapping_sub(self.0 as u64),
+            ))
         }
     }
 

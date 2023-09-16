@@ -63,10 +63,10 @@ use core::{mem, ptr};
 #[doc(inline)]
 pub use alloc::alloc::*;
 
-use core::alloc::Layout;
 use core::alloc::AllocError;
-use core::alloc::GlobalAlloc;
 use core::alloc::Allocator;
+use core::alloc::GlobalAlloc;
+use core::alloc::Layout;
 
 /// The default memory allocator provided by the operating system.
 ///
@@ -339,7 +339,11 @@ pub fn set_alloc_error_hook(hook: fn(Layout)) {
 /// If no custom hook is registered, the default hook will be returned.
 pub fn take_alloc_error_hook() -> fn(Layout) {
     let hook = HOOK.swap(ptr::null_mut(), Ordering::SeqCst);
-    if hook.is_null() { default_alloc_error_hook } else { unsafe { mem::transmute(hook) } }
+    if hook.is_null() {
+        default_alloc_error_hook
+    } else {
+        unsafe { mem::transmute(hook) }
+    }
 }
 
 fn default_alloc_error_hook(layout: Layout) {
@@ -361,8 +365,11 @@ fn default_alloc_error_hook(layout: Layout) {
 #[alloc_error_handler]
 pub fn rust_oom(layout: Layout) -> ! {
     let hook = HOOK.load(Ordering::SeqCst);
-    let hook: fn(Layout) =
-        if hook.is_null() { default_alloc_error_hook } else { unsafe { mem::transmute(hook) } };
+    let hook: fn(Layout) = if hook.is_null() {
+        default_alloc_error_hook
+    } else {
+        unsafe { mem::transmute(hook) }
+    };
     hook(layout);
     crate::std::process::abort()
 }

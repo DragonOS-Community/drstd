@@ -108,8 +108,10 @@ struct WaiterQueue<'a> {
 
 impl Once {
     #[inline]
-        pub const fn new() -> Once {
-        Once { state_and_queue: AtomicPtr::new(ptr::invalid_mut(INCOMPLETE)) }
+    pub const fn new() -> Once {
+        Once {
+            state_and_queue: AtomicPtr::new(ptr::invalid_mut(INCOMPLETE)),
+        }
     }
 
     #[inline]
@@ -251,8 +253,9 @@ impl fmt::Debug for Once {
 impl Drop for WaiterQueue<'_> {
     fn drop(&mut self) {
         // Swap out our state with however we finished.
-        let state_and_queue =
-            self.state_and_queue.swap(self.set_state_on_drop_to, Ordering::AcqRel);
+        let state_and_queue = self
+            .state_and_queue
+            .swap(self.set_state_on_drop_to, Ordering::AcqRel);
 
         // We should only ever see an old state which was RUNNING.
         assert_eq!(state_and_queue.addr() & STATE_MASK, RUNNING);

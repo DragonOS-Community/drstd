@@ -11,7 +11,6 @@
 //! The [`escape_default`] function provides an iterator over the bytes of an
 //! escaped version of the character given.
 
-
 pub use core::ascii::{escape_default, EscapeDefault};
 
 pub use core::ascii::Char;
@@ -41,7 +40,7 @@ pub use core::ascii::Char;
 #[deprecated(since = "1.26.0", note = "use inherent methods instead")]
 pub trait AsciiExt {
     /// Container type for copied ASCII characters.
-        type Owned;
+    type Owned;
 
     /// Checks if the value is within the ASCII range.
     ///
@@ -49,7 +48,7 @@ pub trait AsciiExt {
     ///
     /// This method is deprecated in favor of the identically-named
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
-        fn is_ascii(&self) -> bool;
+    fn is_ascii(&self) -> bool;
 
     /// Makes a copy of the value in its ASCII upper case equivalent.
     ///
@@ -67,7 +66,7 @@ pub trait AsciiExt {
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
     ///
     /// [`make_ascii_uppercase`]: AsciiExt::make_ascii_uppercase
-        #[allow(deprecated)]
+    #[allow(deprecated)]
     fn to_ascii_uppercase(&self) -> Self::Owned;
 
     /// Makes a copy of the value in its ASCII lower case equivalent.
@@ -86,7 +85,7 @@ pub trait AsciiExt {
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
     ///
     /// [`make_ascii_lowercase`]: AsciiExt::make_ascii_lowercase
-        #[allow(deprecated)]
+    #[allow(deprecated)]
     fn to_ascii_lowercase(&self) -> Self::Owned;
 
     /// Checks that two values are an ASCII case-insensitive match.
@@ -98,7 +97,7 @@ pub trait AsciiExt {
     ///
     /// This method is deprecated in favor of the identically-named
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
-        fn eq_ignore_ascii_case(&self, other: &Self) -> bool;
+    fn eq_ignore_ascii_case(&self, other: &Self) -> bool;
 
     /// Converts this type to its ASCII upper case equivalent in-place.
     ///
@@ -114,7 +113,7 @@ pub trait AsciiExt {
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
     ///
     /// [`to_ascii_uppercase`]: AsciiExt::to_ascii_uppercase
-        fn make_ascii_uppercase(&mut self);
+    fn make_ascii_uppercase(&mut self);
 
     /// Converts this type to its ASCII lower case equivalent in-place.
     ///
@@ -130,7 +129,7 @@ pub trait AsciiExt {
     /// inherent methods on `u8`, `char`, `[u8]` and `str`.
     ///
     /// [`to_ascii_lowercase`]: AsciiExt::to_ascii_lowercase
-        fn make_ascii_lowercase(&mut self);
+    fn make_ascii_lowercase(&mut self);
 }
 
 macro_rules! delegating_ascii_methods {

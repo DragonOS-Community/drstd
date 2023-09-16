@@ -69,7 +69,9 @@ pub struct Once {
 impl Once {
     #[inline]
     pub const fn new() -> Once {
-        Once { state: AtomicU32::new(INCOMPLETE) }
+        Once {
+            state: AtomicU32::new(INCOMPLETE),
+        }
     }
 
     #[inline]
@@ -104,16 +106,19 @@ impl Once {
                 }
                 INCOMPLETE | POISONED => {
                     // Try to register the current thread as the one running.
-                    if let Err(new) =
-                        self.state.compare_exchange_weak(state, RUNNING, Acquire, Acquire)
+                    if let Err(new) = self
+                        .state
+                        .compare_exchange_weak(state, RUNNING, Acquire, Acquire)
                     {
                         state = new;
                         continue;
                     }
                     // `waiter_queue` will manage other waiting threads, and
                     // wake them up on drop.
-                    let mut waiter_queue =
-                        CompletionGuard { state: &self.state, set_state_on_drop_to: POISONED };
+                    let mut waiter_queue = CompletionGuard {
+                        state: &self.state,
+                        set_state_on_drop_to: POISONED,
+                    };
                     // Run the function, letting it know if we're poisoned or not.
                     let f_state = public::OnceState {
                         inner: OnceState {

@@ -15,7 +15,7 @@ pub trait AsRawFd {
     /// This method does **not** pass ownership of the raw file descriptor
     /// to the caller. The descriptor is only guaranteed to be valid while
     /// the original object has not yet been destroyed.
-        fn as_raw_fd(&self) -> RawFd;
+    fn as_raw_fd(&self) -> RawFd;
 }
 
 /// A trait to express the ability to construct an object from a raw file
@@ -36,7 +36,7 @@ pub trait FromRawFd {
     /// descriptor they are wrapping. Usage of this function could
     /// accidentally allow violating this contract which can cause memory
     /// unsafety in code that relies on it being true.
-        unsafe fn from_raw_fd(fd: RawFd, metadata: Self::Metadata) -> Self;
+    unsafe fn from_raw_fd(fd: RawFd, metadata: Self::Metadata) -> Self;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership of
@@ -52,7 +52,7 @@ pub trait TryIntoRawFd: Sized {
     /// Unlike other platforms, on SGX, the file descriptor is shared between
     /// all clones of an object. To avoid race conditions, this function will
     /// only return `Ok` when called on the final clone.
-        fn try_into_raw_fd(self) -> Result<RawFd, Self>;
+    fn try_into_raw_fd(self) -> Result<RawFd, Self>;
 }
 
 impl AsRawFd for net::TcpStream {
@@ -85,7 +85,10 @@ impl FromRawFd for net::TcpStream {
     unsafe fn from_raw_fd(fd: RawFd, metadata: Self::Metadata) -> net::TcpStream {
         let fd = sys::fd::FileDesc::from_inner(fd);
         let socket = sys::net::Socket::from_inner((fd, metadata.local_addr));
-        net::TcpStream::from_inner(sys::net::TcpStream::from_inner((socket, metadata.peer_addr)))
+        net::TcpStream::from_inner(sys::net::TcpStream::from_inner((
+            socket,
+            metadata.peer_addr,
+        )))
     }
 }
 

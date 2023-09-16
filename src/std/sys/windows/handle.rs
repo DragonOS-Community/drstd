@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests;
 
@@ -21,8 +20,12 @@ pub struct Handle(OwnedHandle);
 impl Handle {
     pub fn new_event(manual: bool, init: bool) -> io::Result<Handle> {
         unsafe {
-            let event =
-                c::CreateEventW(ptr::null_mut(), manual as c::BOOL, init as c::BOOL, ptr::null());
+            let event = c::CreateEventW(
+                ptr::null_mut(),
+                manual as c::BOOL,
+                init as c::BOOL,
+                ptr::null(),
+            );
             if event.is_null() {
                 Err(io::Error::last_os_error())
             } else {
@@ -171,8 +174,12 @@ impl Handle {
         unsafe {
             let mut bytes = 0;
             let wait = if wait { c::TRUE } else { c::FALSE };
-            let res =
-                cvt(c::GetOverlappedResult(self.as_raw_handle(), overlapped, &mut bytes, wait));
+            let res = cvt(c::GetOverlappedResult(
+                self.as_raw_handle(),
+                overlapped,
+                &mut bytes,
+                wait,
+            ));
             match res {
                 Ok(_) => Ok(bytes as usize),
                 Err(e) => {
@@ -219,7 +226,9 @@ impl Handle {
         inherit: bool,
         options: c::DWORD,
     ) -> io::Result<Self> {
-        Ok(Self(self.0.as_handle().duplicate(access, inherit, options)?))
+        Ok(Self(
+            self.0.as_handle().duplicate(access, inherit, options)?,
+        ))
     }
 
     /// Performs a synchronous read.

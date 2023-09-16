@@ -31,7 +31,7 @@ pub trait TcpStreamExt: Sealed {
     ///         .expect("Couldn't connect to the server...");
     /// stream.set_quickack(true).expect("set_quickack call failed");
     /// ```
-        fn set_quickack(&self, quickack: bool) -> io::Result<()>;
+    fn set_quickack(&self, quickack: bool) -> io::Result<()>;
 
     /// Gets the value of the `TCP_QUICKACK` option on this socket.
     ///
@@ -49,7 +49,7 @@ pub trait TcpStreamExt: Sealed {
     /// stream.set_quickack(true).expect("set_quickack call failed");
     /// assert_eq!(stream.quickack().unwrap_or(false), true);
     /// ```
-        fn quickack(&self) -> io::Result<bool>;
+    fn quickack(&self) -> io::Result<bool>;
 }
 
 impl Sealed for net::TcpStream {}

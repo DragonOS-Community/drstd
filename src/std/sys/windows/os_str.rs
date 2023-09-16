@@ -70,11 +70,15 @@ impl Buf {
 
     #[inline]
     pub unsafe fn from_encoded_bytes_unchecked(s: Vec<u8>) -> Self {
-        Self { inner: Wtf8Buf::from_bytes_unchecked(s) }
+        Self {
+            inner: Wtf8Buf::from_bytes_unchecked(s),
+        }
     }
 
     pub fn with_capacity(capacity: usize) -> Buf {
-        Buf { inner: Wtf8Buf::with_capacity(capacity) }
+        Buf {
+            inner: Wtf8Buf::with_capacity(capacity),
+        }
     }
 
     pub fn clear(&mut self) {
@@ -86,7 +90,9 @@ impl Buf {
     }
 
     pub fn from_string(s: String) -> Buf {
-        Buf { inner: Wtf8Buf::from_string(s) }
+        Buf {
+            inner: Wtf8Buf::from_string(s),
+        }
     }
 
     pub fn as_slice(&self) -> &Slice {
@@ -146,7 +152,9 @@ impl Buf {
     #[inline]
     pub fn from_box(boxed: Box<Slice>) -> Buf {
         let inner: Box<Wtf8> = unsafe { mem::transmute(boxed) };
-        Buf { inner: Wtf8Buf::from_box(inner) }
+        Buf {
+            inner: Wtf8Buf::from_box(inner),
+        }
     }
 
     #[inline]
@@ -185,7 +193,9 @@ impl Slice {
     }
 
     pub fn to_owned(&self) -> Buf {
-        Buf { inner: self.inner.to_owned() }
+        Buf {
+            inner: self.inner.to_owned(),
+        }
     }
 
     pub fn clone_into(&self, buf: &mut Buf) {
@@ -225,12 +235,16 @@ impl Slice {
 
     #[inline]
     pub fn to_ascii_lowercase(&self) -> Buf {
-        Buf { inner: self.inner.to_ascii_lowercase() }
+        Buf {
+            inner: self.inner.to_ascii_lowercase(),
+        }
     }
 
     #[inline]
     pub fn to_ascii_uppercase(&self) -> Buf {
-        Buf { inner: self.inner.to_ascii_uppercase() }
+        Buf {
+            inner: self.inner.to_ascii_uppercase(),
+        }
     }
 
     #[inline]

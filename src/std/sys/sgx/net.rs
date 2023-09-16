@@ -19,7 +19,10 @@ pub struct Socket {
 
 impl Socket {
     fn new(fd: usercalls::raw::Fd, local_addr: String) -> Socket {
-        Socket { inner: Arc::new(FileDesc::new(fd)), local_addr: Some(local_addr) }
+        Socket {
+            inner: Arc::new(FileDesc::new(fd)),
+            local_addr: Some(local_addr),
+        }
     }
 }
 
@@ -39,7 +42,10 @@ impl TryIntoInner<FileDesc> for Socket {
 
 impl FromInner<(FileDesc, Option<String>)> for Socket {
     fn from_inner((inner, local_addr): (FileDesc, Option<String>)) -> Socket {
-        Socket { inner: Arc::new(inner), local_addr }
+        Socket {
+            inner: Arc::new(inner),
+            local_addr,
+        }
     }
 }
 
@@ -71,8 +77,15 @@ fn io_err_to_addr(result: io::Result<&SocketAddr>) -> io::Result<String> {
         // need to downcast twice because io::Error::into_inner doesn't return the original
         // value if the conversion fails
         Err(e) => {
-            if e.get_ref().and_then(|e| e.downcast_ref::<NonIpSockAddr>()).is_some() {
-                Ok(e.into_inner().unwrap().downcast::<NonIpSockAddr>().unwrap().host)
+            if e.get_ref()
+                .and_then(|e| e.downcast_ref::<NonIpSockAddr>())
+                .is_some()
+            {
+                Ok(e.into_inner()
+                    .unwrap()
+                    .downcast::<NonIpSockAddr>()
+                    .unwrap()
+                    .host)
             } else {
                 Err(e)
             }
@@ -92,7 +105,10 @@ impl TcpStream {
     pub fn connect(addr: io::Result<&SocketAddr>) -> io::Result<TcpStream> {
         let addr = io_err_to_addr(addr)?;
         let (fd, local_addr, peer_addr) = usercalls::connect_stream(&addr)?;
-        Ok(TcpStream { inner: Socket::new(fd, local_addr), peer_addr: Some(peer_addr) })
+        Ok(TcpStream {
+            inner: Socket::new(fd, local_addr),
+            peer_addr: Some(peer_addr),
+        })
     }
 
     pub fn connect_timeout(addr: &SocketAddr, dur: Duration) -> io::Result<TcpStream> {
@@ -262,7 +278,9 @@ impl TcpListener {
     pub fn bind(addr: io::Result<&SocketAddr>) -> io::Result<TcpListener> {
         let addr = io_err_to_addr(addr)?;
         let (fd, local_addr) = usercalls::bind_stream(&addr)?;
-        Ok(TcpListener { inner: Socket::new(fd, local_addr) })
+        Ok(TcpListener {
+            inner: Socket::new(fd, local_addr),
+        })
     }
 
     pub fn socket_addr(&self) -> io::Result<SocketAddr> {
@@ -273,7 +291,13 @@ impl TcpListener {
         let (fd, local_addr, peer_addr) = usercalls::accept_stream(self.inner.inner.raw())?;
         let peer_addr = Some(peer_addr);
         let ret_peer = addr_to_sockaddr(&peer_addr).unwrap_or_else(|_| ([0; 4], 0).into());
-        Ok((TcpStream { inner: Socket::new(fd, local_addr), peer_addr }, ret_peer))
+        Ok((
+            TcpStream {
+                inner: Socket::new(fd, local_addr),
+                peer_addr,
+            },
+            ret_peer,
+        ))
     }
 
     pub fn duplicate(&self) -> io::Result<TcpListener> {
@@ -480,7 +504,10 @@ pub struct LookupHost(!);
 
 impl LookupHost {
     fn new(host: String) -> io::Result<LookupHost> {
-        Err(io::Error::new(io::ErrorKind::Uncategorized, NonIpSockAddr { host }))
+        Err(io::Error::new(
+            io::ErrorKind::Uncategorized,
+            NonIpSockAddr { host },
+        ))
     }
 
     pub fn port(&self) -> u16 {

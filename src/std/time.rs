@@ -29,10 +29,6 @@
 //! println!("Running slow_function() took {} seconds.", elapsed_time.as_secs());
 //! ```
 
-
-#[cfg(test)]
-mod tests;
-
 use crate::std::error::Error;
 use crate::std::fmt;
 use crate::std::ops::{Add, AddAssign, Sub, SubAssign};
@@ -273,7 +269,7 @@ impl Instant {
     /// let now = Instant::now();
     /// ```
     #[must_use]
-        pub fn now() -> Instant {
+    pub fn now() -> Instant {
         Instant(time::Instant::now())
     }
 
@@ -301,7 +297,7 @@ impl Instant {
     /// println!("{:?}", now.duration_since(new_now)); // 0ns
     /// ```
     #[must_use]
-        pub fn duration_since(&self, earlier: Instant) -> Duration {
+    pub fn duration_since(&self, earlier: Instant) -> Duration {
         self.checked_duration_since(earlier).unwrap_or_default()
     }
 
@@ -326,7 +322,7 @@ impl Instant {
     /// println!("{:?}", now.checked_duration_since(new_now)); // None
     /// ```
     #[must_use]
-        pub fn checked_duration_since(&self, earlier: Instant) -> Option<Duration> {
+    pub fn checked_duration_since(&self, earlier: Instant) -> Option<Duration> {
         self.0.checked_sub_instant(&earlier.0)
     }
 
@@ -346,7 +342,7 @@ impl Instant {
     /// println!("{:?}", now.saturating_duration_since(new_now)); // 0ns
     /// ```
     #[must_use]
-        pub fn saturating_duration_since(&self, earlier: Instant) -> Duration {
+    pub fn saturating_duration_since(&self, earlier: Instant) -> Duration {
         self.checked_duration_since(earlier).unwrap_or_default()
     }
 
@@ -372,21 +368,21 @@ impl Instant {
     /// assert!(instant.elapsed() >= three_secs);
     /// ```
     #[must_use]
-        pub fn elapsed(&self) -> Duration {
+    pub fn elapsed(&self) -> Duration {
         Instant::now() - *self
     }
 
     /// Returns `Some(t)` where `t` is the time `self + duration` if `t` can be represented as
     /// `Instant` (which means it's inside the bounds of the underlying data structure), `None`
     /// otherwise.
-        pub fn checked_add(&self, duration: Duration) -> Option<Instant> {
+    pub fn checked_add(&self, duration: Duration) -> Option<Instant> {
         self.0.checked_add_duration(&duration).map(Instant)
     }
 
     /// Returns `Some(t)` where `t` is the time `self - duration` if `t` can be represented as
     /// `Instant` (which means it's inside the bounds of the underlying data structure), `None`
     /// otherwise.
-        pub fn checked_sub(&self, duration: Duration) -> Option<Instant> {
+    pub fn checked_sub(&self, duration: Duration) -> Option<Instant> {
         self.0.checked_sub_duration(&duration).map(Instant)
     }
 }
@@ -399,7 +395,8 @@ impl Add<Duration> for Instant {
     /// This function may panic if the resulting point in time cannot be represented by the
     /// underlying data structure. See [`Instant::checked_add`] for a version without panic.
     fn add(self, other: Duration) -> Instant {
-        self.checked_add(other).expect("overflow when adding duration to instant")
+        self.checked_add(other)
+            .expect("overflow when adding duration to instant")
     }
 }
 
@@ -413,7 +410,8 @@ impl Sub<Duration> for Instant {
     type Output = Instant;
 
     fn sub(self, other: Duration) -> Instant {
-        self.checked_sub(other).expect("overflow when subtracting duration from instant")
+        self.checked_sub(other)
+            .expect("overflow when subtracting duration from instant")
     }
 }
 
@@ -475,7 +473,7 @@ impl SystemTime {
     ///     Err(_) => panic!("SystemTime before UNIX EPOCH!"),
     /// }
     /// ```
-        pub const UNIX_EPOCH: SystemTime = UNIX_EPOCH;
+    pub const UNIX_EPOCH: SystemTime = UNIX_EPOCH;
 
     /// Returns the system time corresponding to "now".
     ///
@@ -487,7 +485,7 @@ impl SystemTime {
     /// let sys_time = SystemTime::now();
     /// ```
     #[must_use]
-        pub fn now() -> SystemTime {
+    pub fn now() -> SystemTime {
         SystemTime(time::SystemTime::now())
     }
 
@@ -515,7 +513,7 @@ impl SystemTime {
     ///     .expect("Clock may have gone backwards");
     /// println!("{difference:?}");
     /// ```
-        pub fn duration_since(&self, earlier: SystemTime) -> Result<Duration, SystemTimeError> {
+    pub fn duration_since(&self, earlier: SystemTime) -> Result<Duration, SystemTimeError> {
         self.0.sub_time(&earlier.0).map_err(SystemTimeError)
     }
 
@@ -544,21 +542,21 @@ impl SystemTime {
     /// sleep(one_sec);
     /// assert!(sys_time.elapsed().unwrap() >= one_sec);
     /// ```
-        pub fn elapsed(&self) -> Result<Duration, SystemTimeError> {
+    pub fn elapsed(&self) -> Result<Duration, SystemTimeError> {
         SystemTime::now().duration_since(*self)
     }
 
     /// Returns `Some(t)` where `t` is the time `self + duration` if `t` can be represented as
     /// `SystemTime` (which means it's inside the bounds of the underlying data structure), `None`
     /// otherwise.
-        pub fn checked_add(&self, duration: Duration) -> Option<SystemTime> {
+    pub fn checked_add(&self, duration: Duration) -> Option<SystemTime> {
         self.0.checked_add_duration(&duration).map(SystemTime)
     }
 
     /// Returns `Some(t)` where `t` is the time `self - duration` if `t` can be represented as
     /// `SystemTime` (which means it's inside the bounds of the underlying data structure), `None`
     /// otherwise.
-        pub fn checked_sub(&self, duration: Duration) -> Option<SystemTime> {
+    pub fn checked_sub(&self, duration: Duration) -> Option<SystemTime> {
         self.0.checked_sub_duration(&duration).map(SystemTime)
     }
 }
@@ -571,7 +569,8 @@ impl Add<Duration> for SystemTime {
     /// This function may panic if the resulting point in time cannot be represented by the
     /// underlying data structure. See [`SystemTime::checked_add`] for a version without panic.
     fn add(self, dur: Duration) -> SystemTime {
-        self.checked_add(dur).expect("overflow when adding duration to instant")
+        self.checked_add(dur)
+            .expect("overflow when adding duration to instant")
     }
 }
 
@@ -585,7 +584,8 @@ impl Sub<Duration> for SystemTime {
     type Output = SystemTime;
 
     fn sub(self, dur: Duration) -> SystemTime {
-        self.checked_sub(dur).expect("overflow when subtracting duration from instant")
+        self.checked_sub(dur)
+            .expect("overflow when subtracting duration from instant")
     }
 }
 
@@ -653,7 +653,7 @@ impl SystemTimeError {
     /// }
     /// ```
     #[must_use]
-        pub fn duration(&self) -> Duration {
+    pub fn duration(&self) -> Duration {
         self.0
     }
 }

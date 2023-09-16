@@ -58,7 +58,10 @@ fn genius_quotes() {
     chk(r#""EXE check""#, &["EXE check"]);
     chk(r#""EXE """for""" check"#, &["EXE for check"]);
     chk(r#""EXE \"for\" check"#, &[r"EXE \for\ check"]);
-    chk(r#""EXE \" for \" check"#, &[r"EXE \", "for", r#"""#, "check"]);
+    chk(
+        r#""EXE \" for \" check"#,
+        &[r"EXE \", "for", r#"""#, "check"],
+    );
     chk(r#"E"X"E test"#, &["EXE", "test"]);
     chk(r#"EX""E test"#, &["EXE", "test"]);
 }
@@ -75,7 +78,10 @@ fn post_2008() {
     chk(r#"EXE "CallMe\\\"Ishmael""#, &["EXE", r#"CallMe\"Ishmael"#]);
     chk(r#"EXE a\\\b"#, &["EXE", r"a\\\b"]);
     chk(r#"EXE "a\\\b""#, &["EXE", r"a\\\b"]);
-    chk(r#"EXE "\"Call Me Ishmael\"""#, &["EXE", r#""Call Me Ishmael""#]);
+    chk(
+        r#"EXE "\"Call Me Ishmael\"""#,
+        &["EXE", r#""Call Me Ishmael""#],
+    );
     chk(r#"EXE "C:\TEST A\\""#, &["EXE", r"C:\TEST A\"]);
     chk(r#"EXE "\"C:\TEST A\\\"""#, &["EXE", r#""C:\TEST A\""#]);
     chk(r#"EXE "a b c"  d  e"#, &["EXE", "a b c", "d", "e"]);
@@ -85,7 +91,16 @@ fn post_2008() {
     chk(r#"EXE a\\\\"b c" d e"#, &["EXE", r"a\\b c", "d", "e"]);
     // Double Double Quotes
     chk(r#"EXE "a b c"""#, &["EXE", r#"a b c""#]);
-    chk(r#"EXE """CallMeIshmael"""  b  c"#, &["EXE", r#""CallMeIshmael""#, "b", "c"]);
-    chk(r#"EXE """Call Me Ishmael""""#, &["EXE", r#""Call Me Ishmael""#]);
-    chk(r#"EXE """"Call Me Ishmael"" b c"#, &["EXE", r#""Call"#, "Me", "Ishmael", "b", "c"]);
+    chk(
+        r#"EXE """CallMeIshmael"""  b  c"#,
+        &["EXE", r#""CallMeIshmael""#, "b", "c"],
+    );
+    chk(
+        r#"EXE """Call Me Ishmael""""#,
+        &["EXE", r#""Call Me Ishmael""#],
+    );
+    chk(
+        r#"EXE """"Call Me Ishmael"" b c"#,
+        &["EXE", r#""Call"#, "Me", "Ishmael", "b", "c"],
+    );
 }

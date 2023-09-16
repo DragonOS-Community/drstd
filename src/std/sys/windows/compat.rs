@@ -69,8 +69,12 @@ unsafe extern "C" fn init() {
 
 /// Helper macro for creating CStrs from literals and symbol names.
 macro_rules! ansi_str {
-    (sym $ident:ident) => {{ crate::std::sys::compat::const_cstr_from_bytes(concat!(stringify!($ident), "\0").as_bytes()) }};
-    ($lit:literal) => {{ crate::std::sys::compat::const_cstr_from_bytes(concat!($lit, "\0").as_bytes()) }};
+    (sym $ident:ident) => {{
+        crate::std::sys::compat::const_cstr_from_bytes(concat!(stringify!($ident), "\0").as_bytes())
+    }};
+    ($lit:literal) => {{
+        crate::std::sys::compat::const_cstr_from_bytes(concat!($lit, "\0").as_bytes())
+    }};
 }
 
 /// Creates a C string wrapper from a byte slice, in a constant context.

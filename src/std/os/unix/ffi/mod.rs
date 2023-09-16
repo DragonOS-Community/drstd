@@ -34,7 +34,6 @@
 //!
 //! [`std::ffi`]: crate::std::ffi
 
-
 mod os_str;
 
 pub use self::os_str::{OsStrExt, OsStringExt};

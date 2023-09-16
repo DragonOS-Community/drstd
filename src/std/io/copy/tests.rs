@@ -10,7 +10,10 @@ fn copy_copies() {
     assert_eq!(copy(&mut r, &mut w).unwrap(), 4);
 
     let mut r = repeat(0).take(1 << 17);
-    assert_eq!(copy(&mut r as &mut dyn Read, &mut w as &mut dyn Write).unwrap(), 1 << 17);
+    assert_eq!(
+        copy(&mut r as &mut dyn Read, &mut w as &mut dyn Write).unwrap(),
+        1 << 17
+    );
 }
 
 struct ShortReader {
@@ -47,15 +50,25 @@ impl Write for WriteObserver {
 fn copy_specializes_bufwriter() {
     let cap = 117 * 1024;
     let buf_sz = 16 * 1024;
-    let mut r = ShortReader { cap, observed_buffer: 0, read_size: 1337 };
+    let mut r = ShortReader {
+        cap,
+        observed_buffer: 0,
+        read_size: 1337,
+    };
     let mut w = BufWriter::with_capacity(buf_sz, WriteObserver { observed_buffer: 0 });
     assert_eq!(
         copy(&mut r, &mut w).unwrap(),
         cap as u64,
         "expected the whole capacity to be copied"
     );
-    assert_eq!(r.observed_buffer, buf_sz, "expected a large buffer to be provided to the reader");
-    assert!(w.get_mut().observed_buffer > DEFAULT_BUF_SIZE, "expected coalesced writes");
+    assert_eq!(
+        r.observed_buffer, buf_sz,
+        "expected a large buffer to be provided to the reader"
+    );
+    assert!(
+        w.get_mut().observed_buffer > DEFAULT_BUF_SIZE,
+        "expected coalesced writes"
+    );
 }
 
 #[test]
@@ -65,7 +78,10 @@ fn copy_specializes_bufreader() {
     let mut buffered = BufReader::with_capacity(256 * 1024, Cursor::new(&mut source));
 
     let mut sink = Vec::new();
-    assert_eq!(crate::std::io::copy(&mut buffered, &mut sink).unwrap(), source.len() as u64);
+    assert_eq!(
+        crate::std::io::copy(&mut buffered, &mut sink).unwrap(),
+        source.len() as u64
+    );
     assert_eq!(source.as_slice(), sink.as_slice());
 
     let buf_sz = 71 * 1024;
@@ -73,7 +89,10 @@ fn copy_specializes_bufreader() {
 
     let mut buffered = BufReader::with_capacity(buf_sz, Cursor::new(&mut source));
     let mut sink = WriteObserver { observed_buffer: 0 };
-    assert_eq!(crate::std::io::copy(&mut buffered, &mut sink).unwrap(), source.len() as u64);
+    assert_eq!(
+        crate::std::io::copy(&mut buffered, &mut sink).unwrap(),
+        source.len() as u64
+    );
     assert_eq!(
         sink.observed_buffer, buf_sz,
         "expected a large buffer to be provided to the writer"
@@ -83,7 +102,11 @@ fn copy_specializes_bufreader() {
 #[test]
 fn copy_specializes_to_vec() {
     let cap = 123456;
-    let mut source = ShortReader { cap, observed_buffer: 0, read_size: 1337 };
+    let mut source = ShortReader {
+        cap,
+        observed_buffer: 0,
+        read_size: 1337,
+    };
     let mut sink = Vec::new();
     assert_eq!(cap as u64, io::copy(&mut source, &mut sink).unwrap());
     assert!(
@@ -129,8 +152,10 @@ mod io_benches {
         // use dyn to avoid specializations unrelated to readbuf
         let dyn_in = &mut file_in as &mut dyn Read;
         let mut reader = BufReader::with_capacity(256 * 1024, dyn_in.take(0));
-        let mut writer =
-            OpenOptions::new().write(true).open("/dev/null").expect("opening /dev/null failed");
+        let mut writer = OpenOptions::new()
+            .write(true)
+            .open("/dev/null")
+            .expect("opening /dev/null failed");
 
         const BYTES: u64 = 1024 * 1024;
 

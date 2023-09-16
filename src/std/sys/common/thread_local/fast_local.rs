@@ -146,7 +146,10 @@ impl<T> fmt::Debug for Key<T> {
 }
 impl<T> Key<T> {
     pub const fn new() -> Key<T> {
-        Key { inner: LazyKeyInner::new(), dtor_state: Cell::new(DtorState::Unregistered) }
+        Key {
+            inner: LazyKeyInner::new(),
+            dtor_state: Cell::new(DtorState::Unregistered),
+        }
     }
 
     // note that this is just a publicly-callable function only for the

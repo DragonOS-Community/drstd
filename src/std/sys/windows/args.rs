@@ -38,10 +38,14 @@ pub fn args() -> Args {
     unsafe {
         let lp_cmd_line = c::GetCommandLineW();
         let parsed_args_list = parse_lp_cmd_line(WStrUnits::new(lp_cmd_line), || {
-            current_exe().map(PathBuf::into_os_string).unwrap_or_else(|_| OsString::new())
+            current_exe()
+                .map(PathBuf::into_os_string)
+                .unwrap_or_else(|_| OsString::new())
         });
 
-        Args { parsed_args_list: parsed_args_list.into_iter() }
+        Args {
+            parsed_args_list: parsed_args_list.into_iter(),
+        }
     }
 }
 
@@ -218,7 +222,14 @@ enum Quote {
 
 pub(crate) fn append_arg(cmd: &mut Vec<u16>, arg: &Arg, force_quotes: bool) -> io::Result<()> {
     let (arg, quote) = match arg {
-        Arg::Regular(arg) => (arg, if force_quotes { Quote::Always } else { Quote::Auto }),
+        Arg::Regular(arg) => (
+            arg,
+            if force_quotes {
+                Quote::Always
+            } else {
+                Quote::Auto
+            },
+        ),
         Arg::Raw(arg) => (arg, Quote::Never),
     };
 
@@ -229,9 +240,10 @@ pub(crate) fn append_arg(cmd: &mut Vec<u16>, arg: &Arg, force_quotes: bool) -> i
     let arg_bytes = arg.as_encoded_bytes();
     let (quote, escape) = match quote {
         Quote::Always => (true, true),
-        Quote::Auto => {
-            (arg_bytes.iter().any(|c| *c == b' ' || *c == b'\t') || arg_bytes.is_empty(), true)
-        }
+        Quote::Auto => (
+            arg_bytes.iter().any(|c| *c == b' ' || *c == b'\t') || arg_bytes.is_empty(),
+            true,
+        ),
         Quote::Never => (false, false),
     };
     if quote {

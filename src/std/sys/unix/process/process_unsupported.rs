@@ -118,6 +118,8 @@ impl Into<ExitStatus> for ExitStatusError {
 
 impl ExitStatusError {
     pub fn code(self) -> Option<NonZeroI32> {
-        ExitStatus(self.0.into()).code().map(|st| st.try_into().unwrap())
+        ExitStatus(self.0.into())
+            .code()
+            .map(|st| st.try_into().unwrap())
     }
 }

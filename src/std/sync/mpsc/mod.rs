@@ -135,7 +135,6 @@
 //! println!("completed");
 //! ```
 
-
 #[cfg(all(test, not(target_os = "emscripten")))]
 mod tests;
 
@@ -398,7 +397,7 @@ unsafe impl<T: Send> Send for SyncSender<T> {}
 /// disconnected, implying that the data could never be received. The error
 /// contains the data being sent as a payload so it can be recovered.
 #[derive(PartialEq, Eq, Clone, Copy)]
-pub struct SendError<T>( pub T);
+pub struct SendError<T>(pub T);
 
 /// An error returned from the [`recv`] function on a [`Receiver`].
 ///
@@ -419,11 +418,11 @@ pub struct RecvError;
 pub enum TryRecvError {
     /// This **channel** is currently empty, but the **Sender**(s) have not yet
     /// disconnected, so data may yet become available.
-        Empty,
+    Empty,
 
     /// The **channel**'s sending half has become disconnected, and there will
     /// never be any more data received on it.
-        Disconnected,
+    Disconnected,
 }
 
 /// This enumeration is the list of possible errors that made [`recv_timeout`]
@@ -435,10 +434,10 @@ pub enum TryRecvError {
 pub enum RecvTimeoutError {
     /// This **channel** is currently empty, but the **Sender**(s) have not yet
     /// disconnected, so data may yet become available.
-        Timeout,
+    Timeout,
     /// The **channel**'s sending half has become disconnected, and there will
     /// never be any more data received on it.
-        Disconnected,
+    Disconnected,
 }
 
 /// This enumeration is the list of the possible error outcomes for the
@@ -453,11 +452,11 @@ pub enum TrySendError<T> {
     /// If this is a buffered channel, then the buffer is full at this time. If
     /// this is not a buffered channel, then there is no [`Receiver`] available to
     /// acquire the data.
-        Full( T),
+    Full(T),
 
     /// This [`sync_channel`]'s receiving half has disconnected, so the data could not be
     /// sent. The data is returned back to the callee in this case.
-        Disconnected( T),
+    Disconnected(T),
 }
 
 /// Creates a new asynchronous channel, returning the sender/receiver halves.
@@ -583,7 +582,7 @@ impl<T> Sender<T> {
     /// drop(rx);
     /// assert_eq!(tx.send(1).unwrap_err().0, 1);
     /// ```
-        pub fn send(&self, t: T) -> Result<(), SendError<T>> {
+    pub fn send(&self, t: T) -> Result<(), SendError<T>> {
         self.inner.send(t)
     }
 }
@@ -595,7 +594,9 @@ impl<T> Clone for Sender<T> {
     /// (including the original) need to be dropped in order for
     /// [`Receiver::recv`] to stop blocking.
     fn clone(&self) -> Sender<T> {
-        Sender { inner: self.inner.clone() }
+        Sender {
+            inner: self.inner.clone(),
+        }
     }
 }
 
@@ -650,7 +651,7 @@ impl<T> SyncSender<T> {
     /// let msg = receiver.recv().unwrap();
     /// assert_eq!(1, msg);
     /// ```
-        pub fn send(&self, t: T) -> Result<(), SendError<T>> {
+    pub fn send(&self, t: T) -> Result<(), SendError<T>> {
         self.inner.send(t)
     }
 
@@ -703,7 +704,7 @@ impl<T> SyncSender<T> {
     ///     Err(_) => println!("the third message was never sent"),
     /// }
     /// ```
-        pub fn try_send(&self, t: T) -> Result<(), TrySendError<T>> {
+    pub fn try_send(&self, t: T) -> Result<(), TrySendError<T>> {
         self.inner.try_send(t)
     }
 
@@ -719,7 +720,9 @@ impl<T> SyncSender<T> {
 
 impl<T> Clone for SyncSender<T> {
     fn clone(&self) -> SyncSender<T> {
-        SyncSender { inner: self.inner.clone() }
+        SyncSender {
+            inner: self.inner.clone(),
+        }
     }
 }
 
@@ -761,7 +764,7 @@ impl<T> Receiver<T> {
     ///
     /// assert!(receiver.try_recv().is_err());
     /// ```
-        pub fn try_recv(&self) -> Result<T, TryRecvError> {
+    pub fn try_recv(&self) -> Result<T, TryRecvError> {
         self.inner.try_recv()
     }
 
@@ -819,7 +822,7 @@ impl<T> Receiver<T> {
     /// assert_eq!(Ok(3), recv.recv());
     /// assert_eq!(Err(RecvError), recv.recv());
     /// ```
-        pub fn recv(&self) -> Result<T, RecvError> {
+    pub fn recv(&self) -> Result<T, RecvError> {
         self.inner.recv()
     }
 
@@ -878,7 +881,7 @@ impl<T> Receiver<T> {
     ///     Err(mpsc::RecvTimeoutError::Timeout)
     /// );
     /// ```
-        pub fn recv_timeout(&self, timeout: Duration) -> Result<T, RecvTimeoutError> {
+    pub fn recv_timeout(&self, timeout: Duration) -> Result<T, RecvTimeoutError> {
         self.inner.recv_timeout(timeout)
     }
 
@@ -938,7 +941,7 @@ impl<T> Receiver<T> {
     ///     Err(mpsc::RecvTimeoutError::Timeout)
     /// );
     /// ```
-        pub fn recv_deadline(&self, deadline: Instant) -> Result<T, RecvTimeoutError> {
+    pub fn recv_deadline(&self, deadline: Instant) -> Result<T, RecvTimeoutError> {
         self.inner.recv_deadline(deadline)
     }
 
@@ -965,7 +968,7 @@ impl<T> Receiver<T> {
     /// assert_eq!(iter.next(), Some(3));
     /// assert_eq!(iter.next(), None);
     /// ```
-        pub fn iter(&self) -> Iter<'_, T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         Iter { rx: self }
     }
 
@@ -1005,7 +1008,7 @@ impl<T> Receiver<T> {
     /// assert_eq!(iter.next(), Some(3));
     /// assert_eq!(iter.next(), None);
     /// ```
-        pub fn try_iter(&self) -> TryIter<'_, T> {
+    pub fn try_iter(&self) -> TryIter<'_, T> {
         TryIter { rx: self }
     }
 }

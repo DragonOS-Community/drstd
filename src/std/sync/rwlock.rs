@@ -145,9 +145,13 @@ impl<T> RwLock<T> {
     ///
     /// let lock = RwLock::new(5);
     /// ```
-            #[inline]
+    #[inline]
     pub const fn new(t: T) -> RwLock<T> {
-        RwLock { inner: sys::RwLock::new(), poison: poison::Flag::new(), data: UnsafeCell::new(t) }
+        RwLock {
+            inner: sys::RwLock::new(),
+            poison: poison::Flag::new(),
+            data: UnsafeCell::new(t),
+        }
     }
 }
 
@@ -193,7 +197,7 @@ impl<T: ?Sized> RwLock<T> {
     /// }).join().unwrap();
     /// ```
     #[inline]
-        pub fn read(&self) -> LockResult<RwLockReadGuard<'_, T>> {
+    pub fn read(&self) -> LockResult<RwLockReadGuard<'_, T>> {
         unsafe {
             self.inner.read();
             RwLockReadGuard::new(self)
@@ -237,7 +241,7 @@ impl<T: ?Sized> RwLock<T> {
     /// };
     /// ```
     #[inline]
-        pub fn try_read(&self) -> TryLockResult<RwLockReadGuard<'_, T>> {
+    pub fn try_read(&self) -> TryLockResult<RwLockReadGuard<'_, T>> {
         unsafe {
             if self.inner.try_read() {
                 Ok(RwLockReadGuard::new(self)?)
@@ -279,7 +283,7 @@ impl<T: ?Sized> RwLock<T> {
     /// assert!(lock.try_read().is_err());
     /// ```
     #[inline]
-        pub fn write(&self) -> LockResult<RwLockWriteGuard<'_, T>> {
+    pub fn write(&self) -> LockResult<RwLockWriteGuard<'_, T>> {
         unsafe {
             self.inner.write();
             RwLockWriteGuard::new(self)
@@ -324,7 +328,7 @@ impl<T: ?Sized> RwLock<T> {
     /// assert!(lock.try_write().is_err());
     /// ```
     #[inline]
-        pub fn try_write(&self) -> TryLockResult<RwLockWriteGuard<'_, T>> {
+    pub fn try_write(&self) -> TryLockResult<RwLockWriteGuard<'_, T>> {
         unsafe {
             if self.inner.try_write() {
                 Ok(RwLockWriteGuard::new(self)?)
@@ -356,7 +360,7 @@ impl<T: ?Sized> RwLock<T> {
     /// assert_eq!(lock.is_poisoned(), true);
     /// ```
     #[inline]
-        pub fn is_poisoned(&self) -> bool {
+    pub fn is_poisoned(&self) -> bool {
         self.poison.get()
     }
 
@@ -394,7 +398,7 @@ impl<T: ?Sized> RwLock<T> {
     /// assert_eq!(*guard, 1);
     /// ```
     #[inline]
-        pub fn clear_poison(&self) {
+    pub fn clear_poison(&self) {
         self.poison.clear();
     }
 
@@ -419,7 +423,7 @@ impl<T: ?Sized> RwLock<T> {
     /// }
     /// assert_eq!(lock.into_inner().unwrap(), "modified");
     /// ```
-        pub fn into_inner(self) -> LockResult<T>
+    pub fn into_inner(self) -> LockResult<T>
     where
         T: Sized,
     {
@@ -448,7 +452,7 @@ impl<T: ?Sized> RwLock<T> {
     /// *lock.get_mut().unwrap() = 10;
     /// assert_eq!(*lock.read().unwrap(), 10);
     /// ```
-        pub fn get_mut(&mut self) -> LockResult<&mut T> {
+    pub fn get_mut(&mut self) -> LockResult<&mut T> {
         let data = self.data.get_mut();
         poison::map_result(self.poison.borrow(), |()| data)
     }
@@ -505,7 +509,10 @@ impl<'rwlock, T: ?Sized> RwLockWriteGuard<'rwlock, T> {
     // SAFETY: if and only if `lock.inner.write()` (or `lock.inner.try_write()`) has been
     // successfully called from the same thread before instantiating this object.
     unsafe fn new(lock: &'rwlock RwLock<T>) -> LockResult<RwLockWriteGuard<'rwlock, T>> {
-        poison::map_result(lock.poison.guard(), |guard| RwLockWriteGuard { lock, poison: guard })
+        poison::map_result(lock.poison.guard(), |guard| RwLockWriteGuard {
+            lock,
+            poison: guard,
+        })
     }
 }
 

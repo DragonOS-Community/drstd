@@ -1,6 +1,5 @@
 //! Windows-specific primitives.
 
-
 use crate::std::os::raw::c_void;
 
 pub type HANDLE = *mut c_void;

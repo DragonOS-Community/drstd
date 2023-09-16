@@ -67,14 +67,21 @@ impl UnixListener {
     ///     }
     /// };
     /// ```
-        pub fn bind<P: AsRef<Path>>(path: P) -> io::Result<UnixListener> {
+    pub fn bind<P: AsRef<Path>>(path: P) -> io::Result<UnixListener> {
         unsafe {
             let inner = Socket::new_raw(dlibc::AF_UNIX, dlibc::SOCK_STREAM)?;
             let (addr, len) = sockaddr_un(path.as_ref())?;
-            const backlog: dlibc::c_int =
-                if cfg!(any(target_os = "linux", target_os = "freebsd")) { -1 } else { 128 };
+            const backlog: dlibc::c_int = if cfg!(any(target_os = "linux", target_os = "freebsd")) {
+                -1
+            } else {
+                128
+            };
 
-            cvt(dlibc::bind(inner.as_inner().as_raw_fd(), &addr as *const _ as *const _, len as _))?;
+            cvt(dlibc::bind(
+                inner.as_inner().as_raw_fd(),
+                &addr as *const _ as *const _,
+                len as _,
+            ))?;
             cvt(dlibc::listen(inner.as_inner().as_raw_fd(), backlog))?;
 
             Ok(UnixListener(inner))
@@ -104,7 +111,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn bind_addr(socket_addr: &SocketAddr) -> io::Result<UnixListener> {
+    pub fn bind_addr(socket_addr: &SocketAddr) -> io::Result<UnixListener> {
         unsafe {
             let inner = Socket::new_raw(dlibc::AF_UNIX, dlibc::SOCK_STREAM)?;
             #[cfg(target_os = "linux")]
@@ -144,7 +151,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn accept(&self) -> io::Result<(UnixStream, SocketAddr)> {
+    pub fn accept(&self) -> io::Result<(UnixStream, SocketAddr)> {
         let mut storage: dlibc::sockaddr_un = unsafe { mem::zeroed() };
         let mut len = mem::size_of_val(&storage) as dlibc::socklen_t;
         let sock = self.0.accept(&mut storage as *mut _ as *mut _, &mut len)?;
@@ -169,7 +176,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn try_clone(&self) -> io::Result<UnixListener> {
+    pub fn try_clone(&self) -> io::Result<UnixListener> {
         self.0.duplicate().map(UnixListener)
     }
 
@@ -186,7 +193,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn local_addr(&self) -> io::Result<SocketAddr> {
+    pub fn local_addr(&self) -> io::Result<SocketAddr> {
         SocketAddr::new(|addr, len| unsafe { dlibc::getsockname(self.as_raw_fd(), addr, len) })
     }
 
@@ -209,7 +216,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
+    pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         self.0.set_nonblocking(nonblocking)
     }
 
@@ -232,7 +239,7 @@ impl UnixListener {
     ///
     /// # Platform specific
     /// On Redox this always returns `None`.
-        pub fn take_error(&self) -> io::Result<Option<io::Error>> {
+    pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         self.0.take_error()
     }
 
@@ -267,7 +274,7 @@ impl UnixListener {
     ///     Ok(())
     /// }
     /// ```
-        pub fn incoming(&self) -> Incoming<'_> {
+    pub fn incoming(&self) -> Incoming<'_> {
         Incoming { listener: self }
     }
 }
@@ -282,7 +289,9 @@ impl AsRawFd for UnixListener {
 impl FromRawFd for UnixListener {
     #[inline]
     unsafe fn from_raw_fd(fd: RawFd) -> UnixListener {
-        UnixListener(Socket::from_inner(FromInner::from_inner(OwnedFd::from_raw_fd(fd))))
+        UnixListener(Socket::from_inner(FromInner::from_inner(
+            OwnedFd::from_raw_fd(fd),
+        )))
     }
 }
 

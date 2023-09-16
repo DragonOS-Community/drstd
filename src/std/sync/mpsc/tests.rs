@@ -418,7 +418,10 @@ fn oneshot_single_thread_recv_timeout() {
     let (tx, rx) = channel();
     tx.send(()).unwrap();
     assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Ok(()));
-    assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Err(RecvTimeoutError::Timeout));
+    assert_eq!(
+        rx.recv_timeout(Duration::from_millis(1)),
+        Err(RecvTimeoutError::Timeout)
+    );
     tx.send(()).unwrap();
     assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Ok(()));
 }
@@ -531,7 +534,10 @@ fn shared_recv_timeout() {
         rx.recv().unwrap();
     }
 
-    assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Err(RecvTimeoutError::Timeout));
+    assert_eq!(
+        rx.recv_timeout(Duration::from_millis(1)),
+        Err(RecvTimeoutError::Timeout)
+    );
     tx.send(()).unwrap();
     assert_eq!(rx.recv_timeout(Duration::from_millis(1)), Ok(()));
 }

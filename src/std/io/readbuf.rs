@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod tests;
 
@@ -68,7 +67,11 @@ impl<'data> From<&'data mut [u8]> for BorrowedBuf<'data> {
 impl<'data> From<&'data mut [MaybeUninit<u8>]> for BorrowedBuf<'data> {
     #[inline]
     fn from(buf: &'data mut [MaybeUninit<u8>]) -> BorrowedBuf<'data> {
-        BorrowedBuf { buf, filled: 0, init: 0 }
+        BorrowedBuf {
+            buf,
+            filled: 0,
+            init: 0,
+        }
     }
 }
 

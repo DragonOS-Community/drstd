@@ -96,7 +96,11 @@ pub unsafe fn find_eh_action(lsda: *const u8, context: &EHContext<'_>) -> Result
                     return Ok(EHAction::None);
                 } else {
                     let lpad = lpad_base + cs_lpad;
-                    return Ok(interpret_cs_action(action_table as *mut u8, cs_action_entry, lpad));
+                    return Ok(interpret_cs_action(
+                        action_table as *mut u8,
+                        cs_action_entry,
+                        lpad,
+                    ));
                 }
             }
         }
@@ -120,7 +124,11 @@ pub unsafe fn find_eh_action(lsda: *const u8, context: &EHContext<'_>) -> Result
                 // Can never have null landing pad for sjlj -- that would have
                 // been indicated by a -1 call site index.
                 let lpad = (cs_lpad + 1) as usize;
-                return Ok(interpret_cs_action(action_table as *mut u8, cs_action_entry, lpad));
+                return Ok(interpret_cs_action(
+                    action_table as *mut u8,
+                    cs_action_entry,
+                    lpad,
+                ));
             }
         }
     }
@@ -154,7 +162,11 @@ unsafe fn interpret_cs_action(
 
 #[inline]
 fn round_up(unrounded: usize, align: usize) -> Result<usize, ()> {
-    if align.is_power_of_two() { Ok((unrounded + align - 1) & !(align - 1)) } else { Err(()) }
+    if align.is_power_of_two() {
+        Ok((unrounded + align - 1) & !(align - 1))
+    } else {
+        Err(())
+    }
 }
 
 unsafe fn read_encoded_pointer(
@@ -168,7 +180,9 @@ unsafe fn read_encoded_pointer(
 
     // DW_EH_PE_aligned implies it's an absolute pointer value
     if encoding == DW_EH_PE_aligned {
-        reader.ptr = reader.ptr.with_addr(round_up(reader.ptr.addr(), mem::size_of::<usize>())?);
+        reader.ptr = reader
+            .ptr
+            .with_addr(round_up(reader.ptr.addr(), mem::size_of::<usize>())?);
         return Ok(reader.read::<usize>());
     }
 

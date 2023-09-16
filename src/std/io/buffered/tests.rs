@@ -17,7 +17,11 @@ pub struct ShortReader {
 // rustfmt-on-save.
 impl Read for ShortReader {
     fn read(&mut self, _: &mut [u8]) -> io::Result<usize> {
-        if self.lengths.is_empty() { Ok(0) } else { Ok(self.lengths.remove(0)) }
+        if self.lengths.is_empty() {
+            Ok(0)
+        } else {
+            Ok(self.lengths.remove(0))
+        }
     }
 }
 
@@ -253,7 +257,10 @@ fn test_buffered_reader_seek_underflow() {
     assert_eq!(reader.fill_buf().ok().map(|s| s.len()), Some(5));
     // the following seek will require two underlying seeks
     let expected = 9223372036854775802;
-    assert_eq!(reader.seek(SeekFrom::Current(i64::MIN)).ok(), Some(expected));
+    assert_eq!(
+        reader.seek(SeekFrom::Current(i64::MIN)).ok(),
+        Some(expected)
+    );
     assert_eq!(reader.fill_buf().ok().map(|s| s.len()), Some(5));
     // seeking to 0 should empty the buffer.
     assert_eq!(reader.seek(SeekFrom::Current(0)).ok(), Some(expected));
@@ -378,7 +385,10 @@ fn test_buffered_writer_seek() {
     assert_eq!(&w.get_ref().get_ref()[..], &[0, 1, 2, 3, 4, 5, 6, 7][..]);
     assert_eq!(w.seek(SeekFrom::Start(2)).ok(), Some(2));
     w.write_all(&[8, 9]).unwrap();
-    assert_eq!(&w.into_inner().unwrap().into_inner()[..], &[0, 1, 8, 9, 4, 5, 6, 7]);
+    assert_eq!(
+        &w.into_inner().unwrap().into_inner()[..],
+        &[0, 1, 8, 9, 4, 5, 6, 7]
+    );
 }
 
 #[test]
@@ -450,7 +460,9 @@ fn test_lines() {
 
 #[test]
 fn test_short_reads() {
-    let inner = ShortReader { lengths: vec![0, 1, 2, 0, 1, 0] };
+    let inner = ShortReader {
+        lengths: vec![0, 1, 2, 0, 1, 0],
+    };
     let mut reader = BufReader::new(inner);
     let mut buf = [0, 0];
     assert_eq!(reader.read(&mut buf).unwrap(), 0);
@@ -565,7 +577,10 @@ struct ProgrammableSink {
 impl Write for ProgrammableSink {
     fn write(&mut self, data: &[u8]) -> io::Result<usize> {
         if self.always_write_error {
-            return Err(io::Error::new(io::ErrorKind::Other, "test - always_write_error"));
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                "test - always_write_error",
+            ));
         }
 
         match self.max_writes {
@@ -590,7 +605,10 @@ impl Write for ProgrammableSink {
 
     fn flush(&mut self) -> io::Result<()> {
         if self.always_flush_error {
-            Err(io::Error::new(io::ErrorKind::Other, "test - always_flush_error"))
+            Err(io::Error::new(
+                io::ErrorKind::Other,
+                "test - always_flush_error",
+            ))
         } else {
             Ok(())
         }
@@ -681,8 +699,13 @@ fn line_vectored_partial_and_errors() {
     use crate::std::collections::VecDeque;
 
     enum Call {
-        Write { inputs: Vec<&'static [u8]>, output: io::Result<usize> },
-        Flush { output: io::Result<()> },
+        Write {
+            inputs: Vec<&'static [u8]>,
+            output: io::Result<usize>,
+        },
+        Flush {
+            output: io::Result<()>,
+        },
     }
 
     #[derive(Default)]
@@ -727,21 +750,37 @@ fn line_vectored_partial_and_errors() {
 
     // partial writes keep going
     let mut a = LineWriter::new(Writer::default());
-    a.write_vectored(&[IoSlice::new(&[]), IoSlice::new(b"abc")]).unwrap();
+    a.write_vectored(&[IoSlice::new(&[]), IoSlice::new(b"abc")])
+        .unwrap();
 
-    a.get_mut().calls.push_back(Call::Write { inputs: vec![b"abc"], output: Ok(1) });
-    a.get_mut().calls.push_back(Call::Write { inputs: vec![b"bc"], output: Ok(2) });
-    a.get_mut().calls.push_back(Call::Write { inputs: vec![b"x", b"\n"], output: Ok(2) });
+    a.get_mut().calls.push_back(Call::Write {
+        inputs: vec![b"abc"],
+        output: Ok(1),
+    });
+    a.get_mut().calls.push_back(Call::Write {
+        inputs: vec![b"bc"],
+        output: Ok(2),
+    });
+    a.get_mut().calls.push_back(Call::Write {
+        inputs: vec![b"x", b"\n"],
+        output: Ok(2),
+    });
 
-    a.write_vectored(&[IoSlice::new(b"x"), IoSlice::new(b"\n")]).unwrap();
+    a.write_vectored(&[IoSlice::new(b"x"), IoSlice::new(b"\n")])
+        .unwrap();
 
     a.get_mut().calls.push_back(Call::Flush { output: Ok(()) });
     a.flush().unwrap();
 
     // erroneous writes stop and don't write more
-    a.get_mut().calls.push_back(Call::Write { inputs: vec![b"x", b"\na"], output: Err(err()) });
+    a.get_mut().calls.push_back(Call::Write {
+        inputs: vec![b"x", b"\na"],
+        output: Err(err()),
+    });
     a.get_mut().calls.push_back(Call::Flush { output: Ok(()) });
-    assert!(a.write_vectored(&[IoSlice::new(b"x"), IoSlice::new(b"\na")]).is_err());
+    assert!(a
+        .write_vectored(&[IoSlice::new(b"x"), IoSlice::new(b"\na")])
+        .is_err());
     a.flush().unwrap();
 
     fn err() -> io::Error {
@@ -801,7 +840,10 @@ fn line_vectored_ignored() {
 /// This behavior is desirable because it prevents flushing partial lines
 #[test]
 fn partial_write_buffers_line() {
-    let writer = ProgrammableSink { accept_prefix: Some(13), ..Default::default() };
+    let writer = ProgrammableSink {
+        accept_prefix: Some(13),
+        ..Default::default()
+    };
     let mut writer = LineWriter::new(writer);
 
     assert_eq!(writer.write(b"Line 1\nLine 2\nLine 3\nLine4").unwrap(), 21);
@@ -918,8 +960,13 @@ fn line_write_all() {
     };
     let mut writer = LineWriter::new(writer);
 
-    writer.write_all(b"Line 1\nLine 2\nLine 3\nLine 4\nPartial").unwrap();
-    assert_eq!(&writer.get_ref().buffer, b"Line 1\nLine 2\nLine 3\nLine 4\n");
+    writer
+        .write_all(b"Line 1\nLine 2\nLine 3\nLine 4\nPartial")
+        .unwrap();
+    assert_eq!(
+        &writer.get_ref().buffer,
+        b"Line 1\nLine 2\nLine 3\nLine 4\n"
+    );
     writer.write_all(b" Line 5\n").unwrap();
     assert_eq!(
         writer.get_ref().buffer.as_slice(),
@@ -1014,7 +1061,8 @@ impl Write for WriteRecorder {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         use crate::std::str::from_utf8;
 
-        self.events.push(RecordedEvent::Write(from_utf8(buf).unwrap().to_string()));
+        self.events
+            .push(RecordedEvent::Write(from_utf8(buf).unwrap().to_string()));
         Ok(buf.len())
     }
 
@@ -1038,7 +1086,10 @@ fn single_formatted_write() {
     // buffer before attempting to write the last "!\n". write_all shouldn't
     // have this limitation.
     writeln!(&mut writer, "{}, {}!", "hello", "world").unwrap();
-    assert_eq!(writer.get_ref().events, [RecordedEvent::Write("hello, world!\n".to_string())]);
+    assert_eq!(
+        writer.get_ref().events,
+        [RecordedEvent::Write("hello, world!\n".to_string())]
+    );
 }
 
 #[test]

@@ -78,7 +78,11 @@ unsafe impl GlobalAlloc for System {
     #[inline]
     unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
         // SAFETY: the caller must uphold the safety contract for `malloc`
-        unsafe { DLMALLOC.lock().realloc(ptr, layout.size(), layout.align(), new_size) }
+        unsafe {
+            DLMALLOC
+                .lock()
+                .realloc(ptr, layout.size(), layout.align(), new_size)
+        }
     }
 }
 

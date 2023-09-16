@@ -121,7 +121,11 @@ impl fmt::Debug for EnvStrDebug<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self { slice } = self;
         f.debug_list()
-            .entries(slice.iter().map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())))
+            .entries(
+                slice
+                    .iter()
+                    .map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())),
+            )
             .finish()
     }
 }
@@ -129,7 +133,9 @@ impl fmt::Debug for EnvStrDebug<'_> {
 impl Env {
     pub fn str_debug(&self) -> impl fmt::Debug + '_ {
         let Self { iter } = self;
-        EnvStrDebug { slice: iter.as_slice() }
+        EnvStrDebug {
+            slice: iter.as_slice(),
+        }
     }
 }
 
@@ -164,7 +170,9 @@ pub fn env() -> Env {
             result.push((key.clone(), value.clone()));
         }
 
-        return Env { iter: result.into_iter() };
+        return Env {
+            iter: result.into_iter(),
+        };
     }
 }
 

@@ -112,7 +112,9 @@ fn wait_timeout_while_wait() {
     let c = Arc::new(Condvar::new());
 
     let g = m.lock().unwrap();
-    let (_g, wait) = c.wait_timeout_while(g, Duration::from_millis(1), |_| true).unwrap();
+    let (_g, wait) = c
+        .wait_timeout_while(g, Duration::from_millis(1), |_| true)
+        .unwrap();
     // no spurious wakeups. ensure it timed-out
     assert!(wait.timed_out());
 }
@@ -124,7 +126,9 @@ fn wait_timeout_while_instant_satisfy() {
     let c = Arc::new(Condvar::new());
 
     let g = m.lock().unwrap();
-    let (_g, wait) = c.wait_timeout_while(g, Duration::from_millis(0), |_| false).unwrap();
+    let (_g, wait) = c
+        .wait_timeout_while(g, Duration::from_millis(0), |_| false)
+        .unwrap();
     // ensure it didn't time-out even if we were not given any time.
     assert!(!wait.timed_out());
 }
@@ -145,7 +149,9 @@ fn wait_timeout_while_wake() {
         cvar.notify_one();
     });
     let (g2, wait) = c
-        .wait_timeout_while(g, Duration::from_millis(u64::MAX), |&mut notified| !notified)
+        .wait_timeout_while(g, Duration::from_millis(u64::MAX), |&mut notified| {
+            !notified
+        })
         .unwrap();
     // ensure it didn't time-out even if we were not given any time.
     assert!(!wait.timed_out());

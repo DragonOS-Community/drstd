@@ -52,7 +52,11 @@ fn test_process_mask() {
             let stdin_write = pipes.stdin.take().unwrap();
             let stdout_read = pipes.stdout.take().unwrap();
 
-            t!(cvt_nz(dlibc::pthread_sigmask(dlibc::SIG_SETMASK, old_set.as_ptr(), ptr::null_mut())));
+            t!(cvt_nz(dlibc::pthread_sigmask(
+                dlibc::SIG_SETMASK,
+                old_set.as_ptr(),
+                ptr::null_mut()
+            )));
 
             t!(cvt(dlibc::kill(cat.id() as dlibc::pid_t, dlibc::SIGINT)));
             // We need to wait until SIGINT is definitely delivered. The

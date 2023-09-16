@@ -60,6 +60,8 @@ mod platform {
     pub use crate::std::os::l4re::*;
     #[cfg(target_os = "linux")]
     pub use crate::std::os::linux::*;
+    #[cfg(target_os = "dragonos")]
+    pub use crate::std::os::linux::*;
     #[cfg(target_os = "macos")]
     pub use crate::std::os::macos::*;
     #[cfg(target_os = "netbsd")]
@@ -80,8 +82,6 @@ mod platform {
     pub use crate::std::os::vxworks::*;
     #[cfg(target_os = "watchos")]
     pub use crate::std::os::watchos::*;
-    #[cfg(target_os = "dragonos")]
-    pub use crate::std::os::linux::*;
 }
 
 pub mod ffi;
@@ -113,17 +113,17 @@ pub mod ucred;
 /// Includes all extension traits, and some important type definitions.
 pub mod prelude {
     #[doc(no_inline)]
-        pub use super::ffi::{OsStrExt, OsStringExt};
+    pub use super::ffi::{OsStrExt, OsStringExt};
     #[doc(no_inline)]
-        pub use super::fs::DirEntryExt;
+    pub use super::fs::DirEntryExt;
     #[doc(no_inline)]
-        pub use super::fs::FileExt;
+    pub use super::fs::FileExt;
     #[doc(no_inline)]
-        pub use super::fs::{FileTypeExt, MetadataExt, OpenOptionsExt, PermissionsExt};
+    pub use super::fs::{FileTypeExt, MetadataExt, OpenOptionsExt, PermissionsExt};
     #[doc(no_inline)]
-        pub use super::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
+    pub use super::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
     #[doc(no_inline)]
-        pub use super::process::{CommandExt, ExitStatusExt};
+    pub use super::process::{CommandExt, ExitStatusExt};
     #[doc(no_inline)]
-        pub use super::thread::JoinHandleExt;
+    pub use super::thread::JoinHandleExt;
 }

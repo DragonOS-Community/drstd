@@ -8,10 +8,10 @@ use crate::std::mem;
 use crate::std::net::{Ipv4Addr, Ipv6Addr, Shutdown, SocketAddr};
 use crate::std::ptr;
 use crate::std::sys::common::small_c_string::run_with_cstr;
-use dlibc as c;
 use crate::std::sys::net::{cvt, cvt_gai, cvt_r, init, wrlen_t, Socket};
 use crate::std::sys_common::{AsInner, FromInner, IntoInner};
 use crate::std::time::Duration;
+use dlibc as c;
 use dlibc;
 
 use crate::std::ffi::{c_int, c_void};
@@ -118,7 +118,10 @@ pub fn sockaddr_to_addr(storage: &c::sockaddr_storage, len: usize) -> io::Result
                 *(storage as *const _ as *const c::sockaddr_in6)
             })))
         }
-        _ => Err(io::const_io_error!(ErrorKind::InvalidInput, "invalid argument")),
+        _ => Err(io::const_io_error!(
+            ErrorKind::InvalidInput,
+            "invalid argument"
+        )),
     }
 }
 
@@ -204,8 +207,17 @@ impl<'a> TryFrom<(&'a str, u16)> for LookupHost {
             hints.ai_socktype = c::SOCK_STREAM;
             let mut res = ptr::null_mut();
             unsafe {
-                cvt_gai(c::getaddrinfo(c_host.as_ptr(), ptr::null(), &hints, &mut res))
-                    .map(|_| LookupHost { original: res, cur: res, port })
+                cvt_gai(c::getaddrinfo(
+                    c_host.as_ptr(),
+                    ptr::null(),
+                    &hints,
+                    &mut res,
+                ))
+                .map(|_| LookupHost {
+                    original: res,
+                    cur: res,
+                    port,
+                })
             }
         })
     }
@@ -289,7 +301,12 @@ impl TcpStream {
     pub fn write(&self, buf: &[u8]) -> io::Result<usize> {
         let len = cmp::min(buf.len(), <wrlen_t>::MAX as usize) as wrlen_t;
         let ret = cvt(unsafe {
-            c::send(self.inner.as_raw(), buf.as_ptr() as *const c_void, len, MSG_NOSIGNAL)
+            c::send(
+                self.inner.as_raw(),
+                buf.as_ptr() as *const c_void,
+                len,
+                MSG_NOSIGNAL,
+            )
         })?;
         Ok(ret as usize)
     }
@@ -446,7 +463,9 @@ impl TcpListener {
     pub fn accept(&self) -> io::Result<(TcpStream, SocketAddr)> {
         let mut storage: c::sockaddr_storage = unsafe { mem::zeroed() };
         let mut len = mem::size_of_val(&storage) as c::socklen_t;
-        let sock = self.inner.accept(&mut storage as *mut _ as *mut _, &mut len)?;
+        let sock = self
+            .inner
+            .accept(&mut storage as *mut _ as *mut _, &mut len)?;
         let addr = sockaddr_to_addr(&storage, len as usize)?;
         Ok((TcpStream { inner: sock }, addr))
     }
@@ -465,7 +484,12 @@ impl TcpListener {
     }
 
     pub fn set_only_v6(&self, only_v6: bool) -> io::Result<()> {
-        setsockopt(&self.inner, c::IPPROTO_IPV6, c::IPV6_V6ONLY, only_v6 as c_int)
+        setsockopt(
+            &self.inner,
+            c::IPPROTO_IPV6,
+            c::IPV6_V6ONLY,
+            only_v6 as c_int,
+        )
     }
 
     pub fn only_v6(&self) -> io::Result<bool> {
@@ -583,7 +607,12 @@ impl UdpSocket {
     }
 
     pub fn set_broadcast(&self, broadcast: bool) -> io::Result<()> {
-        setsockopt(&self.inner, c::SOL_SOCKET, c::SO_BROADCAST, broadcast as c_int)
+        setsockopt(
+            &self.inner,
+            c::SOL_SOCKET,
+            c::SO_BROADCAST,
+            broadcast as c_int,
+        )
     }
 
     pub fn broadcast(&self) -> io::Result<bool> {
@@ -620,7 +649,12 @@ impl UdpSocket {
     }
 
     pub fn set_multicast_loop_v6(&self, multicast_loop_v6: bool) -> io::Result<()> {
-        setsockopt(&self.inner, c::IPPROTO_IPV6, c::IPV6_MULTICAST_LOOP, multicast_loop_v6 as c_int)
+        setsockopt(
+            &self.inner,
+            c::IPPROTO_IPV6,
+            c::IPV6_MULTICAST_LOOP,
+            multicast_loop_v6 as c_int,
+        )
     }
 
     pub fn multicast_loop_v6(&self) -> io::Result<bool> {
@@ -688,7 +722,12 @@ impl UdpSocket {
     pub fn send(&self, buf: &[u8]) -> io::Result<usize> {
         let len = cmp::min(buf.len(), <wrlen_t>::MAX as usize) as wrlen_t;
         let ret = cvt(unsafe {
-            c::send(self.inner.as_raw(), buf.as_ptr() as *const c_void, len, MSG_NOSIGNAL)
+            c::send(
+                self.inner.as_raw(),
+                buf.as_ptr() as *const c_void,
+                len,
+                MSG_NOSIGNAL,
+            )
         })?;
         Ok(ret as usize)
     }

@@ -48,7 +48,10 @@ fn test_copy_from_userspace_function() {
             // Verify copy
             for byte in 0..size {
                 unsafe {
-                    assert_eq!(dst[byte as usize], *src.as_ptr().offset(offset + byte as isize));
+                    assert_eq!(
+                        dst[byte as usize],
+                        *src.as_ptr().offset(offset + byte as isize)
+                    );
                 }
             }
         }

@@ -98,7 +98,9 @@ impl Parker {
     /// Construct the Windows parker. The UNIX parker implementation
     /// requires this to happen in-place.
     pub unsafe fn new_in_place(parker: *mut Parker) {
-        parker.write(Self { state: AtomicI8::new(EMPTY) });
+        parker.write(Self {
+            state: AtomicI8::new(EMPTY),
+        });
     }
 
     // Assumes this is only called by the thread that owns the Parker,
@@ -116,7 +118,11 @@ impl Parker {
                 // Wait for something to happen, assuming it's still set to PARKED.
                 wait_on_address(self.ptr(), &PARKED as *const _ as c::LPVOID, 1, c::INFINITE);
                 // Change NOTIFIED=>EMPTY but leave PARKED alone.
-                if self.state.compare_exchange(NOTIFIED, EMPTY, Acquire, Acquire).is_ok() {
+                if self
+                    .state
+                    .compare_exchange(NOTIFIED, EMPTY, Acquire, Acquire)
+                    .is_ok()
+                {
                     // Actually woken up by unpark().
                     return;
                 } else {
@@ -146,7 +152,12 @@ impl Parker {
 
         if let Some(wait_on_address) = c::WaitOnAddress::option() {
             // Wait for something to happen, assuming it's still set to PARKED.
-            wait_on_address(self.ptr(), &PARKED as *const _ as c::LPVOID, 1, dur2timeout(timeout));
+            wait_on_address(
+                self.ptr(),
+                &PARKED as *const _ as c::LPVOID,
+                1,
+                dur2timeout(timeout),
+            );
             // Set the state back to EMPTY (from either PARKED or NOTIFIED).
             // Note that we don't just write EMPTY, but use swap() to also
             // include an acquire-ordered read to synchronize with unpark()'s

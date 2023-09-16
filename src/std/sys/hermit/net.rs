@@ -10,7 +10,6 @@ use crate::std::sys::time::Instant;
 use crate::std::sys_common::net::{getsockopt, setsockopt, sockaddr_to_addr};
 use crate::std::sys_common::{AsInner, FromInner, IntoInner};
 use crate::std::time::Duration;
-libc;
 
 use core::ffi::c_int;
 
@@ -72,7 +71,11 @@ impl Socket {
             Err(e) => return Err(e),
         }
 
-        let mut pollfd = netc::pollfd { fd: self.as_raw_fd(), events: netc::POLLOUT, revents: 0 };
+        let mut pollfd = netc::pollfd {
+            fd: self.as_raw_fd(),
+            events: netc::POLLOUT,
+            revents: 0,
+        };
 
         if timeout.as_secs() == 0 && timeout.subsec_nanos() == 0 {
             return Err(io::const_io_error!(
@@ -86,7 +89,10 @@ impl Socket {
         loop {
             let elapsed = start.elapsed();
             if elapsed >= timeout {
-                return Err(io::const_io_error!(io::ErrorKind::TimedOut, "connection timed out"));
+                return Err(io::const_io_error!(
+                    io::ErrorKind::TimedOut,
+                    "connection timed out"
+                ));
             }
 
             let timeout = timeout - elapsed;
@@ -260,7 +266,10 @@ impl Socket {
                 }
                 timeout
             }
-            None => netc::timeval { tv_sec: 0, tv_usec: 0 },
+            None => netc::timeval {
+                tv_sec: 0,
+                tv_usec: 0,
+            },
         };
 
         setsockopt(self, netc::SOL_SOCKET, kind, timeout)

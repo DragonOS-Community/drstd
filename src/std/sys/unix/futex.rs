@@ -18,7 +18,12 @@ use dlibc;
 /// Returns directly if the futex doesn't hold the expected value.
 ///
 /// Returns false on timeout, and true in all other cases.
-#[cfg(any(target_os = "linux", target_os = "android", target_os = "freebsd",target_os = "dragonos",))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "android",
+    target_os = "freebsd",
+    target_os = "dragonos",
+))]
 pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -> bool {
     use super::time::Timespec;
     use crate::std::ptr::null;
@@ -90,7 +95,7 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
 /// or false if no thread was waiting on this futex.
 ///
 /// On some platforms, this always returns false.
-#[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos",))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos",))]
 pub fn futex_wake(futex: &AtomicU32) -> bool {
     let ptr = futex as *const AtomicU32;
     let op = dlibc::FUTEX_WAKE | dlibc::FUTEX_PRIVATE_FLAG;
@@ -98,7 +103,7 @@ pub fn futex_wake(futex: &AtomicU32) -> bool {
 }
 
 /// Wake up all threads that are waiting on futex_wait on this futex.
-#[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos",))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos",))]
 pub fn futex_wake_all(futex: &AtomicU32) {
     let ptr = futex as *const AtomicU32;
     let op = dlibc::FUTEX_WAKE | dlibc::FUTEX_PRIVATE_FLAG;
@@ -152,7 +157,9 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
             futex as *const AtomicU32 as *mut u32,
             dlibc::FUTEX_WAIT,
             expected as i32,
-            timespec.as_ref().map_or(null(), |t| t as *const dlibc::timespec),
+            timespec
+                .as_ref()
+                .map_or(null(), |t| t as *const dlibc::timespec),
             null_mut(),
         )
     };
@@ -164,8 +171,13 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
 pub fn futex_wake(futex: &AtomicU32) -> bool {
     use crate::std::ptr::{null, null_mut};
     unsafe {
-        dlibc::futex(futex as *const AtomicU32 as *mut u32, dlibc::FUTEX_WAKE, 1, null(), null_mut())
-            > 0
+        dlibc::futex(
+            futex as *const AtomicU32 as *mut u32,
+            dlibc::FUTEX_WAKE,
+            1,
+            null(),
+            null_mut(),
+        ) > 0
     }
 }
 
@@ -188,11 +200,16 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
     // A timeout of 0 means infinite.
     // We round smaller timeouts up to 1 millisecond.
     // Overflows are rounded up to an infinite timeout.
-    let timeout_ms =
-        timeout.and_then(|d| Some(i32::try_from(d.as_millis()).ok()?.max(1))).unwrap_or(0);
+    let timeout_ms = timeout
+        .and_then(|d| Some(i32::try_from(d.as_millis()).ok()?.max(1)))
+        .unwrap_or(0);
 
     let r = unsafe {
-        dlibc::umtx_sleep(futex as *const AtomicU32 as *const i32, expected as i32, timeout_ms)
+        dlibc::umtx_sleep(
+            futex as *const AtomicU32 as *const i32,
+            expected as i32,
+            timeout_ms,
+        )
     };
 
     r == 0 || super::os::errno() != dlibc::ETIMEDOUT
@@ -285,8 +302,12 @@ pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -
         .unwrap_or(zircon::ZX_TIME_INFINITE);
 
     unsafe {
-        zircon::zx_futex_wait(futex, AtomicU32::new(expected), zircon::ZX_HANDLE_INVALID, deadline)
-            != zircon::ZX_ERR_TIMED_OUT
+        zircon::zx_futex_wait(
+            futex,
+            AtomicU32::new(expected),
+            zircon::ZX_HANDLE_INVALID,
+            deadline,
+        ) != zircon::ZX_ERR_TIMED_OUT
     }
 }
 

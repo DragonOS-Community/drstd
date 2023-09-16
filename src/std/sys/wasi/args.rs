@@ -14,7 +14,9 @@ impl !Sync for Args {}
 
 /// Returns the command line arguments
 pub fn args() -> Args {
-    Args { iter: maybe_args().unwrap_or(Vec::new()).into_iter() }
+    Args {
+        iter: maybe_args().unwrap_or(Vec::new()).into_iter(),
+    }
 }
 
 fn maybe_args() -> Option<Vec<OsString>> {

@@ -86,7 +86,10 @@ fn repeat_repeats() {
 fn take_some_bytes() {
     assert_eq!(repeat(4).take(100).bytes().count(), 100);
     assert_eq!(repeat(4).take(100).bytes().next().unwrap().unwrap(), 4);
-    assert_eq!(repeat(1).take(10).chain(repeat(2).take(10)).bytes().count(), 20);
+    assert_eq!(
+        repeat(1).take(10).chain(repeat(2).take(10)).bytes().count(),
+        20
+    );
 }
 
 #[allow(dead_code)]

@@ -272,7 +272,7 @@ unsafe fn register_dtor(key: &'static StaticKey) {
 #[link_section = ".CRT$XLB"]
 #[allow(dead_code, unused_variables)]
 #[used] // we don't want LLVM eliminating this symbol for any reason, and
-// when the symbol makes it to the linker the linker will take over
+        // when the symbol makes it to the linker the linker will take over
 pub static p_thread_callback: unsafe extern "system" fn(c::LPVOID, c::DWORD, c::LPVOID) =
     on_tls_callback;
 

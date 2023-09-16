@@ -15,7 +15,10 @@ pub struct SpinMutex<T = ()> {
 impl<T> SpinMutex<T> {
     #[inline]
     pub const fn new(x: T) -> Self {
-        Self { locked: AtomicBool::new(false), data: UnsafeCell::new(x) }
+        Self {
+            locked: AtomicBool::new(false),
+            data: UnsafeCell::new(x),
+        }
     }
 
     /// Acquire a lock.
@@ -73,7 +76,9 @@ impl<T> SpinIdOnceCell<T> {
     pub fn get(&self) -> Option<(abi::ID, &T)> {
         match self.id.load(Ordering::Acquire) {
             ID_UNINIT => None,
-            id => Some((id as abi::ID, unsafe { (&*self.extra.get()).assume_init_ref() })),
+            id => Some((id as abi::ID, unsafe {
+                (&*self.extra.get()).assume_init_ref()
+            })),
         }
     }
 
@@ -81,7 +86,9 @@ impl<T> SpinIdOnceCell<T> {
     pub fn get_mut(&mut self) -> Option<(abi::ID, &mut T)> {
         match *self.id.get_mut() {
             ID_UNINIT => None,
-            id => Some((id as abi::ID, unsafe { (&mut *self.extra.get()).assume_init_mut() })),
+            id => Some((id as abi::ID, unsafe {
+                (&mut *self.extra.get()).assume_init_mut()
+            })),
         }
     }
 

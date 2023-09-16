@@ -33,7 +33,12 @@ impl Command {
 
         let process_handle = unsafe { self.do_exec(theirs, envp.as_ref())? };
 
-        Ok((Process { handle: Handle::new(process_handle) }, ours))
+        Ok((
+            Process {
+                handle: Handle::new(process_handle),
+            },
+            ours,
+        ))
     }
 
     pub fn output(&mut self) -> io::Result<(ExitStatus, Vec<u8>, Vec<u8>)> {
@@ -326,6 +331,8 @@ impl Into<ExitStatus> for ExitStatusError {
 impl ExitStatusError {
     pub fn code(self) -> Option<NonZeroI32> {
         // fixme: affected by the same bug as ExitStatus::code()
-        ExitStatus(self.0.into()).code().map(|st| st.try_into().unwrap())
+        ExitStatus(self.0.into())
+            .code()
+            .map(|st| st.try_into().unwrap())
     }
 }

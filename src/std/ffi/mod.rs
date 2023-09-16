@@ -152,7 +152,6 @@
 //! [windows.OsStringExt]: crate::std::os::windows::ffi::OsStringExt "os::windows::ffi::OsStringExt"
 //! [`from_wide`]: crate::std::os::windows::ffi::OsStringExt::from_wide "os::windows::ffi::OsStringExt::from_wide"
 
-
 pub use alloc::ffi::{CString, FromVecWithNulError, IntoStringError, NulError};
 pub use core::ffi::FromBytesUntilNulError;
 pub use core::ffi::{CStr, FromBytesWithNulError};
@@ -165,7 +164,6 @@ pub use core::ffi::{
 };
 
 pub use core::ffi::c_void;
-
 
 pub use core::ffi::{VaList, VaListImpl};
 

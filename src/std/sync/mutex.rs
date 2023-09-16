@@ -217,9 +217,13 @@ impl<T> Mutex<T> {
     ///
     /// let mutex = Mutex::new(0);
     /// ```
-            #[inline]
+    #[inline]
     pub const fn new(t: T) -> Mutex<T> {
-        Mutex { inner: sys::Mutex::new(), poison: poison::Flag::new(), data: UnsafeCell::new(t) }
+        Mutex {
+            inner: sys::Mutex::new(),
+            poison: poison::Flag::new(),
+            data: UnsafeCell::new(t),
+        }
     }
 }
 
@@ -259,7 +263,7 @@ impl<T: ?Sized> Mutex<T> {
     /// }).join().expect("thread::spawn failed");
     /// assert_eq!(*mutex.lock().unwrap(), 10);
     /// ```
-        pub fn lock(&self) -> LockResult<MutexGuard<'_, T>> {
+    pub fn lock(&self) -> LockResult<MutexGuard<'_, T>> {
         unsafe {
             self.inner.lock();
             MutexGuard::new(self)
@@ -305,7 +309,7 @@ impl<T: ?Sized> Mutex<T> {
     /// }).join().expect("thread::spawn failed");
     /// assert_eq!(*mutex.lock().unwrap(), 10);
     /// ```
-        pub fn try_lock(&self) -> TryLockResult<MutexGuard<'_, T>> {
+    pub fn try_lock(&self) -> TryLockResult<MutexGuard<'_, T>> {
         unsafe {
             if self.inner.try_lock() {
                 Ok(MutexGuard::new(self)?)
@@ -330,7 +334,7 @@ impl<T: ?Sized> Mutex<T> {
     /// *guard += 20;
     /// Mutex::unlock(guard);
     /// ```
-        pub fn unlock(guard: MutexGuard<'_, T>) {
+    pub fn unlock(guard: MutexGuard<'_, T>) {
         drop(guard);
     }
 
@@ -356,7 +360,7 @@ impl<T: ?Sized> Mutex<T> {
     /// assert_eq!(mutex.is_poisoned(), true);
     /// ```
     #[inline]
-        pub fn is_poisoned(&self) -> bool {
+    pub fn is_poisoned(&self) -> bool {
         self.poison.get()
     }
 
@@ -394,7 +398,7 @@ impl<T: ?Sized> Mutex<T> {
     /// assert_eq!(*x, 1);
     /// ```
     #[inline]
-        pub fn clear_poison(&self) {
+    pub fn clear_poison(&self) {
         self.poison.clear();
     }
 
@@ -413,7 +417,7 @@ impl<T: ?Sized> Mutex<T> {
     /// let mutex = Mutex::new(0);
     /// assert_eq!(mutex.into_inner().unwrap(), 0);
     /// ```
-        pub fn into_inner(self) -> LockResult<T>
+    pub fn into_inner(self) -> LockResult<T>
     where
         T: Sized,
     {
@@ -440,7 +444,7 @@ impl<T: ?Sized> Mutex<T> {
     /// *mutex.get_mut().unwrap() = 10;
     /// assert_eq!(*mutex.lock().unwrap(), 10);
     /// ```
-        pub fn get_mut(&mut self) -> LockResult<&mut T> {
+    pub fn get_mut(&mut self) -> LockResult<&mut T> {
         let data = self.data.get_mut();
         poison::map_result(self.poison.borrow(), |()| data)
     }
@@ -482,7 +486,10 @@ impl<T: ?Sized + fmt::Debug> fmt::Debug for Mutex<T> {
 
 impl<'mutex, T: ?Sized> MutexGuard<'mutex, T> {
     unsafe fn new(lock: &'mutex Mutex<T>) -> LockResult<MutexGuard<'mutex, T>> {
-        poison::map_result(lock.poison.guard(), |guard| MutexGuard { lock, poison: guard })
+        poison::map_result(lock.poison.guard(), |guard| MutexGuard {
+            lock,
+            poison: guard,
+        })
     }
 }
 

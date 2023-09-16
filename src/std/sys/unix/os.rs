@@ -62,7 +62,10 @@ extern "C" {
         ),
         link_name = "__errno"
     )]
-    #[cfg_attr(any(target_os = "solaris", target_os = "illumos"), link_name = "___errno")]
+    #[cfg_attr(
+        any(target_os = "solaris", target_os = "illumos"),
+        link_name = "___errno"
+    )]
     #[cfg_attr(target_os = "nto", link_name = "__get_errno_ptr")]
     #[cfg_attr(
         any(
@@ -123,7 +126,10 @@ pub fn set_errno(e: i32) {
 pub fn error_string(errno: i32) -> String {
     extern "C" {
         #[cfg_attr(
-            all(any(target_os = "linux", target_env = "newlib"), not(target_env = "ohos")),
+            all(
+                any(target_os = "linux", target_env = "newlib"),
+                not(target_env = "ohos")
+            ),
             link_name = "__xpg_strerror_r"
         )]
         fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: dlibc::size_t) -> c_int;
@@ -156,7 +162,9 @@ pub fn getcwd() -> io::Result<PathBuf> {
         unsafe {
             let ptr = buf.as_mut_ptr() as *mut dlibc::c_char;
             if !dlibc::getcwd(ptr, buf.capacity()).is_null() {
-                let len = CStr::from_ptr(buf.as_ptr() as *const dlibc::c_char).to_bytes().len();
+                let len = CStr::from_ptr(buf.as_ptr() as *const dlibc::c_char)
+                    .to_bytes()
+                    .len();
                 buf.set_len(len);
                 buf.shrink_to_fit();
                 return Ok(PathBuf::from(OsString::from_vec(buf)));
@@ -184,7 +192,11 @@ pub fn chdir(p: &path::Path) -> io::Result<()> {
 #[cfg(not(target_os = "espidf"))]
 pub fn chdir(p: &path::Path) -> io::Result<()> {
     let result = run_path_with_cstr(p, |p| unsafe { Ok(dlibc::chdir(p.as_ptr())) })?;
-    if result == 0 { Ok(()) } else { Err(io::Error::last_os_error()) }
+    if result == 0 {
+        Ok(())
+    } else {
+        Err(io::Error::last_os_error())
+    }
 }
 
 pub struct SplitPaths<'a> {
@@ -241,7 +253,11 @@ where
 
 impl fmt::Display for JoinPathsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "path segment contains separator `{}`", char::from(PATH_SEPARATOR))
+        write!(
+            f,
+            "path segment contains separator `{}`",
+            char::from(PATH_SEPARATOR)
+        )
     }
 }
 
@@ -294,7 +310,12 @@ pub fn current_exe() -> io::Result<PathBuf> {
 pub fn current_exe() -> io::Result<PathBuf> {
     fn sysctl() -> io::Result<PathBuf> {
         unsafe {
-            let mib = [dlibc::CTL_KERN, dlibc::KERN_PROC_ARGS, -1, dlibc::KERN_PROC_PATHNAME];
+            let mib = [
+                dlibc::CTL_KERN,
+                dlibc::KERN_PROC_ARGS,
+                -1,
+                dlibc::KERN_PROC_PATHNAME,
+            ];
             let mut path_len: usize = 0;
             cvt(dlibc::sysctl(
                 mib.as_ptr(),
@@ -339,12 +360,31 @@ pub fn current_exe() -> io::Result<PathBuf> {
 #[cfg(target_os = "openbsd")]
 pub fn current_exe() -> io::Result<PathBuf> {
     unsafe {
-        let mut mib = [dlibc::CTL_KERN, dlibc::KERN_PROC_ARGS, dlibc::getpid(), dlibc::KERN_PROC_ARGV];
+        let mut mib = [
+            dlibc::CTL_KERN,
+            dlibc::KERN_PROC_ARGS,
+            dlibc::getpid(),
+            dlibc::KERN_PROC_ARGV,
+        ];
         let mib = mib.as_mut_ptr();
         let mut argv_len = 0;
-        cvt(dlibc::sysctl(mib, 4, ptr::null_mut(), &mut argv_len, ptr::null_mut(), 0))?;
+        cvt(dlibc::sysctl(
+            mib,
+            4,
+            ptr::null_mut(),
+            &mut argv_len,
+            ptr::null_mut(),
+            0,
+        ))?;
         let mut argv = Vec::<*const dlibc::c_char>::with_capacity(argv_len as usize);
-        cvt(dlibc::sysctl(mib, 4, argv.as_mut_ptr() as *mut _, &mut argv_len, ptr::null_mut(), 0))?;
+        cvt(dlibc::sysctl(
+            mib,
+            4,
+            argv.as_mut_ptr() as *mut _,
+            &mut argv_len,
+            ptr::null_mut(),
+            0,
+        ))?;
         argv.set_len(argv_len as usize);
         if argv[0].is_null() {
             return Err(io::const_io_error!(
@@ -361,7 +401,12 @@ pub fn current_exe() -> io::Result<PathBuf> {
     }
 }
 
-#[cfg(any(target_os = "linux", target_os = "android", target_os = "emscripten",target_os = "dragonos",))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "android",
+    target_os = "emscripten",
+    target_os = "dragonos",
+))]
 pub fn current_exe() -> io::Result<PathBuf> {
     match crate::std::fs::read_link("/proc/self/exe") {
         Err(ref e) if e.kind() == io::ErrorKind::NotFound => Err(io::const_io_error!(
@@ -383,7 +428,12 @@ pub fn current_exe() -> io::Result<PathBuf> {
     Ok(PathBuf::from(OsString::from_vec(e)))
 }
 
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "tvos",
+    target_os = "watchos"
+))]
 pub fn current_exe() -> io::Result<PathBuf> {
     unsafe {
         let mut sz: u32 = 0;
@@ -416,7 +466,11 @@ pub fn current_exe() -> io::Result<PathBuf> {
 
                 // Prepend a current working directory to the path if
                 // it doesn't contain an absolute pathname.
-                if filename[0] == b'/' { Ok(path) } else { getcwd().map(|cwd| cwd.join(path)) }
+                if filename[0] == b'/' {
+                    Ok(path)
+                } else {
+                    getcwd().map(|cwd| cwd.join(path))
+                }
             }
         }
     }
@@ -436,7 +490,10 @@ pub fn current_exe() -> io::Result<PathBuf> {
         );
         if result != 0 {
             use crate::std::io::ErrorKind;
-            Err(io::const_io_error!(ErrorKind::Uncategorized, "Error getting executable path"))
+            Err(io::const_io_error!(
+                ErrorKind::Uncategorized,
+                "Error getting executable path"
+            ))
         } else {
             let name = CStr::from_ptr((*info.as_ptr()).name.as_ptr()).to_bytes();
             Ok(PathBuf::from(OsStr::from_bytes(name)))
@@ -452,7 +509,10 @@ pub fn current_exe() -> io::Result<PathBuf> {
 #[cfg(target_os = "l4re")]
 pub fn current_exe() -> io::Result<PathBuf> {
     use crate::std::io::ErrorKind;
-    Err(io::const_io_error!(ErrorKind::Unsupported, "Not yet implemented!"))
+    Err(io::const_io_error!(
+        ErrorKind::Unsupported,
+        "Not yet implemented!"
+    ))
 }
 
 #[cfg(target_os = "vxworks")]
@@ -490,7 +550,11 @@ pub fn current_exe() -> io::Result<PathBuf> {
     let path = PathBuf::from(exe_path);
 
     // Prepend the current working directory to the path if it's not absolute.
-    if !path.is_absolute() { getcwd().map(|cwd| cwd.join(path)) } else { Ok(path) }
+    if !path.is_absolute() {
+        getcwd().map(|cwd| cwd.join(path))
+    } else {
+        Ok(path)
+    }
 }
 
 pub struct Env {
@@ -506,7 +570,11 @@ impl fmt::Debug for EnvStrDebug<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self { slice } = self;
         f.debug_list()
-            .entries(slice.iter().map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())))
+            .entries(
+                slice
+                    .iter()
+                    .map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())),
+            )
             .finish()
     }
 }
@@ -514,7 +582,9 @@ impl fmt::Debug for EnvStrDebug<'_> {
 impl Env {
     pub fn str_debug(&self) -> impl fmt::Debug + '_ {
         let Self { iter } = self;
-        EnvStrDebug { slice: iter.as_slice() }
+        EnvStrDebug {
+            slice: iter.as_slice(),
+        }
     }
 }
 
@@ -572,7 +642,9 @@ pub fn env() -> Env {
                 environ = environ.add(1);
             }
         }
-        return Env { iter: result.into_iter() };
+        return Env {
+            iter: result.into_iter(),
+        };
     }
 
     fn parse(input: &[u8]) -> Option<(OsString, OsString)> {
@@ -635,17 +707,21 @@ pub fn page_size() -> usize {
 }
 
 pub fn temp_dir() -> PathBuf {
-    crate::std::env::var_os("TMPDIR").map(PathBuf::from).unwrap_or_else(|| {
-        if cfg!(target_os = "android") {
-            PathBuf::from("/data/local/tmp")
-        } else {
-            PathBuf::from("/tmp")
-        }
-    })
+    crate::std::env::var_os("TMPDIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            if cfg!(target_os = "android") {
+                PathBuf::from("/data/local/tmp")
+            } else {
+                PathBuf::from("/tmp")
+            }
+        })
 }
 
 pub fn home_dir() -> Option<PathBuf> {
-    return crate::std::env::var_os("HOME").or_else(|| unsafe { fallback() }).map(PathBuf::from);
+    return crate::std::env::var_os("HOME")
+        .or_else(|| unsafe { fallback() })
+        .map(PathBuf::from);
 
     #[cfg(any(
         target_os = "android",

@@ -1,8 +1,5 @@
 // #![doc = include_str!("../../core/src/error.md")]
 
-#[cfg(test)]
-mod tests;
-
 use crate::std::backtrace::Backtrace;
 use crate::std::fmt::{self, Write};
 
@@ -12,7 +9,7 @@ pub use core::error::{request_ref, request_value, Request};
 mod private {
     // This is a hack to prevent `type_id` from being overridden by `Error`
     // implementations, since that can enable unsound downcasting.
-        #[derive(Debug)]
+    #[derive(Debug)]
     pub struct Internal;
 }
 
@@ -238,7 +235,7 @@ where
     Report<E>: From<E>,
 {
     /// Create a new `Report` from an input error.
-        pub fn new(error: E) -> Report<E> {
+    pub fn new(error: E) -> Report<E> {
         Self::from(error)
     }
 }
@@ -351,7 +348,7 @@ impl<E> Report<E> {
     ///    0: SuperErrorSideKick is here!
     ///    1: SuperErrorSideKickSideKick is here!
     /// ```
-        pub fn pretty(mut self, pretty: bool) -> Self {
+    pub fn pretty(mut self, pretty: bool) -> Self {
         self.pretty = pretty;
         self
     }
@@ -439,7 +436,7 @@ impl<E> Report<E> {
     ///   10: __libc_start_main
     ///   11: _start
     /// ```
-        pub fn show_backtrace(mut self, show_backtrace: bool) -> Self {
+    pub fn show_backtrace(mut self, show_backtrace: bool) -> Self {
         self.show_backtrace = show_backtrace;
         self
     }
@@ -463,10 +460,14 @@ where
     }
 
     /// Format the report as a single line.
-        fn fmt_singleline(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt_singleline(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.error)?;
 
-        let sources = self.error.source().into_iter().flat_map(<dyn Error>::sources);
+        let sources = self
+            .error
+            .source()
+            .into_iter()
+            .flat_map(<dyn Error>::sources);
 
         for cause in sources {
             write!(f, ": {cause}")?;
@@ -476,7 +477,7 @@ where
     }
 
     /// Format the report as multiple lines, with each error cause on its own line.
-        fn fmt_multiline(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt_multiline(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let error = &self.error;
 
         write!(f, "{error}")?;
@@ -517,7 +518,11 @@ where
     E: Error,
 {
     fn from(error: E) -> Self {
-        Report { error, show_backtrace: false, pretty: false }
+        Report {
+            error,
+            show_backtrace: false,
+            pretty: false,
+        }
     }
 }
 
@@ -526,7 +531,11 @@ where
     E: Error,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.pretty { self.fmt_multiline(f) } else { self.fmt_singleline(f) }
+        if self.pretty {
+            self.fmt_multiline(f)
+        } else {
+            self.fmt_singleline(f)
+        }
     }
 }
 

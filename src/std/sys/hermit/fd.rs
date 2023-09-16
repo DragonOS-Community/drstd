@@ -1,4 +1,3 @@
-
 use crate::std::io::{self, Read};
 use crate::std::os::hermit::io::{FromRawFd, OwnedFd, RawFd};
 use crate::std::sys::cvt;
@@ -69,7 +68,9 @@ impl FromInner<OwnedFd> for FileDesc {
 
 impl FromRawFd for FileDesc {
     unsafe fn from_raw_fd(raw_fd: RawFd) -> Self {
-        Self { fd: FromRawFd::from_raw_fd(raw_fd) }
+        Self {
+            fd: FromRawFd::from_raw_fd(raw_fd),
+        }
     }
 }
 

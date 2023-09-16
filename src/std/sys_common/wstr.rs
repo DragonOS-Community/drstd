@@ -20,7 +20,10 @@ impl WStrUnits<'_> {
     /// SAFETY: `lpwstr` must point to a null-terminated wide string that lives
     /// at least as long as the lifetime of this struct.
     pub unsafe fn new(lpwstr: *const u16) -> Option<Self> {
-        Some(Self { lpwstr: NonNull::new(lpwstr as _)?, lifetime: PhantomData })
+        Some(Self {
+            lpwstr: NonNull::new(lpwstr as _)?,
+            lifetime: PhantomData,
+        })
     }
 
     pub fn peek(&self) -> Option<NonZeroU16> {

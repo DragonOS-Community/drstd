@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests;
 
-use core::alloc::Allocator;
 use crate::std::cmp;
 use crate::std::collections::VecDeque;
 use crate::std::fmt;
@@ -10,6 +9,7 @@ use crate::std::io::{
 };
 use crate::std::mem;
 use crate::std::str;
+use core::alloc::Allocator;
 
 // =============================================================================
 // Forwarding implementations
@@ -366,7 +366,10 @@ impl Write for &mut [u8] {
         if self.write(data)? == data.len() {
             Ok(())
         } else {
-            Err(io::const_io_error!(ErrorKind::WriteZero, "failed to write whole buffer"))
+            Err(io::const_io_error!(
+                ErrorKind::WriteZero,
+                "failed to write whole buffer"
+            ))
         }
     }
 

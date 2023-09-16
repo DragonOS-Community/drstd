@@ -2,8 +2,8 @@
 #[cfg(all(test, not(target_os = "emscripten")))]
 mod tests;
 
-use dlibc as c;
 use crate::std::sys_common::{FromInner, IntoInner};
+use dlibc as c;
 
 pub use core::net::IpAddr;
 
@@ -16,7 +16,9 @@ impl IntoInner<c::in_addr> for Ipv4Addr {
     fn into_inner(self) -> c::in_addr {
         // `s_addr` is stored as BE on all machines and the array is in BE order.
         // So the native endian conversion method is used so that it's never swapped.
-        c::in_addr { s_addr: u32::from_ne_bytes(self.octets()) }
+        c::in_addr {
+            s_addr: u32::from_ne_bytes(self.octets()),
+        }
     }
 }
 impl FromInner<c::in_addr> for Ipv4Addr {
@@ -27,7 +29,9 @@ impl FromInner<c::in_addr> for Ipv4Addr {
 
 impl IntoInner<c::in6_addr> for Ipv6Addr {
     fn into_inner(self) -> c::in6_addr {
-        c::in6_addr { s6_addr: self.octets() }
+        c::in6_addr {
+            s6_addr: self.octets(),
+        }
     }
 }
 impl FromInner<c::in6_addr> for Ipv6Addr {

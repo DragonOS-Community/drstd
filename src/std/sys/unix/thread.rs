@@ -163,7 +163,12 @@ impl Thread {
         }
     }
 
-    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+    #[cfg(any(
+        target_os = "macos",
+        target_os = "ios",
+        target_os = "tvos",
+        target_os = "watchos"
+    ))]
     pub fn set_name(name: &CStr) {
         unsafe {
             let name = truncate_cstr::<{ dlibc::MAXTHREADNAMESIZE }>(name);
@@ -263,7 +268,11 @@ impl Thread {
         let mut micros = dur.as_micros();
         unsafe {
             while micros > 0 {
-                let st = if micros > u32::MAX as u128 { u32::MAX } else { micros as u32 };
+                let st = if micros > u32::MAX as u128 {
+                    u32::MAX
+                } else {
+                    micros as u32
+                };
                 dlibc::usleep(st);
 
                 micros -= st as u128;
@@ -275,7 +284,11 @@ impl Thread {
         unsafe {
             let ret = dlibc::pthread_join(self.id, ptr::null_mut());
             mem::forget(self);
-            assert!(ret == 0, "failed to join thread: {}", io::Error::from_raw_os_error(ret));
+            assert!(
+                ret == 0,
+                "failed to join thread: {}",
+                io::Error::from_raw_os_error(ret)
+            );
         }
     }
 
@@ -476,7 +489,7 @@ pub fn available_parallelism() -> io::Result<NonZeroUsize> {
     }
 }
 
-#[cfg(any(target_os = "android", target_os = "linux",target_os = "dragonos",))]
+#[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos",))]
 mod cgroups {
     //! Currently not covered
     //! * cgroup v2 in non-standard mountpoints
@@ -511,7 +524,10 @@ mod cgroups {
         let _: Option<()> = try {
             let mut buf = Vec::with_capacity(128);
             // find our place in the cgroup hierarchy
-            File::open("/proc/self/cgroup").ok()?.read_to_end(&mut buf).ok()?;
+            File::open("/proc/self/cgroup")
+                .ok()?
+                .read_to_end(&mut buf)
+                .ok()?;
             let (cgroup_path, version) =
                 buf.split(|&c| c == b'\n').fold(None, |previous, line| {
                     let mut fields = line.splitn(3, |&c| c == b':');
@@ -574,7 +590,10 @@ mod cgroups {
 
                 read_buf.clear();
 
-                if File::open(&path).and_then(|mut f| f.read_to_string(&mut read_buf)).is_ok() {
+                if File::open(&path)
+                    .and_then(|mut f| f.read_to_string(&mut read_buf))
+                    .is_ok()
+                {
                     let raw_quota = read_buf.lines().next()?;
                     let mut raw_quota = raw_quota.split(' ');
                     let limit = raw_quota.next()?;
@@ -612,7 +631,9 @@ mod cgroups {
         ];
 
         for mount in mounts {
-            let Some((mount, group_path)) = mount(&group_path) else { continue };
+            let Some((mount, group_path)) = mount(&group_path) else {
+                continue;
+            };
 
             path.clear();
             path.push(mount.as_ref());
@@ -761,7 +782,10 @@ pub mod guard {
     #[cfg(target_os = "openbsd")]
     unsafe fn get_stack_start() -> Option<*mut dlibc::c_void> {
         let mut current_stack: dlibc::stack_t = crate::std::mem::zeroed();
-        assert_eq!(dlibc::pthread_stackseg_np(dlibc::pthread_self(), &mut current_stack), 0);
+        assert_eq!(
+            dlibc::pthread_stackseg_np(dlibc::pthread_self(), &mut current_stack),
+            0
+        );
 
         let stack_ptr = current_stack.ss_sp;
         let stackaddr = if dlibc::pthread_main_np() == 1 {
@@ -793,7 +817,10 @@ pub mod guard {
         if e == 0 {
             let mut stackaddr = crate::std::ptr::null_mut();
             let mut stacksize = 0;
-            assert_eq!(dlibc::pthread_attr_getstack(&attr, &mut stackaddr, &mut stacksize), 0);
+            assert_eq!(
+                dlibc::pthread_attr_getstack(&attr, &mut stackaddr, &mut stacksize),
+                0
+            );
             ret = Some(stackaddr);
         }
         if e == 0 || cfg!(target_os = "freebsd") {
@@ -890,12 +917,18 @@ pub mod guard {
                 0,
             );
             if result != stackptr || result == MAP_FAILED {
-                panic!("failed to allocate a guard page: {}", io::Error::last_os_error());
+                panic!(
+                    "failed to allocate a guard page: {}",
+                    io::Error::last_os_error()
+                );
             }
 
             let result = mprotect(stackptr, page_size, PROT_NONE);
             if result != 0 {
-                panic!("failed to protect the guard page: {}", io::Error::last_os_error());
+                panic!(
+                    "failed to protect the guard page: {}",
+                    io::Error::last_os_error()
+                );
             }
 
             let guardaddr = stackptr.addr();
@@ -942,15 +975,20 @@ pub mod guard {
             }
             let mut stackptr = crate::std::ptr::null_mut::<dlibc::c_void>();
             let mut size = 0;
-            assert_eq!(dlibc::pthread_attr_getstack(&attr, &mut stackptr, &mut size), 0);
+            assert_eq!(
+                dlibc::pthread_attr_getstack(&attr, &mut stackptr, &mut size),
+                0
+            );
 
             let stackaddr = stackptr.addr();
             ret = if cfg!(any(target_os = "freebsd", target_os = "netbsd")) {
                 Some(stackaddr - guardsize..stackaddr)
             } else if cfg!(all(target_os = "linux", target_env = "musl")) {
                 Some(stackaddr - guardsize..stackaddr)
-            } else if cfg!(all(target_os = "linux", any(target_env = "gnu", target_env = "uclibc")))
-            {
+            } else if cfg!(all(
+                target_os = "linux",
+                any(target_env = "gnu", target_env = "uclibc")
+            )) {
                 // glibc used to include the guard area within the stack, as noted in the BUGS
                 // section of `man pthread_attr_getguardsize`. This has been corrected starting
                 // with glibc 2.27, and in some distro backports, so the guard is now placed at the
@@ -988,7 +1026,10 @@ fn min_stack_size(attr: *const dlibc::pthread_attr_t) -> usize {
 }
 
 // No point in looking up __pthread_get_minstack() on non-glibc platforms.
-#[cfg(all(not(all(target_os = "linux", target_env = "gnu")), not(target_os = "netbsd")))]
+#[cfg(all(
+    not(all(target_os = "linux", target_env = "gnu")),
+    not(target_os = "netbsd")
+))]
 fn min_stack_size(_: *const dlibc::pthread_attr_t) -> usize {
     dlibc::PTHREAD_STACK_MIN
 }

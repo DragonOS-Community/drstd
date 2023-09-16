@@ -16,7 +16,9 @@ impl Handler {
     }
 
     fn null() -> Handler {
-        Handler { data: crate::std::ptr::null_mut() }
+        Handler {
+            data: crate::std::ptr::null_mut(),
+        }
     }
 }
 
@@ -140,20 +142,36 @@ mod imp {
         let flags = MAP_PRIVATE | MAP_ANON | dlibc::MAP_STACK;
         #[cfg(not(any(target_os = "openbsd", target_os = "netbsd", target_os = "linux",)))]
         let flags = MAP_PRIVATE | MAP_ANON;
-        let stackp =
-            mmap64(ptr::null_mut(), SIGSTKSZ + page_size(), PROT_READ | PROT_WRITE, flags, -1, 0);
+        let stackp = mmap64(
+            ptr::null_mut(),
+            SIGSTKSZ + page_size(),
+            PROT_READ | PROT_WRITE,
+            flags,
+            -1,
+            0,
+        );
         if stackp == MAP_FAILED {
-            panic!("failed to allocate an alternative stack: {}", io::Error::last_os_error());
+            panic!(
+                "failed to allocate an alternative stack: {}",
+                io::Error::last_os_error()
+            );
         }
         let guard_result = dlibc::mprotect(stackp, page_size(), PROT_NONE);
         if guard_result != 0 {
-            panic!("failed to set up alternative stack guard page: {}", io::Error::last_os_error());
+            panic!(
+                "failed to set up alternative stack guard page: {}",
+                io::Error::last_os_error()
+            );
         }
         stackp.add(page_size())
     }
 
     unsafe fn get_stack() -> dlibc::stack_t {
-        dlibc::stack_t { ss_sp: get_stackp(), ss_flags: 0, ss_size: SIGSTKSZ }
+        dlibc::stack_t {
+            ss_sp: get_stackp(),
+            ss_flags: 0,
+            ss_size: SIGSTKSZ,
+        }
     }
 
     pub unsafe fn make_handler() -> Handler {
@@ -166,7 +184,9 @@ mod imp {
         if stack.ss_flags & SS_DISABLE != 0 {
             stack = get_stack();
             sigaltstack(&stack, ptr::null_mut());
-            Handler { data: stack.ss_sp as *mut dlibc::c_void }
+            Handler {
+                data: stack.ss_sp as *mut dlibc::c_void,
+            }
         } else {
             Handler::null()
         }

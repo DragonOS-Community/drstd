@@ -36,16 +36,16 @@ pub mod thread;
 /// Includes all extension traits, and some important type definitions.
 pub mod prelude {
     #[doc(no_inline)]
-        pub use super::ffi::{OsStrExt, OsStringExt};
+    pub use super::ffi::{OsStrExt, OsStringExt};
     #[doc(no_inline)]
-        pub use super::fs::FileExt;
+    pub use super::fs::FileExt;
     #[doc(no_inline)]
-        pub use super::fs::{MetadataExt, OpenOptionsExt};
+    pub use super::fs::{MetadataExt, OpenOptionsExt};
     #[doc(no_inline)]
-        pub use super::io::{
+    pub use super::io::{
         AsHandle, AsSocket, BorrowedHandle, BorrowedSocket, FromRawHandle, FromRawSocket,
         HandleOrInvalid, IntoRawHandle, IntoRawSocket, OwnedHandle, OwnedSocket,
     };
     #[doc(no_inline)]
-        pub use super::io::{AsRawHandle, AsRawSocket, RawHandle, RawSocket};
+    pub use super::io::{AsRawHandle, AsRawSocket, RawHandle, RawSocket};
 }

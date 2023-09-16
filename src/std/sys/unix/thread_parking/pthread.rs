@@ -87,8 +87,10 @@ unsafe fn wait_timeout(
     };
 
     #[cfg(not(target_os = "nto"))]
-    let timeout =
-        now.checked_add_duration(&dur).and_then(|t| t.to_timespec()).unwrap_or(TIMESPEC_MAX);
+    let timeout = now
+        .checked_add_duration(&dur)
+        .and_then(|t| t.to_timespec())
+        .unwrap_or(TIMESPEC_MAX);
     #[cfg(target_os = "nto")]
     let timeout = now
         .checked_add_duration(&dur)
@@ -154,7 +156,11 @@ impl Parker {
     pub unsafe fn park(self: Pin<&Self>) {
         // If we were previously notified then we consume this notification and
         // return quickly.
-        if self.state.compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst).is_ok() {
+        if self
+            .state
+            .compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst)
+            .is_ok()
+        {
             return;
         }
 
@@ -202,7 +208,11 @@ impl Parker {
         // Like `park` above we have a fast path for an already-notified thread, and
         // afterwards we start coordinating for a sleep.
         // return quickly.
-        if self.state.compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst).is_ok() {
+        if self
+            .state
+            .compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst)
+            .is_ok()
+        {
             return;
         }
 

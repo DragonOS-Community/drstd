@@ -130,7 +130,9 @@ mod imp {
     };
 
     pub fn args() -> Args {
-        Args { iter: clone().into_iter() }
+        Args {
+            iter: clone().into_iter(),
+        }
     }
 
     fn clone() -> Vec<OsString> {
@@ -144,7 +146,11 @@ mod imp {
             // before initialization has completed, and we return an empty
             // list.
             let argv = ARGV.load(Ordering::Relaxed);
-            let argc = if argv.is_null() { 0 } else { ARGC.load(Ordering::Relaxed) };
+            let argc = if argv.is_null() {
+                0
+            } else {
+                ARGC.load(Ordering::Relaxed)
+            };
             let mut args = Vec::with_capacity(argc as usize);
             for i in 0..argc {
                 let ptr = *argv.offset(i) as *const dlibc::c_char;
@@ -171,7 +177,12 @@ mod imp {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "tvos",
+    target_os = "watchos"
+))]
 mod imp {
     use super::Args;
     use crate::std::ffi::CStr;
@@ -188,8 +199,10 @@ mod imp {
         }
 
         let vec = unsafe {
-            let (argc, argv) =
-                (*_NSGetArgc() as isize, *_NSGetArgv() as *const *const dlibc::c_char);
+            let (argc, argv) = (
+                *_NSGetArgc() as isize,
+                *_NSGetArgv() as *const *const dlibc::c_char,
+            );
             (0..argc as isize)
                 .map(|i| {
                     let bytes = CStr::from_ptr(*argv.offset(i)).to_bytes().to_vec();
@@ -197,7 +210,9 @@ mod imp {
                 })
                 .collect::<Vec<_>>()
         };
-        Args { iter: vec.into_iter() }
+        Args {
+            iter: vec.into_iter(),
+        }
     }
 
     // As _NSGetArgc and _NSGetArgv aren't mentioned in iOS docs
@@ -264,7 +279,9 @@ mod imp {
             }
         }
 
-        Args { iter: res.into_iter() }
+        Args {
+            iter: res.into_iter(),
+        }
     }
 }
 
@@ -276,6 +293,8 @@ mod imp {
     pub unsafe fn init(_argc: isize, _argv: *const *const u8) {}
 
     pub fn args() -> Args {
-        Args { iter: Vec::new().into_iter() }
+        Args {
+            iter: Vec::new().into_iter(),
+        }
     }
 }

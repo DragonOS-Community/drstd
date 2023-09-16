@@ -75,7 +75,6 @@
 //!
 //! [`BorrowedFd<'a>`]: crate::std::os::unix::io::BorrowedFd
 
-
 pub use crate::std::os::fd::*;
 
 // Tests for this module

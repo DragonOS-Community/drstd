@@ -2,7 +2,6 @@
 //!
 //! [`std::thread`]: crate::std::thread
 
-
 #[allow(deprecated)]
 use crate::std::os::unix::raw::pthread_t;
 use crate::std::sys_common::{AsInner, IntoInner};
@@ -14,14 +13,14 @@ pub type RawPthread = pthread_t;
 /// Unix-specific extensions to [`JoinHandle`].
 pub trait JoinHandleExt {
     /// Extracts the raw pthread_t without taking ownership
-        fn as_pthread_t(&self) -> RawPthread;
+    fn as_pthread_t(&self) -> RawPthread;
 
     /// Consumes the thread, returning the raw pthread_t
     ///
     /// This function **transfers ownership** of the underlying pthread_t to
     /// the caller. Callers are then the unique owners of the pthread_t and
     /// must either detach or join the pthread_t once it's no longer needed.
-        fn into_pthread_t(self) -> RawPthread;
+    fn into_pthread_t(self) -> RawPthread;
 }
 
 impl<T> JoinHandleExt for JoinHandle<T> {

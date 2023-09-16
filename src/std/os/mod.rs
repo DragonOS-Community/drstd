@@ -148,10 +148,10 @@ pub mod fd;
 mod net;
 
 #[cfg(target_os = "dragonos")]
-pub mod unix;
+pub mod fd;
 #[cfg(target_os = "dragonos")]
 pub mod linux;
 #[cfg(target_os = "dragonos")]
-pub mod fd;
-#[cfg(target_os = "dragonos")]
 mod net;
+#[cfg(target_os = "dragonos")]
+pub mod unix;

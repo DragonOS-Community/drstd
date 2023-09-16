@@ -81,7 +81,11 @@ pub(crate) struct DlsymWeak<F> {
 
 impl<F> DlsymWeak<F> {
     pub(crate) const fn new(name: &'static str) -> Self {
-        DlsymWeak { name, func: AtomicPtr::new(ptr::invalid_mut(1)), _marker: PhantomData }
+        DlsymWeak {
+            name,
+            func: AtomicPtr::new(ptr::invalid_mut(1)),
+            _marker: PhantomData,
+        }
     }
 
     #[inline]
@@ -127,7 +131,11 @@ impl<F> DlsymWeak<F> {
         // This synchronizes with the acquire fence in `get`.
         self.func.store(val, Ordering::Release);
 
-        if val.is_null() { None } else { Some(mem::transmute_copy::<*mut dlibc::c_void, F>(&val)) }
+        if val.is_null() {
+            None
+        } else {
+            Some(mem::transmute_copy::<*mut dlibc::c_void, F>(&val))
+        }
     }
 }
 

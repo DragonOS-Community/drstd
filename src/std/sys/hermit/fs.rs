@@ -232,9 +232,10 @@ impl OpenOptions {
             (true, true, false) => Ok(O_RDWR),
             (false, _, true) => Ok(O_WRONLY | O_APPEND),
             (true, _, true) => Ok(O_RDWR | O_APPEND),
-            (false, false, false) => {
-                Err(io::const_io_error!(ErrorKind::InvalidInput, "invalid access mode"))
-            }
+            (false, false, false) => Err(io::const_io_error!(
+                ErrorKind::InvalidInput,
+                "invalid access mode"
+            )),
         }
     }
 
@@ -423,7 +424,9 @@ pub fn readdir(_p: &Path) -> io::Result<ReadDir> {
 }
 
 pub fn unlink(path: &Path) -> io::Result<()> {
-    run_path_with_cstr(path, |path| cvt(unsafe { abi::unlink(path.as_ptr()) }).map(|_| ()))
+    run_path_with_cstr(path, |path| {
+        cvt(unsafe { abi::unlink(path.as_ptr()) }).map(|_| ())
+    })
 }
 
 pub fn rename(_old: &Path, _new: &Path) -> io::Result<()> {

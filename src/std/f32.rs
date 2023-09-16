@@ -11,9 +11,6 @@
 
 #![allow(missing_docs)]
 
-#[cfg(test)]
-mod tests;
-
 #[cfg(not(test))]
 use crate::std::intrinsics;
 #[cfg(not(test))]
@@ -42,7 +39,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn floor(self) -> f32 {
         unsafe { intrinsics::floorf32(self) }
     }
@@ -61,7 +58,7 @@ impl f32 {
     #[doc(alias = "ceiling")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn ceil(self) -> f32 {
         unsafe { intrinsics::ceilf32(self) }
     }
@@ -86,7 +83,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn round(self) -> f32 {
         unsafe { intrinsics::roundf32(self) }
     }
@@ -111,7 +108,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn round_ties_even(self) -> f32 {
         unsafe { intrinsics::rintf32(self) }
     }
@@ -133,7 +130,7 @@ impl f32 {
     #[doc(alias = "truncate")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn trunc(self) -> f32 {
         unsafe { intrinsics::truncf32(self) }
     }
@@ -153,7 +150,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn fract(self) -> f32 {
         self - self.trunc()
     }
@@ -176,7 +173,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn abs(self) -> f32 {
         unsafe { intrinsics::fabsf32(self) }
     }
@@ -199,9 +196,13 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn signum(self) -> f32 {
-        if self.is_nan() { Self::NAN } else { 1.0_f32.copysign(self) }
+        if self.is_nan() {
+            Self::NAN
+        } else {
+            1.0_f32.copysign(self)
+        }
     }
 
     /// Returns a number composed of the magnitude of `self` and the sign of
@@ -228,7 +229,7 @@ impl f32 {
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
     #[inline]
-        pub fn copysign(self, sign: f32) -> f32 {
+    pub fn copysign(self, sign: f32) -> f32 {
         unsafe { intrinsics::copysignf32(self, sign) }
     }
 
@@ -254,7 +255,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn mul_add(self, a: f32, b: f32) -> f32 {
         unsafe { intrinsics::fmaf32(self, a, b) }
     }
@@ -279,7 +280,7 @@ impl f32 {
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
     #[inline]
-        pub fn div_euclid(self, rhs: f32) -> f32 {
+    pub fn div_euclid(self, rhs: f32) -> f32 {
         let q = (self / rhs).trunc();
         if self % rhs < 0.0 {
             return if rhs > 0.0 { q - 1.0 } else { q + 1.0 };
@@ -314,9 +315,13 @@ impl f32 {
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
     #[inline]
-        pub fn rem_euclid(self, rhs: f32) -> f32 {
+    pub fn rem_euclid(self, rhs: f32) -> f32 {
         let r = self % rhs;
-        if r < 0.0 { r + rhs.abs() } else { r }
+        if r < 0.0 {
+            r + rhs.abs()
+        } else {
+            r
+        }
     }
 
     /// Raises a number to an integer power.
@@ -335,7 +340,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn powi(self, n: i32) -> f32 {
         unsafe { intrinsics::powif32(self, n) }
     }
@@ -352,7 +357,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn powf(self, n: f32) -> f32 {
         unsafe { intrinsics::powf32(self, n) }
     }
@@ -376,7 +381,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn sqrt(self) -> f32 {
         unsafe { intrinsics::sqrtf32(self) }
     }
@@ -397,7 +402,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn exp(self) -> f32 {
         unsafe { intrinsics::expf32(self) }
     }
@@ -416,7 +421,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn exp2(self) -> f32 {
         unsafe { intrinsics::exp2f32(self) }
     }
@@ -437,7 +442,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn ln(self) -> f32 {
         unsafe { intrinsics::logf32(self) }
     }
@@ -460,7 +465,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn log(self, base: f32) -> f32 {
         self.ln() / base.ln()
     }
@@ -479,7 +484,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn log2(self) -> f32 {
         crate::std::sys::log2f32(self)
     }
@@ -498,7 +503,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn log10(self) -> f32 {
         unsafe { intrinsics::log10f32(self) }
     }
@@ -522,7 +527,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     #[deprecated(
         since = "1.10.0",
         note = "you probably meant `(self - other).abs()`: \
@@ -551,7 +556,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn cbrt(self) -> f32 {
         unsafe { cmath::cbrtf(self) }
     }
@@ -574,7 +579,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn hypot(self, other: f32) -> f32 {
         unsafe { cmath::hypotf(self, other) }
     }
@@ -592,7 +597,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn sin(self) -> f32 {
         unsafe { intrinsics::sinf32(self) }
     }
@@ -610,7 +615,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn cos(self) -> f32 {
         unsafe { intrinsics::cosf32(self) }
     }
@@ -627,7 +632,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn tan(self) -> f32 {
         unsafe { cmath::tanf(self) }
     }
@@ -649,7 +654,7 @@ impl f32 {
     #[doc(alias = "arcsin")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn asin(self) -> f32 {
         unsafe { cmath::asinf(self) }
     }
@@ -671,7 +676,7 @@ impl f32 {
     #[doc(alias = "arccos")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn acos(self) -> f32 {
         unsafe { cmath::acosf(self) }
     }
@@ -692,7 +697,7 @@ impl f32 {
     #[doc(alias = "arctan")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn atan(self) -> f32 {
         unsafe { cmath::atanf(self) }
     }
@@ -725,7 +730,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn atan2(self, other: f32) -> f32 {
         unsafe { cmath::atan2f(self, other) }
     }
@@ -747,7 +752,7 @@ impl f32 {
     /// ```
     #[doc(alias = "sincos")]
     #[rustc_allow_incoherent_impl]
-        #[inline]
+    #[inline]
     pub fn sin_cos(self) -> (f32, f32) {
         (self.sin(), self.cos())
     }
@@ -768,7 +773,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn exp_m1(self) -> f32 {
         unsafe { cmath::expm1f(self) }
     }
@@ -790,7 +795,7 @@ impl f32 {
     #[doc(alias = "log1p")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn ln_1p(self) -> f32 {
         unsafe { cmath::log1pf(self) }
     }
@@ -812,7 +817,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn sinh(self) -> f32 {
         unsafe { cmath::sinhf(self) }
     }
@@ -834,7 +839,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn cosh(self) -> f32 {
         unsafe { cmath::coshf(self) }
     }
@@ -856,7 +861,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn tanh(self) -> f32 {
         unsafe { cmath::tanhf(self) }
     }
@@ -876,11 +881,13 @@ impl f32 {
     #[doc(alias = "arcsinh")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn asinh(self) -> f32 {
         let ax = self.abs();
         let ix = 1.0 / ax;
-        (ax + (ax / (Self::hypot(1.0, ix) + ix))).ln_1p().copysign(self)
+        (ax + (ax / (Self::hypot(1.0, ix) + ix)))
+            .ln_1p()
+            .copysign(self)
     }
 
     /// Inverse hyperbolic cosine function.
@@ -898,7 +905,7 @@ impl f32 {
     #[doc(alias = "arccosh")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn acosh(self) -> f32 {
         if self < 1.0 {
             Self::NAN
@@ -922,7 +929,7 @@ impl f32 {
     #[doc(alias = "arctanh")]
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn atanh(self) -> f32 {
         0.5 * ((2.0 * self) / (1.0 - self)).ln_1p()
     }
@@ -941,7 +948,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn gamma(self) -> f32 {
         unsafe { cmath::tgammaf(self) }
     }
@@ -962,7 +969,7 @@ impl f32 {
     /// ```
     #[rustc_allow_incoherent_impl]
     #[must_use = "method returns a new number and does not mutate the original value"]
-        #[inline]
+    #[inline]
     pub fn ln_gamma(self) -> (f32, i32) {
         let mut signgamp: i32 = 0;
         let x = unsafe { cmath::lgammaf_r(self, &mut signgamp) };

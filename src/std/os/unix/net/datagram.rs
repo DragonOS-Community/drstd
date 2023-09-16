@@ -84,12 +84,16 @@ impl UnixDatagram {
     ///     }
     /// };
     /// ```
-        pub fn bind<P: AsRef<Path>>(path: P) -> io::Result<UnixDatagram> {
+    pub fn bind<P: AsRef<Path>>(path: P) -> io::Result<UnixDatagram> {
         unsafe {
             let socket = UnixDatagram::unbound()?;
             let (addr, len) = sockaddr_un(path.as_ref())?;
 
-            cvt(dlibc::bind(socket.as_raw_fd(), &addr as *const _ as *const _, len as _))?;
+            cvt(dlibc::bind(
+                socket.as_raw_fd(),
+                &addr as *const _ as *const _,
+                len as _,
+            ))?;
 
             Ok(socket)
         }
@@ -116,7 +120,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn bind_addr(socket_addr: &SocketAddr) -> io::Result<UnixDatagram> {
+    pub fn bind_addr(socket_addr: &SocketAddr) -> io::Result<UnixDatagram> {
         unsafe {
             let socket = UnixDatagram::unbound()?;
             cvt(dlibc::bind(
@@ -143,7 +147,7 @@ impl UnixDatagram {
     ///     }
     /// };
     /// ```
-        pub fn unbound() -> io::Result<UnixDatagram> {
+    pub fn unbound() -> io::Result<UnixDatagram> {
         let inner = Socket::new_raw(dlibc::AF_UNIX, dlibc::SOCK_DGRAM)?;
         Ok(UnixDatagram(inner))
     }
@@ -165,7 +169,7 @@ impl UnixDatagram {
     ///     }
     /// };
     /// ```
-        pub fn pair() -> io::Result<(UnixDatagram, UnixDatagram)> {
+    pub fn pair() -> io::Result<(UnixDatagram, UnixDatagram)> {
         let (i1, i2) = Socket::new_pair(dlibc::AF_UNIX, dlibc::SOCK_DGRAM)?;
         Ok((UnixDatagram(i1), UnixDatagram(i2)))
     }
@@ -196,11 +200,15 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn connect<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
+    pub fn connect<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
         unsafe {
             let (addr, len) = sockaddr_un(path.as_ref())?;
 
-            cvt(dlibc::connect(self.as_raw_fd(), &addr as *const _ as *const _, len))?;
+            cvt(dlibc::connect(
+                self.as_raw_fd(),
+                &addr as *const _ as *const _,
+                len,
+            ))?;
         }
         Ok(())
     }
@@ -227,7 +235,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn connect_addr(&self, socket_addr: &SocketAddr) -> io::Result<()> {
+    pub fn connect_addr(&self, socket_addr: &SocketAddr) -> io::Result<()> {
         unsafe {
             cvt(dlibc::connect(
                 self.as_raw_fd(),
@@ -255,7 +263,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn try_clone(&self) -> io::Result<UnixDatagram> {
+    pub fn try_clone(&self) -> io::Result<UnixDatagram> {
         self.0.duplicate().map(UnixDatagram)
     }
 
@@ -272,7 +280,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn local_addr(&self) -> io::Result<SocketAddr> {
+    pub fn local_addr(&self) -> io::Result<SocketAddr> {
         SocketAddr::new(|addr, len| unsafe { dlibc::getsockname(self.as_raw_fd(), addr, len) })
     }
 
@@ -295,7 +303,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn peer_addr(&self) -> io::Result<SocketAddr> {
+    pub fn peer_addr(&self) -> io::Result<SocketAddr> {
         SocketAddr::new(|addr, len| unsafe { dlibc::getpeername(self.as_raw_fd(), addr, len) })
     }
 
@@ -344,7 +352,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
+    pub fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
         self.recv_from_flags(buf, 0)
     }
 
@@ -364,7 +372,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn recv(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn recv(&self, buf: &mut [u8]) -> io::Result<usize> {
         self.0.read(buf)
     }
 
@@ -375,7 +383,10 @@ impl UnixDatagram {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixDatagram, SocketAncillary, AncillaryData};
     /// use std::io::IoSliceMut;
@@ -406,7 +417,7 @@ impl UnixDatagram {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn recv_vectored_with_ancillary_from(
+    pub fn recv_vectored_with_ancillary_from(
         &self,
         bufs: &mut [IoSliceMut<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -424,7 +435,10 @@ impl UnixDatagram {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixDatagram, SocketAncillary, AncillaryData};
     /// use std::io::IoSliceMut;
@@ -455,7 +469,7 @@ impl UnixDatagram {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn recv_vectored_with_ancillary(
+    pub fn recv_vectored_with_ancillary(
         &self,
         bufs: &mut [IoSliceMut<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -481,7 +495,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn send_to<P: AsRef<Path>>(&self, buf: &[u8], path: P) -> io::Result<usize> {
+    pub fn send_to<P: AsRef<Path>>(&self, buf: &[u8], path: P) -> io::Result<usize> {
         unsafe {
             let (addr, len) = sockaddr_un(path.as_ref())?;
 
@@ -517,7 +531,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn send_to_addr(&self, buf: &[u8], socket_addr: &SocketAddr) -> io::Result<usize> {
+    pub fn send_to_addr(&self, buf: &[u8], socket_addr: &SocketAddr) -> io::Result<usize> {
         unsafe {
             let count = cvt(dlibc::sendto(
                 self.as_raw_fd(),
@@ -550,7 +564,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn send(&self, buf: &[u8]) -> io::Result<usize> {
+    pub fn send(&self, buf: &[u8]) -> io::Result<usize> {
         self.0.write(buf)
     }
 
@@ -561,7 +575,10 @@ impl UnixDatagram {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixDatagram, SocketAncillary};
     /// use std::io::IoSlice;
@@ -586,7 +603,7 @@ impl UnixDatagram {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn send_vectored_with_ancillary_to<P: AsRef<Path>>(
+    pub fn send_vectored_with_ancillary_to<P: AsRef<Path>>(
         &self,
         bufs: &[IoSlice<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -602,7 +619,10 @@ impl UnixDatagram {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixDatagram, SocketAncillary};
     /// use std::io::IoSlice;
@@ -627,7 +647,7 @@ impl UnixDatagram {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn send_vectored_with_ancillary(
+    pub fn send_vectored_with_ancillary(
         &self,
         bufs: &[IoSlice<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -674,7 +694,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_read_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
+    pub fn set_read_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
         self.0.set_timeout(timeout, dlibc::SO_RCVTIMEO)
     }
 
@@ -717,7 +737,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_write_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
+    pub fn set_write_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
         self.0.set_timeout(timeout, dlibc::SO_SNDTIMEO)
     }
 
@@ -737,7 +757,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.timeout(dlibc::SO_RCVTIMEO)
     }
 
@@ -757,7 +777,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.timeout(dlibc::SO_SNDTIMEO)
     }
 
@@ -774,7 +794,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
+    pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         self.0.set_nonblocking(nonblocking)
     }
 
@@ -818,7 +838,7 @@ impl UnixDatagram {
         target_os = "netbsd",
         target_os = "freebsd"
     ))]
-        pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
+    pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
         self.0.set_passcred(passcred)
     }
 
@@ -835,7 +855,7 @@ impl UnixDatagram {
         target_os = "netbsd",
         target_os = "freebsd"
     ))]
-        pub fn passcred(&self) -> io::Result<bool> {
+    pub fn passcred(&self) -> io::Result<bool> {
         self.0.passcred()
     }
 
@@ -859,7 +879,7 @@ impl UnixDatagram {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "linux", target_os = "freebsd", target_os = "openbsd",))]
-        pub fn set_mark(&self, mark: u32) -> io::Result<()> {
+    pub fn set_mark(&self, mark: u32) -> io::Result<()> {
         self.0.set_mark(mark)
     }
 
@@ -878,7 +898,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn take_error(&self) -> io::Result<Option<io::Error>> {
+    pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         self.0.take_error()
     }
 
@@ -898,7 +918,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn shutdown(&self, how: Shutdown) -> io::Result<()> {
+    pub fn shutdown(&self, how: Shutdown) -> io::Result<()> {
         self.0.shutdown(how)
     }
 
@@ -923,7 +943,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
         self.0.peek(buf)
     }
 
@@ -954,7 +974,7 @@ impl UnixDatagram {
     ///     Ok(())
     /// }
     /// ```
-        pub fn peek_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
+    pub fn peek_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
         self.recv_from_flags(buf, dlibc::MSG_PEEK)
     }
 }
@@ -969,7 +989,9 @@ impl AsRawFd for UnixDatagram {
 impl FromRawFd for UnixDatagram {
     #[inline]
     unsafe fn from_raw_fd(fd: RawFd) -> UnixDatagram {
-        UnixDatagram(Socket::from_inner(FromInner::from_inner(OwnedFd::from_raw_fd(fd))))
+        UnixDatagram(Socket::from_inner(FromInner::from_inner(
+            OwnedFd::from_raw_fd(fd),
+        )))
     }
 }
 

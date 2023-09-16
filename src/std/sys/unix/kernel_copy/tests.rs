@@ -46,7 +46,11 @@ fn copy_specialization() -> Result<()> {
         assert_eq!(copied, 10, "copy obeyed limit imposed by Take");
         assert_eq!(sink.buffer().len(), 0, "sink buffer was flushed");
         assert_eq!(source.limit(), 0, "outer Take was exhausted");
-        assert_eq!(source.get_ref().buffer().len(), 0, "source buffer should be drained");
+        assert_eq!(
+            source.get_ref().buffer().len(),
+            0,
+            "source buffer should be drained"
+        );
         assert_eq!(
             source.get_ref().get_ref().limit(),
             1,
@@ -71,11 +75,18 @@ fn copies_append_mode_sink() -> Result<()> {
     let tmp_path = tmpdir();
     let source_path = tmp_path.join("copies_append_mode.source");
     let sink_path = tmp_path.join("copies_append_mode.sink");
-    let mut source =
-        OpenOptions::new().create(true).truncate(true).write(true).read(true).open(&source_path)?;
+    let mut source = OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .read(true)
+        .open(&source_path)?;
     write!(source, "not empty")?;
     source.seek(SeekFrom::Start(0))?;
-    let mut sink = OpenOptions::new().create(true).append(true).open(&sink_path)?;
+    let mut sink = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&sink_path)?;
 
     let copied = crate::std::io::copy(&mut source, &mut sink)?;
 
@@ -101,8 +112,11 @@ fn dont_splice_pipes_from_files() -> Result<()> {
 
     let tmp_path = tmpdir();
     let file = tmp_path.join("to_be_modified");
-    let mut file =
-        crate::std::fs::OpenOptions::new().create_new(true).read(true).write(true).open(file)?;
+    let mut file = crate::std::fs::OpenOptions::new()
+        .create_new(true)
+        .read(true)
+        .write(true)
+        .open(file)?;
 
     const SZ: usize = dlibc::PIPE_BUF as usize;
 
@@ -121,7 +135,10 @@ fn dont_splice_pipes_from_files() -> Result<()> {
     // read from pipe
     read_end.read_exact(buf.as_mut_slice()).unwrap();
 
-    assert_eq!(buf[0], 0x01, "data in pipe should reflect the original, not later modifications");
+    assert_eq!(
+        buf[0], 0x01,
+        "data in pipe should reflect the original, not later modifications"
+    );
 
     Ok(())
 }
@@ -232,7 +249,8 @@ fn bench_socket_pipe_socket_copy(b: &mut test::Bencher) {
     let write_end = ChildStdin::from_inner(write_end);
 
     let acceptor = crate::std::net::TcpListener::bind("localhost:0").unwrap();
-    let mut remote_end = crate::std::net::TcpStream::connect(acceptor.local_addr().unwrap()).unwrap();
+    let mut remote_end =
+        crate::std::net::TcpStream::connect(acceptor.local_addr().unwrap()).unwrap();
 
     let local_end = crate::std::sync::Arc::new(acceptor.accept().unwrap().0);
 
@@ -291,15 +309,13 @@ fn bench_socket_pipe_socket_copy(b: &mut test::Bencher) {
     }
 
     let local_source = local_end.clone();
-    crate::std::thread::spawn(move || {
-        loop {
-            super::sendfile_splice(
-                super::SpliceMode::Splice,
-                local_source.as_raw_fd(),
-                write_end.as_raw_fd(),
-                u64::MAX,
-            );
-        }
+    crate::std::thread::spawn(move || loop {
+        super::sendfile_splice(
+            super::SpliceMode::Splice,
+            local_source.as_raw_fd(),
+            write_end.as_raw_fd(),
+            u64::MAX,
+        );
     });
 
     const BYTES: usize = 128 * 1024;

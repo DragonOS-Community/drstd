@@ -1,7 +1,9 @@
 use crate::std::error;
 use crate::std::fmt;
 
-pub use crate::std::sync::mpsc::{RecvError, RecvTimeoutError, SendError, TryRecvError, TrySendError};
+pub use crate::std::sync::mpsc::{
+    RecvError, RecvTimeoutError, SendError, TryRecvError, TrySendError,
+};
 
 /// An error returned from the [`send_timeout`] method.
 ///

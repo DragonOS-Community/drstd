@@ -1,4 +1,3 @@
-
 #[allow(unused_extern_crates)]
 pub extern crate hermit_abi as abi;
 
@@ -10,5 +9,5 @@ pub mod io;
 /// Includes all extension traits, and some important type definitions.
 pub mod prelude {
     #[doc(no_inline)]
-        pub use super::ffi::{OsStrExt, OsStringExt};
+    pub use super::ffi::{OsStrExt, OsStringExt};
 }

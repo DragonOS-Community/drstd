@@ -43,7 +43,10 @@ pub(crate) struct ArrayToken {
 impl Default for ArrayToken {
     #[inline]
     fn default() -> Self {
-        ArrayToken { slot: ptr::null(), stamp: 0 }
+        ArrayToken {
+            slot: ptr::null(),
+            stamp: 0,
+        }
     }
 }
 
@@ -105,7 +108,10 @@ impl<T> Channel<T> {
         let buffer: Box<[Slot<T>]> = (0..cap)
             .map(|i| {
                 // Set the stamp to `{ lap: 0, mark: 0, index: i }`.
-                Slot { stamp: AtomicUsize::new(i), msg: UnsafeCell::new(MaybeUninit::uninit()) }
+                Slot {
+                    stamp: AtomicUsize::new(i),
+                    msg: UnsafeCell::new(MaybeUninit::uninit()),
+                }
             })
             .collect();
 

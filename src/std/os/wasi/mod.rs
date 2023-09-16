@@ -41,11 +41,11 @@ pub mod net;
 /// Includes all extension traits, and some important type definitions.
 pub mod prelude {
     #[doc(no_inline)]
-        pub use super::ffi::{OsStrExt, OsStringExt};
+    pub use super::ffi::{OsStrExt, OsStringExt};
     #[doc(no_inline)]
-        pub use super::fs::FileTypeExt;
+    pub use super::fs::FileTypeExt;
     #[doc(no_inline)]
-        pub use super::fs::{DirEntryExt, FileExt, MetadataExt, OpenOptionsExt};
+    pub use super::fs::{DirEntryExt, FileExt, MetadataExt, OpenOptionsExt};
     #[doc(no_inline)]
-        pub use super::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
+    pub use super::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
 }

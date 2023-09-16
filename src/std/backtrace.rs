@@ -58,10 +58,6 @@
 //! `RUST_LIB_BACKTRACE` or `RUST_BACKTRACE` at runtime might not actually change
 //! how backtraces are captured.
 
-
-#[cfg(test)]
-mod tests;
-
 // NB: A note on resolution of a backtrace:
 //
 // Backtraces primarily happen in two steps, one is where we actually capture
@@ -115,13 +111,13 @@ pub struct Backtrace {
 pub enum BacktraceStatus {
     /// Capturing a backtrace is not supported, likely because it's not
     /// implemented for the current platform.
-        Unsupported,
+    Unsupported,
     /// Capturing a backtrace has been disabled through either the
     /// `RUST_LIB_BACKTRACE` or `RUST_BACKTRACE` environment variables.
-        Disabled,
+    Disabled,
     /// A backtrace has been captured and the `Backtrace` should print
     /// reasonable information when rendered.
-        Captured,
+    Captured,
 }
 
 enum Inner {
@@ -282,10 +278,12 @@ impl Backtrace {
     ///
     /// To forcibly capture a backtrace regardless of environment variables, use
     /// the `Backtrace::force_capture` function.
-        #[inline(never)] // want to make sure there's a frame here to remove
+    #[inline(never)] // want to make sure there's a frame here to remove
     pub fn capture() -> Backtrace {
         if !Backtrace::enabled() {
-            return Backtrace { inner: Inner::Disabled };
+            return Backtrace {
+                inner: Inner::Disabled,
+            };
         }
         Backtrace::create(Backtrace::capture as usize)
     }
@@ -300,15 +298,17 @@ impl Backtrace {
     /// Note that capturing a backtrace can be an expensive operation on some
     /// platforms, so this should be used with caution in performance-sensitive
     /// parts of code.
-        #[inline(never)] // want to make sure there's a frame here to remove
+    #[inline(never)] // want to make sure there's a frame here to remove
     pub fn force_capture() -> Backtrace {
         Backtrace::create(Backtrace::force_capture as usize)
     }
 
     /// Forcibly captures a disabled backtrace, regardless of environment
     /// variable configuration.
-            pub const fn disabled() -> Backtrace {
-        Backtrace { inner: Inner::Disabled }
+    pub const fn disabled() -> Backtrace {
+        Backtrace {
+            inner: Inner::Disabled,
+        }
     }
 
     // Capture a backtrace which start just before the function addressed by
@@ -342,13 +342,15 @@ impl Backtrace {
         //     })))
         // };
 
-        Backtrace { inner:Inner::Unsupported }
+        Backtrace {
+            inner: Inner::Unsupported,
+        }
     }
 
     /// Returns the status of this backtrace, indicating whether this backtrace
     /// request was unsupported, disabled, or a stack trace was actually
     /// captured.
-        #[must_use]
+    #[must_use]
     pub fn status(&self) -> BacktraceStatus {
         match self.inner {
             Inner::Unsupported => BacktraceStatus::Unsupported,
@@ -361,8 +363,12 @@ impl Backtrace {
 impl<'a> Backtrace {
     /// Returns an iterator over the backtrace frames.
     #[must_use]
-        pub fn frames(&'a self) -> &'a [BacktraceFrame] {
-        if let Inner::Captured(c) = &self.inner { &c.frames } else { &[] }
+    pub fn frames(&'a self) -> &'a [BacktraceFrame] {
+        if let Inner::Captured(c) = &self.inner {
+            &c.frames
+        } else {
+            &[]
+        }
     }
 }
 

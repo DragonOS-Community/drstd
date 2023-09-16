@@ -15,7 +15,9 @@ unsafe impl Sync for Condvar {}
 impl Condvar {
     #[inline]
     pub const fn new() -> Condvar {
-        Condvar { waiters: SpinMutex::new(waiter_queue::WaiterQueue::new()) }
+        Condvar {
+            waiters: SpinMutex::new(waiter_queue::WaiterQueue::new()),
+        }
     }
 
     pub fn notify_one(&self) {
@@ -66,7 +68,10 @@ impl Condvar {
             // Park the current task
             expect_success_aborting(unsafe { abi::slp_tsk() }, &"slp_tsk");
 
-            if !self.waiters.with_locked(|waiters| unsafe { waiters.is_queued(waiter) }) {
+            if !self
+                .waiters
+                .with_locked(|waiters| unsafe { waiters.is_queued(waiter) })
+            {
                 break;
             }
         }
@@ -91,7 +96,10 @@ impl Condvar {
             let er = unsafe { abi::tslp_tsk(tmo) };
             if er == 0 {
                 // We were unparked. Are we really dequeued?
-                if self.waiters.with_locked(|waiters| unsafe { waiters.is_queued(waiter) }) {
+                if self
+                    .waiters
+                    .with_locked(|waiters| unsafe { waiters.is_queued(waiter) })
+                {
                     // No we are not. Continue waiting.
                     return abi::E_TMOUT;
                 }
@@ -107,7 +115,9 @@ impl Condvar {
         // Remove `waiter` from `self.waiters`. If `waiter` is still in
         // `waiters`, it means we woke up because of a timeout. Otherwise,
         // we woke up because of `notify_*`.
-        let success = self.waiters.with_locked(|waiters| unsafe { !waiters.remove(waiter) });
+        let success = self
+            .waiters
+            .with_locked(|waiters| unsafe { !waiters.remove(waiter) });
 
         mutex.lock();
         success
@@ -154,7 +164,12 @@ mod waiter_queue {
             // the correctness.
             debug_assert_ne!(task, 0);
 
-            Self { task, priority, prev: None, next: None }
+            Self {
+                task,
+                priority,
+                prev: None,
+                next: None,
+            }
         }
     }
 
@@ -220,7 +235,10 @@ mod waiter_queue {
                     }
                 } else {
                     // `waiter` is the only element
-                    self.head = Some(ListHead { first: waiter_ptr, last: waiter_ptr });
+                    self.head = Some(ListHead {
+                        first: waiter_ptr,
+                        last: waiter_ptr,
+                    });
                 }
             }
         }

@@ -2,7 +2,6 @@
 //!
 //! See the [module-level documentation](super) for more.
 
-
 // Re-exported core operators
 #[doc(no_inline)]
 pub use crate::std::marker::{Send, Sized, Sync, Unpin};
@@ -43,9 +42,7 @@ pub use core::prelude::v1::{RustcDecodable, RustcEncodable};
 
 // Do not `doc(no_inline)` so that they become doc items on their own
 // (no public module for them to be re-exported from).
-pub use core::prelude::v1::{
-    alloc_error_handler, derive, global_allocator, test, test_case,
-};
+pub use core::prelude::v1::{alloc_error_handler, derive, global_allocator, test, test_case};
 
 pub use core::prelude::v1::derive_const;
 

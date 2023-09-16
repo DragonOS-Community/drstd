@@ -17,7 +17,9 @@ impl LazyInit for AllocatedMutex {
 // Implementation according to “Operating Systems: Three Easy Pieces”, chapter 28
 impl Mutex {
     pub const fn new() -> Mutex {
-        Mutex { inner: LazyBox::new() }
+        Mutex {
+            inner: LazyBox::new(),
+        }
     }
 
     #[inline]

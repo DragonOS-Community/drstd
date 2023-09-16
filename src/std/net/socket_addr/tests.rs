@@ -54,7 +54,10 @@ fn to_socket_addr_string() {
 #[test]
 fn ipv4_socket_addr_to_string() {
     // Shortest possible IPv4 length.
-    assert_eq!(SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 0).to_string(), "0.0.0.0:0");
+    assert_eq!(
+        SocketAddrV4::new(Ipv4Addr::new(0, 0, 0, 0), 0).to_string(),
+        "0.0.0.0:0"
+    );
 
     // Longest possible IPv4 length.
     assert_eq!(
@@ -77,8 +80,13 @@ fn ipv4_socket_addr_to_string() {
 fn ipv6_socket_addr_to_string() {
     // IPv4-mapped address.
     assert_eq!(
-        SocketAddrV6::new(Ipv6Addr::new(0, 0, 0, 0, 0, 0xffff, 0xc000, 0x280), 8080, 0, 0)
-            .to_string(),
+        SocketAddrV6::new(
+            Ipv6Addr::new(0, 0, 0, 0, 0, 0xffff, 0xc000, 0x280),
+            8080,
+            0,
+            0
+        )
+        .to_string(),
         "[::ffff:192.0.2.128]:8080"
     );
 
@@ -95,7 +103,10 @@ fn ipv6_socket_addr_to_string() {
     );
 
     // Shortest possible IPv6 length.
-    assert_eq!(SocketAddrV6::new(Ipv6Addr::UNSPECIFIED, 0, 0, 0).to_string(), "[::]:0");
+    assert_eq!(
+        SocketAddrV6::new(Ipv6Addr::UNSPECIFIED, 0, 0, 0).to_string(),
+        "[::]:0"
+    );
 
     // Longest possible IPv6 length.
     assert_eq!(
@@ -111,11 +122,17 @@ fn ipv6_socket_addr_to_string() {
 
     // Test padding.
     assert_eq!(
-        format!("{:22}", SocketAddrV6::new(Ipv6Addr::new(1, 2, 3, 4, 5, 6, 7, 8), 9, 0, 0)),
+        format!(
+            "{:22}",
+            SocketAddrV6::new(Ipv6Addr::new(1, 2, 3, 4, 5, 6, 7, 8), 9, 0, 0)
+        ),
         "[1:2:3:4:5:6:7:8]:9   "
     );
     assert_eq!(
-        format!("{:>22}", SocketAddrV6::new(Ipv6Addr::new(1, 2, 3, 4, 5, 6, 7, 8), 9, 0, 0)),
+        format!(
+            "{:>22}",
+            SocketAddrV6::new(Ipv6Addr::new(1, 2, 3, 4, 5, 6, 7, 8), 9, 0, 0)
+        ),
         "   [1:2:3:4:5:6:7:8]:9"
     );
 }
@@ -269,9 +286,15 @@ fn compare() {
     let v4_1 = "224.120.45.1:23456".parse::<SocketAddrV4>().unwrap();
     let v4_2 = "224.210.103.5:12345".parse::<SocketAddrV4>().unwrap();
     let v4_3 = "224.210.103.5:23456".parse::<SocketAddrV4>().unwrap();
-    let v6_1 = "[2001:db8:f00::1002]:23456".parse::<SocketAddrV6>().unwrap();
-    let v6_2 = "[2001:db8:f00::2001]:12345".parse::<SocketAddrV6>().unwrap();
-    let v6_3 = "[2001:db8:f00::2001]:23456".parse::<SocketAddrV6>().unwrap();
+    let v6_1 = "[2001:db8:f00::1002]:23456"
+        .parse::<SocketAddrV6>()
+        .unwrap();
+    let v6_2 = "[2001:db8:f00::2001]:12345"
+        .parse::<SocketAddrV6>()
+        .unwrap();
+    let v6_3 = "[2001:db8:f00::2001]:23456"
+        .parse::<SocketAddrV6>()
+        .unwrap();
 
     // equality
     assert_eq!(v4_1, v4_1);

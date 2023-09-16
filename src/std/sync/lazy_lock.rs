@@ -83,8 +83,13 @@ impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     /// Creates a new lazy value with the given initializing
     /// function.
     #[inline]
-        pub const fn new(f: F) -> LazyLock<T, F> {
-        LazyLock { once: Once::new(), data: UnsafeCell::new(Data { f: ManuallyDrop::new(f) }) }
+    pub const fn new(f: F) -> LazyLock<T, F> {
+        LazyLock {
+            once: Once::new(),
+            data: UnsafeCell::new(Data {
+                f: ManuallyDrop::new(f),
+            }),
+        }
     }
 
     /// Creates a new lazy value that is already initialized.
@@ -93,7 +98,12 @@ impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     pub(crate) fn preinit(value: T) -> LazyLock<T, F> {
         let once = Once::new();
         once.call_once(|| {});
-        LazyLock { once, data: UnsafeCell::new(Data { value: ManuallyDrop::new(value) }) }
+        LazyLock {
+            once,
+            data: UnsafeCell::new(Data {
+                value: ManuallyDrop::new(value),
+            }),
+        }
     }
 
     /// Consumes this `LazyLock` returning the stored value.
@@ -115,7 +125,7 @@ impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     /// assert_eq!(&*lazy, "HELLO, WORLD!");
     /// assert_eq!(LazyLock::into_inner(lazy).ok(), Some("HELLO, WORLD!".to_string()));
     /// ```
-        pub fn into_inner(mut this: Self) -> Result<T, F> {
+    pub fn into_inner(mut this: Self) -> Result<T, F> {
         let state = this.once.state();
         match state {
             ExclusiveState::Poisoned => panic!("LazyLock instance has previously been poisoned"),
@@ -148,7 +158,7 @@ impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     /// assert_eq!(&*lazy, &92);
     /// ```
     #[inline]
-        pub fn force(this: &LazyLock<T, F>) -> &T {
+    pub fn force(this: &LazyLock<T, F>) -> &T {
         this.once.call_once(|| {
             // SAFETY: `call_once` only runs this closure once, ever.
             let data = unsafe { &mut *this.data.get() };

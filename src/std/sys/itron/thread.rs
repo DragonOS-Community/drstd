@@ -117,9 +117,10 @@ impl Thread {
             // called automatically for terminated tasks.
             unsafe { run_dtors() };
 
-            let old_lifecycle = inner
-                .lifecycle
-                .swap(LIFECYCLE_EXITED_OR_FINISHED_OR_JOIN_FINALIZE, Ordering::AcqRel);
+            let old_lifecycle = inner.lifecycle.swap(
+                LIFECYCLE_EXITED_OR_FINISHED_OR_JOIN_FINALIZE,
+                Ordering::AcqRel,
+            );
 
             match old_lifecycle {
                 LIFECYCLE_DETACHED => {
@@ -192,7 +193,10 @@ impl Thread {
         })
         .map_err(|e| e.as_io_error())?;
 
-        Ok(Self { p_inner, task: new_task })
+        Ok(Self {
+            p_inner,
+            task: new_task,
+        })
     }
 
     pub fn yield_now() {
@@ -274,7 +278,10 @@ impl Drop for Thread {
         let inner = unsafe { self.p_inner.as_ref() };
 
         // Detach the thread.
-        match inner.lifecycle.swap(LIFECYCLE_DETACHED_OR_JOINED, Ordering::AcqRel) {
+        match inner
+            .lifecycle
+            .swap(LIFECYCLE_DETACHED_OR_JOINED, Ordering::AcqRel)
+        {
             LIFECYCLE_INIT => {
                 // [INIT → DETACHED]
                 // When the time comes, the child will figure out that no

@@ -1,6 +1,5 @@
 //! Windows-specific extensions to general I/O primitives.
 
-
 use crate::std::fs;
 use crate::std::io;
 use crate::std::net;
@@ -36,7 +35,7 @@ pub trait AsRawHandle {
     /// [`Stdin`]: io::Stdin
     /// [`Stdout`]: io::Stdout
     /// [`Stderr`]: io::Stderr
-        fn as_raw_handle(&self) -> RawHandle;
+    fn as_raw_handle(&self) -> RawHandle;
 }
 
 /// Construct I/O objects from raw handles.
@@ -65,7 +64,7 @@ pub trait FromRawHandle {
     ///
     /// [`CloseHandle`]: https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
-        unsafe fn from_raw_handle(handle: RawHandle) -> Self;
+    unsafe fn from_raw_handle(handle: RawHandle) -> Self;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership of
@@ -80,7 +79,7 @@ pub trait IntoRawHandle {
     /// However, transferring ownership is not strictly required. Use a
     /// `Into<OwnedHandle>::into` implementation for an API which strictly
     /// transfers ownership.
-        fn into_raw_handle(self) -> RawHandle;
+    fn into_raw_handle(self) -> RawHandle;
 }
 
 impl AsRawHandle for fs::File {
@@ -135,7 +134,11 @@ fn stdio_handle(raw: RawHandle) -> RawHandle {
     // console. In that case, return null to the user, which is consistent
     // with what they'd get in the parent, and which avoids the problem that
     // `INVALID_HANDLE_VALUE` aliases the current process handle.
-    if raw == sys::c::INVALID_HANDLE_VALUE { ptr::null_mut() } else { raw }
+    if raw == sys::c::INVALID_HANDLE_VALUE {
+        ptr::null_mut()
+    } else {
+        raw
+    }
 }
 
 impl FromRawHandle for fs::File {
@@ -166,7 +169,7 @@ pub trait AsRawSocket {
     ///
     /// However, borrowing is not strictly required. See [`AsSocket::as_socket`]
     /// for an API which strictly borrows a socket.
-        fn as_raw_socket(&self) -> RawSocket;
+    fn as_raw_socket(&self) -> RawSocket;
 }
 
 /// Creates I/O objects from raw sockets.
@@ -190,7 +193,7 @@ pub trait FromRawSocket {
     ///   - be a socket that may be freed via [`closesocket`].
     ///
     /// [`closesocket`]: https://docs.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-closesocket
-        unsafe fn from_raw_socket(sock: RawSocket) -> Self;
+    unsafe fn from_raw_socket(sock: RawSocket) -> Self;
 }
 
 /// A trait to express the ability to consume an object and acquire ownership of
@@ -205,7 +208,7 @@ pub trait IntoRawSocket {
     /// However, transferring ownership is not strictly required. Use a
     /// `Into<OwnedSocket>::into` implementation for an API which strictly
     /// transfers ownership.
-        fn into_raw_socket(self) -> RawSocket;
+    fn into_raw_socket(self) -> RawSocket;
 }
 
 impl AsRawSocket for net::TcpStream {
@@ -252,20 +255,29 @@ impl FromRawSocket for net::UdpSocket {
 impl IntoRawSocket for net::TcpStream {
     #[inline]
     fn into_raw_socket(self) -> RawSocket {
-        self.into_inner().into_socket().into_inner().into_raw_socket()
+        self.into_inner()
+            .into_socket()
+            .into_inner()
+            .into_raw_socket()
     }
 }
 
 impl IntoRawSocket for net::TcpListener {
     #[inline]
     fn into_raw_socket(self) -> RawSocket {
-        self.into_inner().into_socket().into_inner().into_raw_socket()
+        self.into_inner()
+            .into_socket()
+            .into_inner()
+            .into_raw_socket()
     }
 }
 
 impl IntoRawSocket for net::UdpSocket {
     #[inline]
     fn into_raw_socket(self) -> RawSocket {
-        self.into_inner().into_socket().into_inner().into_raw_socket()
+        self.into_inner()
+            .into_socket()
+            .into_inner()
+            .into_raw_socket()
     }
 }

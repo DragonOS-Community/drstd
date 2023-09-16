@@ -1,6 +1,5 @@
 //! Panic support in the standard library.
 
-
 use crate::std::any::Any;
 use crate::std::collections;
 use crate::std::panicking;
@@ -208,7 +207,11 @@ pub enum BacktraceStyle {
 
 impl BacktraceStyle {
     pub(crate) fn full() -> Option<Self> {
-        if cfg!(feature = "backtrace") { Some(BacktraceStyle::Full) } else { None }
+        if cfg!(feature = "backtrace") {
+            Some(BacktraceStyle::Full)
+        } else {
+            None
+        }
     }
 
     fn as_usize(self) -> usize {
@@ -299,6 +302,3 @@ pub fn get_backtrace_style() -> Option<BacktraceStyle> {
     set_backtrace_style(format);
     Some(format)
 }
-
-#[cfg(test)]
-mod tests;

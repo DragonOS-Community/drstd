@@ -10,13 +10,19 @@ unsafe impl Sync for Mutex {} // no threads on this platform
 
 impl Mutex {
     #[inline]
-        pub const fn new() -> Mutex {
-        Mutex { locked: Cell::new(false) }
+    pub const fn new() -> Mutex {
+        Mutex {
+            locked: Cell::new(false),
+        }
     }
 
     #[inline]
     pub fn lock(&self) {
-        assert_eq!(self.locked.replace(true), false, "cannot recursively acquire mutex");
+        assert_eq!(
+            self.locked.replace(true),
+            false,
+            "cannot recursively acquire mutex"
+        );
     }
 
     #[inline]

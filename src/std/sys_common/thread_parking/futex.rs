@@ -36,7 +36,9 @@ impl Parker {
     /// Construct the futex parker. The UNIX parker implementation
     /// requires this to happen in-place.
     pub unsafe fn new_in_place(parker: *mut Parker) {
-        parker.write(Self { state: AtomicU32::new(EMPTY) });
+        parker.write(Self {
+            state: AtomicU32::new(EMPTY),
+        });
     }
 
     // Assumes this is only called by the thread that owns the Parker,
@@ -51,7 +53,11 @@ impl Parker {
             // Wait for something to happen, assuming it's still set to PARKED.
             futex_wait(&self.state, PARKED, None);
             // Change NOTIFIED=>EMPTY and return in that case.
-            if self.state.compare_exchange(NOTIFIED, EMPTY, Acquire, Acquire).is_ok() {
+            if self
+                .state
+                .compare_exchange(NOTIFIED, EMPTY, Acquire, Acquire)
+                .is_ok()
+            {
                 return;
             } else {
                 // Spurious wake up. We loop to try again.

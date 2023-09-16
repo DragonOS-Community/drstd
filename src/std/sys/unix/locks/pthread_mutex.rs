@@ -20,7 +20,9 @@ unsafe impl Sync for AllocatedMutex {}
 
 impl LazyInit for AllocatedMutex {
     fn init() -> Box<Self> {
-        let mutex = Box::new(AllocatedMutex(UnsafeCell::new(dlibc::PTHREAD_MUTEX_INITIALIZER)));
+        let mutex = Box::new(AllocatedMutex(UnsafeCell::new(
+            dlibc::PTHREAD_MUTEX_INITIALIZER,
+        )));
 
         // Issue #33770
         //
@@ -99,7 +101,9 @@ impl Drop for AllocatedMutex {
 impl Mutex {
     #[inline]
     pub const fn new() -> Mutex {
-        Mutex { inner: LazyBox::new() }
+        Mutex {
+            inner: LazyBox::new(),
+        }
     }
 
     #[inline]

@@ -63,7 +63,10 @@ fn socket_name() {
 fn socket_peer() {
     each_ip(&mut |addr1, addr2| {
         let server = t!(UdpSocket::bind(&addr1));
-        assert_eq!(server.peer_addr().unwrap_err().kind(), ErrorKind::NotConnected);
+        assert_eq!(
+            server.peer_addr().unwrap_err().kind(),
+            ErrorKind::NotConnected
+        );
         t!(server.connect(&addr2));
         assert_eq!(addr2, t!(server.peer_addr()));
     })
@@ -181,7 +184,12 @@ fn debug() {
 //        no longer has rounding errors.
 // VxWorks ignores SO_SNDTIMEO.
 #[cfg_attr(
-    any(target_os = "netbsd", target_os = "openbsd", target_os = "vxworks", target_os = "nto"),
+    any(
+        target_os = "netbsd",
+        target_os = "openbsd",
+        target_os = "vxworks",
+        target_os = "nto"
+    ),
     ignore
 )]
 #[test]
@@ -219,7 +227,11 @@ fn test_read_timeout() {
 
     let start = Instant::now();
     loop {
-        let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
+        let kind = stream
+            .recv_from(&mut buf)
+            .err()
+            .expect("expected error")
+            .kind();
         if kind != ErrorKind::Interrupted {
             assert!(
                 kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,
@@ -247,7 +259,11 @@ fn test_read_with_timeout() {
 
     let start = Instant::now();
     loop {
-        let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
+        let kind = stream
+            .recv_from(&mut buf)
+            .err()
+            .expect("expected error")
+            .kind();
         if kind != ErrorKind::Interrupted {
             assert!(
                 kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,

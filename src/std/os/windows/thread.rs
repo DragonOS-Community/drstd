@@ -2,7 +2,6 @@
 //!
 //! [`std::thread`]: crate::std::thread
 
-
 use crate::std::os::windows::io::{AsRawHandle, IntoRawHandle, RawHandle};
 use crate::std::sys_common::{AsInner, IntoInner};
 use crate::std::thread;

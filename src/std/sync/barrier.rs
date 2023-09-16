@@ -77,10 +77,13 @@ impl Barrier {
     ///
     /// let barrier = Barrier::new(10);
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn new(n: usize) -> Barrier {
         Barrier {
-            lock: Mutex::new(BarrierState { count: 0, generation_id: 0 }),
+            lock: Mutex::new(BarrierState {
+                count: 0,
+                generation_id: 0,
+            }),
             cvar: Condvar::new(),
             num_threads: n,
         }
@@ -120,13 +123,15 @@ impl Barrier {
     ///     handle.join().unwrap();
     /// }
     /// ```
-        pub fn wait(&self) -> BarrierWaitResult {
+    pub fn wait(&self) -> BarrierWaitResult {
         let mut lock = self.lock.lock().unwrap();
         let local_gen = lock.generation_id;
         lock.count += 1;
         if lock.count < self.num_threads {
-            let _guard =
-                self.cvar.wait_while(lock, |state| local_gen == state.generation_id).unwrap();
+            let _guard = self
+                .cvar
+                .wait_while(lock, |state| local_gen == state.generation_id)
+                .unwrap();
             BarrierWaitResult(false)
         } else {
             lock.count = 0;
@@ -139,7 +144,9 @@ impl Barrier {
 
 impl fmt::Debug for BarrierWaitResult {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BarrierWaitResult").field("is_leader", &self.is_leader()).finish()
+        f.debug_struct("BarrierWaitResult")
+            .field("is_leader", &self.is_leader())
+            .finish()
     }
 }
 
@@ -159,7 +166,7 @@ impl BarrierWaitResult {
     /// let barrier_wait_result = barrier.wait();
     /// println!("{:?}", barrier_wait_result.is_leader());
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn is_leader(&self) -> bool {
         self.0
     }

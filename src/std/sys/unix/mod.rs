@@ -20,7 +20,7 @@ pub mod fd;
 pub mod fs;
 pub mod futex;
 pub mod io;
-#[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos"))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
 pub mod kernel_copy;
 #[cfg(target_os = "l4re")]
 mod l4re;
@@ -103,9 +103,21 @@ pub unsafe fn init(argc: isize, argv: *const *const u8, sigpipe: u8) {
             #[cfg(all(target_os = "linux", target_env = "gnu"))]
             use dlibc::open64;
             let pfds: &mut [_] = &mut [
-                dlibc::pollfd { fd: 0, events: 0, revents: 0 },
-                dlibc::pollfd { fd: 1, events: 0, revents: 0 },
-                dlibc::pollfd { fd: 2, events: 0, revents: 0 },
+                dlibc::pollfd {
+                    fd: 0,
+                    events: 0,
+                    revents: 0,
+                },
+                dlibc::pollfd {
+                    fd: 1,
+                    events: 0,
+                    revents: 0,
+                },
+                dlibc::pollfd {
+                    fd: 2,
+                    events: 0,
+                    revents: 0,
+                },
             ];
 
             while dlibc::poll(pfds.as_mut_ptr(), 3, 0) == -1 {
@@ -203,7 +215,8 @@ pub unsafe fn init(argc: isize, argv: *const *const u8, sigpipe: u8) {
                 _ => unreachable!(),
             };
             if sigpipe_attr_specified {
-                UNIX_SIGPIPE_ATTR_SPECIFIED.store(true, crate::std::sync::atomic::Ordering::Relaxed);
+                UNIX_SIGPIPE_ATTR_SPECIFIED
+                    .store(true, crate::std::sync::atomic::Ordering::Relaxed);
             }
             if let Some(handler) = handler {
                 rtassert!(signal(dlibc::SIGPIPE, handler) != dlibc::SIG_ERR);
@@ -313,7 +326,11 @@ macro_rules! impl_is_minus_one {
 impl_is_minus_one! { i8 i16 i32 i64 isize }
 
 pub fn cvt<T: IsMinusOne>(t: T) -> crate::std::io::Result<T> {
-    if t.is_minus_one() { Err(crate::std::io::Error::last_os_error()) } else { Ok(t) }
+    if t.is_minus_one() {
+        Err(crate::std::io::Error::last_os_error())
+    } else {
+        Ok(t)
+    }
 }
 
 pub fn cvt_r<T, F>(mut f: F) -> crate::std::io::Result<T>
@@ -331,7 +348,11 @@ where
 
 #[allow(dead_code)] // Not used on all platforms.
 pub fn cvt_nz(error: dlibc::c_int) -> crate::std::io::Result<()> {
-    if error == 0 { Ok(()) } else { Err(crate::std::io::Error::from_raw_os_error(error)) }
+    if error == 0 {
+        Ok(())
+    } else {
+        Err(crate::std::io::Error::from_raw_os_error(error))
+    }
 }
 
 // dlibc::abort() will run the SIGABRT handler.  That's fine because anyone who
@@ -437,6 +458,9 @@ mod unsupported {
     }
 
     pub fn unsupported_err() -> io::Error {
-        io::const_io_error!(io::ErrorKind::Unsupported, "operation not supported on this platform",)
+        io::const_io_error!(
+            io::ErrorKind::Unsupported,
+            "operation not supported on this platform",
+        )
     }
 }

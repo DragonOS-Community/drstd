@@ -344,10 +344,12 @@ impl Stdin {
     ///     Ok(())
     /// }
     /// ```
-        pub fn lock(&self) -> StdinLock<'static> {
+    pub fn lock(&self) -> StdinLock<'static> {
         // Locks this handle with 'static lifetime. This depends on the
         // implementation detail that the underlying `Mutex` is static.
-        StdinLock { inner: self.inner.lock().unwrap_or_else(|e| e.into_inner()) }
+        StdinLock {
+            inner: self.inner.lock().unwrap_or_else(|e| e.into_inner()),
+        }
     }
 
     /// Locks this handle and reads a line of input, appending it to the specified buffer.
@@ -376,7 +378,7 @@ impl Stdin {
     /// - Give it text interactively by running the executable directly,
     ///   in which case it will wait for the Enter key to be pressed before
     ///   continuing
-        pub fn read_line(&self, buf: &mut String) -> io::Result<usize> {
+    pub fn read_line(&self, buf: &mut String) -> io::Result<usize> {
         self.lock().read_line(buf)
     }
 
@@ -396,7 +398,7 @@ impl Stdin {
     /// }
     /// ```
     #[must_use = "`self` will be dropped if the result is not used"]
-        pub fn lines(self) -> Lines<StdinLock<'static>> {
+    pub fn lines(self) -> Lines<StdinLock<'static>> {
         self.lock().lines()
     }
 }
@@ -433,7 +435,7 @@ impl Read for Stdin {
 }
 
 // only used by platform-dependent io::copy specializations, i.e. unused on some platforms
-#[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos"))]
+#[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
 impl StdinLock<'_> {
     pub(crate) fn as_mut_buf(&mut self) -> &mut BufReader<impl Read> {
         &mut self.inner
@@ -642,11 +644,13 @@ impl Stdout {
     ///     Ok(())
     /// }
     /// ```
-        pub fn lock(&self) -> StdoutLock<'static> {
+    pub fn lock(&self) -> StdoutLock<'static> {
         // Locks this handle with 'static lifetime. This depends on the
         // implementation detail that the underlying `ReentrantMutex` is
         // static.
-        StdoutLock { inner: self.inner.lock() }
+        StdoutLock {
+            inner: self.inner.lock(),
+        }
     }
 }
 
@@ -852,11 +856,13 @@ impl Stderr {
     ///     Ok(())
     /// }
     /// ```
-        pub fn lock(&self) -> StderrLock<'static> {
+    pub fn lock(&self) -> StderrLock<'static> {
         // Locks this handle with 'static lifetime. This depends on the
         // implementation detail that the underlying `ReentrantMutex` is
         // static.
-        StderrLock { inner: self.inner.lock() }
+        StderrLock {
+            inner: self.inner.lock(),
+        }
     }
 }
 
@@ -1024,7 +1030,7 @@ pub trait IsTerminal: crate::std::sealed::Sealed {
     /// Note that this [may change in the future][changes].
     ///
     /// [changes]: io#platform-specific-behavior
-        fn is_terminal(&self) -> bool;
+    fn is_terminal(&self) -> bool;
 }
 
 macro_rules! impl_is_terminal {
@@ -1040,15 +1046,21 @@ macro_rules! impl_is_terminal {
     )*}
 }
 
-impl_is_terminal!(File, Stdin, StdinLock<'_>, Stdout, StdoutLock<'_>, Stderr, StderrLock<'_>);
-
+impl_is_terminal!(
+    File,
+    Stdin,
+    StdinLock<'_>,
+    Stdout,
+    StdoutLock<'_>,
+    Stderr,
+    StderrLock<'_>
+);
 
 #[doc(hidden)]
 #[cfg(not(test))]
 pub fn _print(args: fmt::Arguments<'_>) {
     print_to(args, stdout, "stdout");
 }
-
 
 #[doc(hidden)]
 #[cfg(not(test))]

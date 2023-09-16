@@ -48,7 +48,6 @@
 //! [`BorrowedHandle<'a>`]: crate::std::os::windows::io::BorrowedHandle
 //! [`BorrowedSocket<'a>`]: crate::std::os::windows::io::BorrowedSocket
 
-
 mod handle;
 mod raw;
 mod socket;

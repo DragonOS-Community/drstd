@@ -27,7 +27,10 @@ const NOTIFIED: i8 = 1;
 
 impl Parker {
     pub fn new() -> Parker {
-        Parker { state: AtomicI8::new(EMPTY), tid: UnsafeCell::new(None) }
+        Parker {
+            state: AtomicI8::new(EMPTY),
+            tid: UnsafeCell::new(None),
+        }
     }
 
     /// Create a new thread parker. UNIX requires this to happen in-place.
@@ -61,7 +64,11 @@ impl Parker {
             // Loop to guard against spurious wakeups.
             // The state must be reset with acquire ordering to ensure that all
             // calls to `unpark` synchronize with this thread.
-            while self.state.compare_exchange(NOTIFIED, EMPTY, Acquire, Relaxed).is_err() {
+            while self
+                .state
+                .compare_exchange(NOTIFIED, EMPTY, Acquire, Relaxed)
+                .is_err()
+            {
                 park(self.state.as_ptr().addr());
             }
         }

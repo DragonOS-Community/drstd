@@ -91,7 +91,7 @@ impl<W: Write> BufWriter<W> {
     ///
     /// let mut buffer = BufWriter::new(TcpStream::connect("127.0.0.1:34254").unwrap());
     /// ```
-        pub fn new(inner: W) -> BufWriter<W> {
+    pub fn new(inner: W) -> BufWriter<W> {
         BufWriter::with_capacity(DEFAULT_BUF_SIZE, inner)
     }
 
@@ -108,8 +108,12 @@ impl<W: Write> BufWriter<W> {
     /// let stream = TcpStream::connect("127.0.0.1:34254").unwrap();
     /// let mut buffer = BufWriter::with_capacity(100, stream);
     /// ```
-        pub fn with_capacity(capacity: usize, inner: W) -> BufWriter<W> {
-        BufWriter { inner, buf: Vec::with_capacity(capacity), panicked: false }
+    pub fn with_capacity(capacity: usize, inner: W) -> BufWriter<W> {
+        BufWriter {
+            inner,
+            buf: Vec::with_capacity(capacity),
+            panicked: false,
+        }
     }
 
     /// Unwraps this `BufWriter<W>`, returning the underlying writer.
@@ -131,7 +135,7 @@ impl<W: Write> BufWriter<W> {
     /// // unwrap the TcpStream and flush the buffer
     /// let stream = buffer.into_inner().unwrap();
     /// ```
-        pub fn into_inner(mut self) -> Result<W, IntoInnerError<BufWriter<W>>> {
+    pub fn into_inner(mut self) -> Result<W, IntoInnerError<BufWriter<W>>> {
         match self.flush_buf() {
             Err(e) => Err(IntoInnerError::new(self, e)),
             Ok(()) => Ok(self.into_parts().0),
@@ -160,9 +164,13 @@ impl<W: Write> BufWriter<W> {
     /// assert_eq!(recovered_writer.len(), 0);
     /// assert_eq!(&buffered_data.unwrap(), b"ata");
     /// ```
-        pub fn into_parts(mut self) -> (W, Result<Vec<u8>, WriterPanicked>) {
+    pub fn into_parts(mut self) -> (W, Result<Vec<u8>, WriterPanicked>) {
         let buf = mem::take(&mut self.buf);
-        let buf = if !self.panicked { Ok(buf) } else { Err(WriterPanicked { buf }) };
+        let buf = if !self.panicked {
+            Ok(buf)
+        } else {
+            Err(WriterPanicked { buf })
+        };
 
         // SAFETY: forget(self) prevents double dropping inner
         let inner = unsafe { ptr::read(&self.inner) };
@@ -267,7 +275,7 @@ impl<W: ?Sized + Write> BufWriter<W> {
     /// // we can use reference just like buffer
     /// let reference = buffer.get_ref();
     /// ```
-        pub fn get_ref(&self) -> &W {
+    pub fn get_ref(&self) -> &W {
         &self.inner
     }
 
@@ -286,7 +294,7 @@ impl<W: ?Sized + Write> BufWriter<W> {
     /// // we can use reference just like buffer
     /// let reference = buffer.get_mut();
     /// ```
-        pub fn get_mut(&mut self) -> &mut W {
+    pub fn get_mut(&mut self) -> &mut W {
         &mut self.inner
     }
 
@@ -303,7 +311,7 @@ impl<W: ?Sized + Write> BufWriter<W> {
     /// // See how many bytes are currently buffered
     /// let bytes_buffered = buf_writer.buffer().len();
     /// ```
-        pub fn buffer(&self) -> &[u8] {
+    pub fn buffer(&self) -> &[u8] {
         &self.buf
     }
 
@@ -334,7 +342,7 @@ impl<W: ?Sized + Write> BufWriter<W> {
     /// // Calculate how many bytes can be written without flushing
     /// let without_flush = capacity - buf_writer.buffer().len();
     /// ```
-        pub fn capacity(&self) -> usize {
+    pub fn capacity(&self) -> usize {
         self.buf.capacity()
     }
 
@@ -469,7 +477,7 @@ impl WriterPanicked {
     /// Returns the perhaps-unwritten data.  Some of this data may have been written by the
     /// panicking call(s) to the underlying writer, so simply writing it again is not a good idea.
     #[must_use = "`self` will be dropped if the result is not used"]
-        pub fn into_inner(self) -> Vec<u8> {
+    pub fn into_inner(self) -> Vec<u8> {
         self.buf
     }
 
@@ -493,7 +501,10 @@ impl fmt::Display for WriterPanicked {
 impl fmt::Debug for WriterPanicked {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("WriterPanicked")
-            .field("buffer", &format_args!("{}/{}", self.buf.len(), self.buf.capacity()))
+            .field(
+                "buffer",
+                &format_args!("{}/{}", self.buf.len(), self.buf.capacity()),
+            )
             .finish()
     }
 }
@@ -540,8 +551,9 @@ impl<W: ?Sized + Write> Write for BufWriter<W> {
             // same underlying buffer, as otherwise the buffers wouldn't fit in memory). If the
             // computation overflows, then surely the input cannot fit in our buffer, so we forward
             // to the inner writer's `write_vectored` method to let it handle it appropriately.
-            let saturated_total_len =
-                bufs.iter().fold(0usize, |acc, b| acc.saturating_add(b.len()));
+            let saturated_total_len = bufs
+                .iter()
+                .fold(0usize, |acc, b| acc.saturating_add(b.len()));
 
             if saturated_total_len > self.spare_capacity() {
                 // Flush if the total length of the input exceeds our buffer's spare capacity.
@@ -633,7 +645,10 @@ where
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct("BufWriter")
             .field("writer", &&self.inner)
-            .field("buffer", &format_args!("{}/{}", self.buf.len(), self.buf.capacity()))
+            .field(
+                "buffer",
+                &format_args!("{}/{}", self.buf.len(), self.buf.capacity()),
+            )
             .finish()
     }
 }

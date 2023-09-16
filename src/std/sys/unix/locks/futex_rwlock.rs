@@ -64,13 +64,18 @@ fn has_reached_max_readers(state: u32) -> bool {
 impl RwLock {
     #[inline]
     pub const fn new() -> Self {
-        Self { state: AtomicU32::new(0), writer_notify: AtomicU32::new(0) }
+        Self {
+            state: AtomicU32::new(0),
+            writer_notify: AtomicU32::new(0),
+        }
     }
 
     #[inline]
     pub fn try_read(&self) -> bool {
         self.state
-            .fetch_update(Acquire, Relaxed, |s| is_read_lockable(s).then(|| s + READ_LOCKED))
+            .fetch_update(Acquire, Relaxed, |s| {
+                is_read_lockable(s).then(|| s + READ_LOCKED)
+            })
             .is_ok()
     }
 
@@ -108,7 +113,9 @@ impl RwLock {
         loop {
             // If we can lock it, lock it.
             if is_read_lockable(state) {
-                match self.state.compare_exchange_weak(state, state + READ_LOCKED, Acquire, Relaxed)
+                match self
+                    .state
+                    .compare_exchange_weak(state, state + READ_LOCKED, Acquire, Relaxed)
                 {
                     Ok(_) => return, // Locked!
                     Err(s) => {
@@ -126,7 +133,8 @@ impl RwLock {
             // Make sure the readers waiting bit is set before we go to sleep.
             if !has_readers_waiting(state) {
                 if let Err(s) =
-                    self.state.compare_exchange(state, state | READERS_WAITING, Relaxed, Relaxed)
+                    self.state
+                        .compare_exchange(state, state | READERS_WAITING, Relaxed, Relaxed)
                 {
                     state = s;
                     continue;
@@ -144,13 +152,19 @@ impl RwLock {
     #[inline]
     pub fn try_write(&self) -> bool {
         self.state
-            .fetch_update(Acquire, Relaxed, |s| is_unlocked(s).then(|| s + WRITE_LOCKED))
+            .fetch_update(Acquire, Relaxed, |s| {
+                is_unlocked(s).then(|| s + WRITE_LOCKED)
+            })
             .is_ok()
     }
 
     #[inline]
     pub fn write(&self) {
-        if self.state.compare_exchange_weak(0, WRITE_LOCKED, Acquire, Relaxed).is_err() {
+        if self
+            .state
+            .compare_exchange_weak(0, WRITE_LOCKED, Acquire, Relaxed)
+            .is_err()
+        {
             self.write_contended();
         }
     }
@@ -192,7 +206,8 @@ impl RwLock {
             // Set the waiting bit indicating that we're waiting on it.
             if !has_writers_waiting(state) {
                 if let Err(s) =
-                    self.state.compare_exchange(state, state | WRITERS_WAITING, Relaxed, Relaxed)
+                    self.state
+                        .compare_exchange(state, state | WRITERS_WAITING, Relaxed, Relaxed)
                 {
                     state = s;
                     continue;
@@ -256,7 +271,11 @@ impl RwLock {
         // If both writers and readers are waiting, leave the readers waiting
         // and only wake up one writer.
         if state == READERS_WAITING + WRITERS_WAITING {
-            if self.state.compare_exchange(state, READERS_WAITING, Relaxed, Relaxed).is_err() {
+            if self
+                .state
+                .compare_exchange(state, READERS_WAITING, Relaxed, Relaxed)
+                .is_err()
+            {
                 // The lock got locked. Not our problem anymore.
                 return;
             }
@@ -270,7 +289,11 @@ impl RwLock {
 
         // If readers are waiting, wake them all up.
         if state == READERS_WAITING {
-            if self.state.compare_exchange(state, 0, Relaxed, Relaxed).is_ok() {
+            if self
+                .state
+                .compare_exchange(state, 0, Relaxed, Relaxed)
+                .is_ok()
+            {
                 futex_wake_all(&self.state);
             }
         }

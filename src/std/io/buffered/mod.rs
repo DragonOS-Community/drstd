@@ -86,7 +86,7 @@ impl<W> IntoInnerError<W> {
     ///     }
     /// };
     /// ```
-        pub fn error(&self) -> &Error {
+    pub fn error(&self) -> &Error {
         &self.1
     }
 
@@ -120,7 +120,7 @@ impl<W> IntoInnerError<W> {
     ///     }
     /// };
     /// ```
-        pub fn into_inner(self) -> W {
+    pub fn into_inner(self) -> W {
         self.0
     }
 
@@ -139,7 +139,7 @@ impl<W> IntoInnerError<W> {
     /// let err = into_inner_err.into_error();
     /// assert_eq!(err.kind(), ErrorKind::WriteZero);
     /// ```
-        pub fn into_error(self) -> Error {
+    pub fn into_error(self) -> Error {
         self.1
     }
 
@@ -161,7 +161,7 @@ impl<W> IntoInnerError<W> {
     /// assert_eq!(err.kind(), ErrorKind::WriteZero);
     /// assert_eq!(recovered_writer.buffer(), b"t be actually written");
     /// ```
-        pub fn into_parts(self) -> (Error, W) {
+    pub fn into_parts(self) -> (Error, W) {
         (self.1, self.0)
     }
 }

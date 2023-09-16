@@ -54,11 +54,15 @@ impl Instant {
     }
 
     pub fn checked_add_duration(&self, other: &Duration) -> Option<Instant> {
-        Some(Instant { t: self.t.checked_add(*other)? })
+        Some(Instant {
+            t: self.t.checked_add(*other)?,
+        })
     }
 
     pub fn checked_sub_duration(&self, other: &Duration) -> Option<Instant> {
-        Some(Instant { t: self.t.checked_sub(*other)? })
+        Some(Instant {
+            t: self.t.checked_sub(*other)?,
+        })
     }
 }
 
@@ -95,12 +99,16 @@ impl SystemTime {
     }
 
     pub fn checked_add_duration(&self, other: &Duration) -> Option<SystemTime> {
-        let intervals = self.intervals().checked_add(checked_dur2intervals(other)?)?;
+        let intervals = self
+            .intervals()
+            .checked_add(checked_dur2intervals(other)?)?;
         Some(SystemTime::from_intervals(intervals))
     }
 
     pub fn checked_sub_duration(&self, other: &Duration) -> Option<SystemTime> {
-        let intervals = self.intervals().checked_sub(checked_dur2intervals(other)?)?;
+        let intervals = self
+            .intervals()
+            .checked_sub(checked_dur2intervals(other)?)?;
         Some(SystemTime::from_intervals(intervals))
     }
 }
@@ -127,7 +135,9 @@ impl Ord for SystemTime {
 
 impl fmt::Debug for SystemTime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("SystemTime").field("intervals", &self.intervals()).finish()
+        f.debug_struct("SystemTime")
+            .field("intervals", &self.intervals())
+            .finish()
     }
 }
 
@@ -158,7 +168,10 @@ fn checked_dur2intervals(dur: &Duration) -> Option<i64> {
 }
 
 fn intervals2dur(intervals: u64) -> Duration {
-    Duration::new(intervals / INTERVALS_PER_SEC, ((intervals % INTERVALS_PER_SEC) * 100) as u32)
+    Duration::new(
+        intervals / INTERVALS_PER_SEC,
+        ((intervals % INTERVALS_PER_SEC) * 100) as u32,
+    )
 }
 
 mod perf_counter {
@@ -190,7 +203,9 @@ mod perf_counter {
         fn from(other: PerformanceCounterInstant) -> Self {
             let freq = frequency() as u64;
             let instant_nsec = mul_div_u64(other.ts as u64, NANOS_PER_SEC, freq);
-            Self { t: Duration::from_nanos(instant_nsec) }
+            Self {
+                t: Duration::from_nanos(instant_nsec),
+            }
         }
     }
 

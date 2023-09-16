@@ -8,10 +8,6 @@
 //! counterpart ending in `os`. Those ending in `os` will return an [`OsString`]
 //! and those without will return a [`String`].
 
-
-#[cfg(test)]
-mod tests;
-
 use crate::std::error::Error;
 use crate::std::ffi::{OsStr, OsString};
 use crate::std::fmt;
@@ -155,13 +151,17 @@ pub fn vars() -> Vars {
 /// ```
 #[must_use]
 pub fn vars_os() -> VarsOs {
-    VarsOs { inner: os_imp::env() }
+    VarsOs {
+        inner: os_imp::env(),
+    }
 }
 
 impl Iterator for Vars {
     type Item = (String, String);
     fn next(&mut self) -> Option<(String, String)> {
-        self.inner.next().map(|(a, b)| (a.into_string().unwrap(), b.into_string().unwrap()))
+        self.inner
+            .next()
+            .map(|(a, b)| (a.into_string().unwrap(), b.into_string().unwrap()))
     }
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.inner.size_hint()
@@ -170,8 +170,12 @@ impl Iterator for Vars {
 
 impl fmt::Debug for Vars {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Self { inner: VarsOs { inner } } = self;
-        f.debug_struct("Vars").field("inner", &inner.str_debug()).finish()
+        let Self {
+            inner: VarsOs { inner },
+        } = self;
+        f.debug_struct("Vars")
+            .field("inner", &inner.str_debug())
+            .finish()
     }
 }
 
@@ -264,12 +268,12 @@ fn _var_os(key: &OsStr) -> Option<OsString> {
 pub enum VarError {
     /// The specified environment variable was not present in the current
     /// process's environment.
-        NotPresent,
+    NotPresent,
 
     /// The specified environment variable was found, but it did not contain
     /// valid unicode data. The found data is returned as a payload of this
     /// variant.
-        NotUnicode( OsString),
+    NotUnicode(OsString),
 }
 
 impl fmt::Display for VarError {
@@ -407,7 +411,9 @@ pub struct SplitPaths<'a> {
 /// }
 /// ```
 pub fn split_paths<T: AsRef<OsStr> + ?Sized>(unparsed: &T) -> SplitPaths<'_> {
-    SplitPaths { inner: os_imp::split_paths(unparsed.as_ref()) }
+    SplitPaths {
+        inner: os_imp::split_paths(unparsed.as_ref()),
+    }
 }
 
 impl<'a> Iterator for SplitPaths<'a> {
@@ -757,7 +763,9 @@ pub fn args() -> Args {
 /// }
 /// ```
 pub fn args_os() -> ArgsOs {
-    ArgsOs { inner: sys::args::args() }
+    ArgsOs {
+        inner: sys::args::args(),
+    }
 }
 
 impl !Send for Args {}
@@ -791,7 +799,9 @@ impl DoubleEndedIterator for Args {
 
 impl fmt::Debug for Args {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let Self { inner: ArgsOs { inner } } = self;
+        let Self {
+            inner: ArgsOs { inner },
+        } = self;
         f.debug_struct("Args").field("inner", inner).finish()
     }
 }
@@ -855,7 +865,7 @@ pub mod consts {
     /// - riscv64
     /// - s390x
     /// - sparc64
-        //pub const ARCH: &str = env!("STD_ENV_ARCH");
+    //pub const ARCH: &str = env!("STD_ENV_ARCH");
 
     /// The family of the operating system. Example value is `unix`.
     ///
@@ -863,7 +873,7 @@ pub mod consts {
     ///
     /// - unix
     /// - windows
-        pub const FAMILY: &str = os::FAMILY;
+    pub const FAMILY: &str = os::FAMILY;
 
     /// A string describing the specific operating system in use.
     /// Example value is `linux`.
@@ -880,7 +890,7 @@ pub mod consts {
     /// - solaris
     /// - android
     /// - windows
-        pub const OS: &str = os::OS;
+    pub const OS: &str = os::OS;
 
     /// Specifies the filename prefix used for shared libraries on this
     /// platform. Example value is `lib`.
@@ -889,7 +899,7 @@ pub mod consts {
     ///
     /// - lib
     /// - `""` (an empty string)
-        pub const DLL_PREFIX: &str = os::DLL_PREFIX;
+    pub const DLL_PREFIX: &str = os::DLL_PREFIX;
 
     /// Specifies the filename suffix used for shared libraries on this
     /// platform. Example value is `.so`.
@@ -899,7 +909,7 @@ pub mod consts {
     /// - .so
     /// - .dylib
     /// - .dll
-        pub const DLL_SUFFIX: &str = os::DLL_SUFFIX;
+    pub const DLL_SUFFIX: &str = os::DLL_SUFFIX;
 
     /// Specifies the file extension used for shared libraries on this
     /// platform that goes after the dot. Example value is `so`.
@@ -909,7 +919,7 @@ pub mod consts {
     /// - so
     /// - dylib
     /// - dll
-        pub const DLL_EXTENSION: &str = os::DLL_EXTENSION;
+    pub const DLL_EXTENSION: &str = os::DLL_EXTENSION;
 
     /// Specifies the filename suffix used for executable binaries on this
     /// platform. Example value is `.exe`.
@@ -920,7 +930,7 @@ pub mod consts {
     /// - .nexe
     /// - .pexe
     /// - `""` (an empty string)
-        pub const EXE_SUFFIX: &str = os::EXE_SUFFIX;
+    pub const EXE_SUFFIX: &str = os::EXE_SUFFIX;
 
     /// Specifies the file extension, if any, used for executable binaries
     /// on this platform. Example value is `exe`.
@@ -929,5 +939,5 @@ pub mod consts {
     ///
     /// - exe
     /// - `""` (an empty string)
-        pub const EXE_EXTENSION: &str = os::EXE_EXTENSION;
+    pub const EXE_EXTENSION: &str = os::EXE_EXTENSION;
 }

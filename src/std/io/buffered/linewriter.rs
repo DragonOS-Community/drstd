@@ -82,7 +82,7 @@ impl<W: Write> LineWriter<W> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn new(inner: W) -> LineWriter<W> {
+    pub fn new(inner: W) -> LineWriter<W> {
         // Lines typically aren't that long, don't use a giant buffer
         LineWriter::with_capacity(1024, inner)
     }
@@ -102,8 +102,10 @@ impl<W: Write> LineWriter<W> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn with_capacity(capacity: usize, inner: W) -> LineWriter<W> {
-        LineWriter { inner: BufWriter::with_capacity(capacity, inner) }
+    pub fn with_capacity(capacity: usize, inner: W) -> LineWriter<W> {
+        LineWriter {
+            inner: BufWriter::with_capacity(capacity, inner),
+        }
     }
 
     /// Gets a mutable reference to the underlying writer.
@@ -126,7 +128,7 @@ impl<W: Write> LineWriter<W> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_mut(&mut self) -> &mut W {
+    pub fn get_mut(&mut self) -> &mut W {
         self.inner.get_mut()
     }
 
@@ -153,8 +155,10 @@ impl<W: Write> LineWriter<W> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn into_inner(self) -> Result<W, IntoInnerError<LineWriter<W>>> {
-        self.inner.into_inner().map_err(|err| err.new_wrapped(|inner| LineWriter { inner }))
+    pub fn into_inner(self) -> Result<W, IntoInnerError<LineWriter<W>>> {
+        self.inner
+            .into_inner()
+            .map_err(|err| err.new_wrapped(|inner| LineWriter { inner }))
     }
 }
 
@@ -175,7 +179,7 @@ impl<W: ?Sized + Write> LineWriter<W> {
     ///     Ok(())
     /// }
     /// ```
-        pub fn get_ref(&self) -> &W {
+    pub fn get_ref(&self) -> &W {
         self.inner.get_ref()
     }
 }

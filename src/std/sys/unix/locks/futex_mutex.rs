@@ -14,7 +14,9 @@ pub struct Mutex {
 impl Mutex {
     #[inline]
     pub const fn new() -> Self {
-        Self { futex: AtomicU32::new(0) }
+        Self {
+            futex: AtomicU32::new(0),
+        }
     }
 
     #[inline]

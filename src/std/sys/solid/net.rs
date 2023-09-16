@@ -12,8 +12,8 @@ use crate::std::{
 };
 
 use self::netc::{sockaddr, socklen_t, MSG_PEEK};
-use dlibc::{c_int, c_void, size_t};
 use dlibc;
+use dlibc::{c_int, c_void, size_t};
 pub mod netc {
     pub use super::super::abi::sockets::*;
 }
@@ -62,7 +62,11 @@ impl FileDesc {
 
     fn read(&self, buf: &mut [u8]) -> io::Result<usize> {
         let ret = cvt(unsafe {
-            netc::read(self.fd, buf.as_mut_ptr() as *mut c_void, cmp::min(buf.len(), READ_LIMIT))
+            netc::read(
+                self.fd,
+                buf.as_mut_ptr() as *mut c_void,
+                cmp::min(buf.len(), READ_LIMIT),
+            )
         })?;
         Ok(ret as usize)
     }
@@ -85,7 +89,11 @@ impl FileDesc {
 
     fn write(&self, buf: &[u8]) -> io::Result<usize> {
         let ret = cvt(unsafe {
-            netc::write(self.fd, buf.as_ptr() as *const c_void, cmp::min(buf.len(), READ_LIMIT))
+            netc::write(
+                self.fd,
+                buf.as_ptr() as *const c_void,
+                cmp::min(buf.len(), READ_LIMIT),
+            )
         })?;
         Ok(ret as usize)
     }
@@ -140,7 +148,11 @@ macro_rules! impl_is_minus_one {
 impl_is_minus_one! { i8 i16 i32 i64 isize }
 
 pub fn cvt<T: IsMinusOne>(t: T) -> io::Result<T> {
-    if t.is_minus_one() { Err(last_error()) } else { Ok(t) }
+    if t.is_minus_one() {
+        Err(last_error())
+    } else {
+        Ok(t)
+    }
 }
 
 /// A variant of `cvt` for `getaddrinfo` which return 0 for a success.
@@ -255,13 +267,18 @@ impl Socket {
             ));
         }
 
-        let mut timeout =
-            netc::timeval { tv_sec: timeout.as_secs() as _, tv_usec: timeout.subsec_micros() as _ };
+        let mut timeout = netc::timeval {
+            tv_sec: timeout.as_secs() as _,
+            tv_usec: timeout.subsec_micros() as _,
+        };
         if timeout.tv_sec == 0 && timeout.tv_usec == 0 {
             timeout.tv_usec = 1;
         }
 
-        let fds = netc::fd_set { num_fds: 1, fds: [self.0.raw()] };
+        let fds = netc::fd_set {
+            num_fds: 1,
+            fds: [self.0.raw()],
+        };
 
         let mut writefds = fds;
         let mut errorfds = fds;
@@ -277,7 +294,10 @@ impl Socket {
         };
 
         match n {
-            0 => Err(io::const_io_error!(io::ErrorKind::TimedOut, "connection timed out")),
+            0 => Err(io::const_io_error!(
+                io::ErrorKind::TimedOut,
+                "connection timed out"
+            )),
             _ => {
                 let can_write = writefds.num_fds != 0;
                 if !can_write {
@@ -302,7 +322,12 @@ impl Socket {
 
     fn recv_with_flags(&self, mut buf: BorrowedCursor<'_>, flags: c_int) -> io::Result<()> {
         let ret = cvt(unsafe {
-            netc::recv(self.0.raw(), buf.as_mut().as_mut_ptr().cast(), buf.capacity(), flags)
+            netc::recv(
+                self.0.raw(),
+                buf.as_mut().as_mut_ptr().cast(),
+                buf.capacity(),
+                flags,
+            )
         })?;
         unsafe {
             buf.advance(ret as usize);
@@ -392,13 +417,19 @@ impl Socket {
                 } else {
                     dur.as_secs() as netc::c_long
                 };
-                let mut timeout = netc::timeval { tv_sec: secs, tv_usec: dur.subsec_micros() as _ };
+                let mut timeout = netc::timeval {
+                    tv_sec: secs,
+                    tv_usec: dur.subsec_micros() as _,
+                };
                 if timeout.tv_sec == 0 && timeout.tv_usec == 0 {
                     timeout.tv_usec = 1;
                 }
                 timeout
             }
-            None => netc::timeval { tv_sec: 0, tv_usec: 0 },
+            None => netc::timeval {
+                tv_sec: 0,
+                tv_usec: 0,
+            },
         };
         setsockopt(self, netc::SOL_SOCKET, kind, timeout)
     }
@@ -451,14 +482,22 @@ impl Socket {
     pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         let mut nonblocking = nonblocking as c_int;
         cvt(unsafe {
-            netc::ioctl(*self.as_inner(), netc::FIONBIO, (&mut nonblocking) as *mut c_int as _)
+            netc::ioctl(
+                *self.as_inner(),
+                netc::FIONBIO,
+                (&mut nonblocking) as *mut c_int as _,
+            )
         })
         .map(drop)
     }
 
     pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         let raw: c_int = getsockopt(self, netc::SOL_SOCKET, netc::SO_ERROR)?;
-        if raw == 0 { Ok(None) } else { Ok(Some(io::Error::from_raw_os_error(raw as i32))) }
+        if raw == 0 {
+            Ok(None)
+        } else {
+            Ok(Some(io::Error::from_raw_os_error(raw as i32)))
+        }
     }
 
     // This method is used by sys_common code to abstract over targets.

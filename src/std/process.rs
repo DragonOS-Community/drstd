@@ -100,9 +100,6 @@
 
 #![deny(unsafe_op_in_unsafe_fn)]
 
-#[cfg(all(test, not(any(target_os = "emscripten", target_env = "sgx"))))]
-mod tests;
-
 use crate::std::io::prelude::*;
 
 use crate::std::convert::Infallible;
@@ -175,7 +172,7 @@ pub struct Child {
     ///
     /// to avoid partially moving the `child` and thus blocking yourself from calling
     /// functions on `child` while using `stdin`.
-        pub stdin: Option<ChildStdin>,
+    pub stdin: Option<ChildStdin>,
 
     /// The handle for reading from the child's standard output (stdout), if it
     /// has been captured. You might find it helpful to do
@@ -186,7 +183,7 @@ pub struct Child {
     ///
     /// to avoid partially moving the `child` and thus blocking yourself from calling
     /// functions on `child` while using `stdout`.
-        pub stdout: Option<ChildStdout>,
+    pub stdout: Option<ChildStdout>,
 
     /// The handle for reading from the child's standard error (stderr), if it
     /// has been captured. You might find it helpful to do
@@ -197,7 +194,7 @@ pub struct Child {
     ///
     /// to avoid partially moving the `child` and thus blocking yourself from calling
     /// functions on `child` while using `stderr`.
-        pub stderr: Option<ChildStderr>,
+    pub stderr: Option<ChildStderr>,
 }
 
 /// Allows extension traits within `std`.
@@ -559,8 +556,10 @@ impl Command {
     ///         .spawn()
     ///         .expect("sh command failed to start");
     /// ```
-        pub fn new<S: AsRef<OsStr>>(program: S) -> Command {
-        Command { inner: imp::Command::new(program.as_ref()) }
+    pub fn new<S: AsRef<OsStr>>(program: S) -> Command {
+        Command {
+            inner: imp::Command::new(program.as_ref()),
+        }
     }
 
     /// Adds an argument to pass to the program.
@@ -604,7 +603,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn arg<S: AsRef<OsStr>>(&mut self, arg: S) -> &mut Command {
+    pub fn arg<S: AsRef<OsStr>>(&mut self, arg: S) -> &mut Command {
         self.inner.arg(arg.as_ref());
         self
     }
@@ -632,7 +631,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn args<I, S>(&mut self, args: I) -> &mut Command
+    pub fn args<I, S>(&mut self, args: I) -> &mut Command
     where
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
@@ -669,7 +668,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn env<K, V>(&mut self, key: K, val: V) -> &mut Command
+    pub fn env<K, V>(&mut self, key: K, val: V) -> &mut Command
     where
         K: AsRef<OsStr>,
         V: AsRef<OsStr>,
@@ -714,7 +713,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("printenv failed to start");
     /// ```
-        pub fn envs<I, K, V>(&mut self, vars: I) -> &mut Command
+    pub fn envs<I, K, V>(&mut self, vars: I) -> &mut Command
     where
         I: IntoIterator<Item = (K, V)>,
         K: AsRef<OsStr>,
@@ -751,7 +750,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn env_remove<K: AsRef<OsStr>>(&mut self, key: K) -> &mut Command {
+    pub fn env_remove<K: AsRef<OsStr>>(&mut self, key: K) -> &mut Command {
         self.inner.env_mut().remove(key.as_ref());
         self
     }
@@ -780,7 +779,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn env_clear(&mut self) -> &mut Command {
+    pub fn env_clear(&mut self) -> &mut Command {
         self.inner.env_mut().clear();
         self
     }
@@ -809,7 +808,7 @@ impl Command {
     /// ```
     ///
     /// [`canonicalize`]: crate::std::fs::canonicalize
-        pub fn current_dir<P: AsRef<Path>>(&mut self, dir: P) -> &mut Command {
+    pub fn current_dir<P: AsRef<Path>>(&mut self, dir: P) -> &mut Command {
         self.inner.cwd(dir.as_ref().as_ref());
         self
     }
@@ -837,7 +836,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn stdin<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
+    pub fn stdin<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
         self.inner.stdin(cfg.into().0);
         self
     }
@@ -865,7 +864,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn stdout<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
+    pub fn stdout<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
         self.inner.stdout(cfg.into().0);
         self
     }
@@ -893,7 +892,7 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn stderr<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
+    pub fn stderr<T: Into<Stdio>>(&mut self, cfg: T) -> &mut Command {
         self.inner.stderr(cfg.into().0);
         self
     }
@@ -913,8 +912,10 @@ impl Command {
     ///         .spawn()
     ///         .expect("ls command failed to start");
     /// ```
-        pub fn spawn(&mut self) -> io::Result<Child> {
-        self.inner.spawn(imp::Stdio::Inherit, true).map(Child::from_inner)
+    pub fn spawn(&mut self) -> io::Result<Child> {
+        self.inner
+            .spawn(imp::Stdio::Inherit, true)
+            .map(Child::from_inner)
     }
 
     /// Executes the command as a child process, waiting for it to finish and
@@ -941,9 +942,13 @@ impl Command {
     ///
     /// assert!(output.status.success());
     /// ```
-        pub fn output(&mut self) -> io::Result<Output> {
+    pub fn output(&mut self) -> io::Result<Output> {
         let (status, stdout, stderr) = self.inner.output()?;
-        Ok(Output { status: ExitStatus(status), stdout, stderr })
+        Ok(Output {
+            status: ExitStatus(status),
+            stdout,
+            stderr,
+        })
     }
 
     /// Executes a command as a child process, waiting for it to finish and
@@ -965,7 +970,7 @@ impl Command {
     ///
     /// assert!(status.success());
     /// ```
-        pub fn status(&mut self) -> io::Result<ExitStatus> {
+    pub fn status(&mut self) -> io::Result<ExitStatus> {
         self.inner
             .spawn(imp::Stdio::Inherit, true)
             .map(Child::from_inner)
@@ -983,7 +988,7 @@ impl Command {
     /// assert_eq!(cmd.get_program(), "echo");
     /// ```
     #[must_use]
-        pub fn get_program(&self) -> &OsStr {
+    pub fn get_program(&self) -> &OsStr {
         self.inner.get_program()
     }
 
@@ -1004,8 +1009,10 @@ impl Command {
     /// let args: Vec<&OsStr> = cmd.get_args().collect();
     /// assert_eq!(args, &["first", "second"]);
     /// ```
-        pub fn get_args(&self) -> CommandArgs<'_> {
-        CommandArgs { inner: self.inner.get_args() }
+    pub fn get_args(&self) -> CommandArgs<'_> {
+        CommandArgs {
+            inner: self.inner.get_args(),
+        }
     }
 
     /// Returns an iterator of the environment variables explicitly set for the child process.
@@ -1038,7 +1045,7 @@ impl Command {
     ///     (OsStr::new("TZ"), None)
     /// ]);
     /// ```
-        pub fn get_envs(&self) -> CommandEnvs<'_> {
+    pub fn get_envs(&self) -> CommandEnvs<'_> {
         self.inner.get_envs()
     }
 
@@ -1058,7 +1065,7 @@ impl Command {
     /// assert_eq!(cmd.get_current_dir(), Some(Path::new("/bin")));
     /// ```
     #[must_use]
-        pub fn get_current_dir(&self) -> Option<&Path> {
+    pub fn get_current_dir(&self) -> Option<&Path> {
         self.inner.get_current_dir()
     }
 }
@@ -1135,11 +1142,11 @@ impl<'a> ExactSizeIterator for CommandArgs<'a> {
 #[derive(PartialEq, Eq, Clone)]
 pub struct Output {
     /// The status (exit code) of the process.
-        pub status: ExitStatus,
+    pub status: ExitStatus,
     /// The data that the process wrote to stdout.
-        pub stdout: Vec<u8>,
+    pub stdout: Vec<u8>,
     /// The data that the process wrote to stderr.
-        pub stderr: Vec<u8>,
+    pub stderr: Vec<u8>,
 }
 
 // If either stderr or stdout are valid utf8 strings it prints the valid
@@ -1222,7 +1229,7 @@ impl Stdio {
     /// The size of a pipe buffer varies on different targets.
     ///
     #[must_use]
-        pub fn piped() -> Stdio {
+    pub fn piped() -> Stdio {
         Stdio(imp::Stdio::MakePipe)
     }
 
@@ -1261,7 +1268,7 @@ impl Stdio {
     /// io::stdout().write_all(&output.stdout).unwrap();
     /// ```
     #[must_use]
-        pub fn inherit() -> Stdio {
+    pub fn inherit() -> Stdio {
         Stdio(imp::Stdio::Inherit)
     }
 
@@ -1300,7 +1307,7 @@ impl Stdio {
     /// // Ignores any piped-in input
     /// ```
     #[must_use]
-        pub fn null() -> Stdio {
+    pub fn null() -> Stdio {
         Stdio(imp::Stdio::Null)
     }
 
@@ -1315,7 +1322,7 @@ impl Stdio {
     /// let io = Stdio::piped();
     /// assert_eq!(io.makes_pipe(), true);
     /// ```
-        pub fn makes_pipe(&self) -> bool {
+    pub fn makes_pipe(&self) -> bool {
         matches!(self.0, imp::Stdio::MakePipe)
     }
 }
@@ -1506,7 +1513,7 @@ impl ExitStatus {
     /// status.exit_ok().expect_err("/dev/nonexistent could be listed!");
     /// # } // cfg!(unix)
     /// ```
-        pub fn exit_ok(&self) -> Result<(), ExitStatusError> {
+    pub fn exit_ok(&self) -> Result<(), ExitStatusError> {
         self.0.exit_ok().map_err(ExitStatusError)
     }
 
@@ -1530,7 +1537,7 @@ impl ExitStatus {
     /// }
     /// ```
     #[must_use]
-        pub fn success(&self) -> bool {
+    pub fn success(&self) -> bool {
         self.0.exit_ok().is_ok()
     }
 
@@ -1561,7 +1568,7 @@ impl ExitStatus {
     /// }
     /// ```
     #[must_use]
-        pub fn code(&self) -> Option<i32> {
+    pub fn code(&self) -> Option<i32> {
         self.0.code()
     }
 }
@@ -1753,14 +1760,14 @@ impl ExitCode {
     /// Note that a `()`-returning `main` implicitly results in a successful
     /// termination, so there's no need to return this from `main` unless
     /// you're also returning other possible codes.
-        pub const SUCCESS: ExitCode = ExitCode(imp::ExitCode::SUCCESS);
+    pub const SUCCESS: ExitCode = ExitCode(imp::ExitCode::SUCCESS);
 
     /// The canonical `ExitCode` for unsuccessful termination on this platform.
     ///
     /// If you're only returning this and `SUCCESS` from `main`, consider
     /// instead returning `Err(_)` and `Ok(())` respectively, which will
     /// return the same codes (but will also `eprintln!` the error).
-        pub const FAILURE: ExitCode = ExitCode(imp::ExitCode::FAILURE);
+    pub const FAILURE: ExitCode = ExitCode(imp::ExitCode::FAILURE);
 
     /// Exit the current process with the given `ExitCode`.
     ///
@@ -1800,7 +1807,7 @@ impl ExitCode {
     ///     code.exit_process()
     /// }
     /// ```
-        pub fn exit_process(self) -> ! {
+    pub fn exit_process(self) -> ! {
         exit(self.to_i32())
     }
 }
@@ -1865,7 +1872,7 @@ impl Child {
     ///
     /// [`ErrorKind`]: io::ErrorKind
     /// [`InvalidInput`]: io::ErrorKind::InvalidInput
-        pub fn kill(&mut self) -> io::Result<()> {
+    pub fn kill(&mut self) -> io::Result<()> {
         self.handle.kill()
     }
 
@@ -1886,7 +1893,7 @@ impl Child {
     /// }
     /// ```
     #[must_use]
-        pub fn id(&self) -> u32 {
+    pub fn id(&self) -> u32 {
         self.handle.id()
     }
 
@@ -1914,7 +1921,7 @@ impl Child {
     ///     println!("ls command didn't start");
     /// }
     /// ```
-        pub fn wait(&mut self) -> io::Result<ExitStatus> {
+    pub fn wait(&mut self) -> io::Result<ExitStatus> {
         drop(self.stdin.take());
         self.handle.wait().map(ExitStatus)
     }
@@ -1953,7 +1960,7 @@ impl Child {
     ///     Err(e) => println!("error attempting to wait: {e}"),
     /// }
     /// ```
-        pub fn try_wait(&mut self) -> io::Result<Option<ExitStatus>> {
+    pub fn try_wait(&mut self) -> io::Result<Option<ExitStatus>> {
         Ok(self.handle.try_wait()?.map(ExitStatus))
     }
 
@@ -1989,7 +1996,7 @@ impl Child {
     /// assert!(output.status.success());
     /// ```
     ///
-        pub fn wait_with_output(mut self) -> io::Result<Output> {
+    pub fn wait_with_output(mut self) -> io::Result<Output> {
         drop(self.stdin.take());
 
         let (mut stdout, mut stderr) = (Vec::new(), Vec::new());
@@ -2010,7 +2017,11 @@ impl Child {
         }
 
         let status = self.wait()?;
-        Ok(Output { status, stdout, stderr })
+        Ok(Output {
+            status,
+            stdout,
+            stderr,
+        })
     }
 }
 
@@ -2162,7 +2173,7 @@ pub fn id() -> u32 {
 pub trait Termination {
     /// Is called to get the representation of the value as status code.
     /// This status code is returned to the operating system.
-        fn report(self) -> ExitCode;
+    fn report(self) -> ExitCode;
 }
 
 impl Termination for () {

@@ -15,10 +15,10 @@ mod imp {
     use crate::std::io::Read;
     use dlibc;
 
-    #[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos"))]
+    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
     use crate::std::sys::weak::syscall;
 
-    #[cfg(any(target_os = "linux", target_os = "android",target_os = "dragonos"))]
+    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
     fn getrandom(buf: &mut [u8]) -> dlibc::ssize_t {
         use crate::std::sync::atomic::{AtomicBool, Ordering};
         use crate::std::sys::os::errno;
@@ -38,7 +38,8 @@ mod imp {
         // without ever blocking, and is preferable to falling back to /dev/urandom.
         static GRND_INSECURE_AVAILABLE: AtomicBool = AtomicBool::new(true);
         if GRND_INSECURE_AVAILABLE.load(Ordering::Relaxed) {
-            let ret = unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_INSECURE) };
+            let ret =
+                unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_INSECURE) };
             if ret == -1 && errno() as dlibc::c_int == dlibc::EINVAL {
                 GRND_INSECURE_AVAILABLE.store(false, Ordering::Relaxed);
             } else {
@@ -185,7 +186,8 @@ mod imp {
         // without ever blocking, and is preferable to falling back to /dev/urandom.
         static GRND_INSECURE_AVAILABLE: AtomicBool = AtomicBool::new(true);
         if GRND_INSECURE_AVAILABLE.load(Ordering::Relaxed) {
-            let ret = unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_INSECURE) };
+            let ret =
+                unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_INSECURE) };
             if ret == -1 && errno() as dlibc::c_int == dlibc::EINVAL {
                 GRND_INSECURE_AVAILABLE.store(false, Ordering::Relaxed);
             } else {
@@ -294,8 +296,8 @@ mod imp {
     use crate::std::io::Read;
     use crate::std::sys::os::errno;
     use crate::std::sys::weak::weak;
-    use dlibc::{c_int, c_void, size_t};
     use dlibc;
+    use dlibc::{c_int, c_void, size_t};
 
     fn getentropy_fill_bytes(v: &mut [u8]) -> bool {
         weak!(fn getentropy(*mut c_void, size_t) -> c_int);
@@ -366,7 +368,10 @@ mod imp {
     pub fn fill_bytes(v: &mut [u8]) {
         let ret = unsafe { SecRandomCopyBytes(kSecRandomDefault, v.len(), v.as_mut_ptr()) };
         if ret == -1 {
-            panic!("couldn't generate random bytes: {}", io::Error::last_os_error());
+            panic!(
+                "couldn't generate random bytes: {}",
+                io::Error::last_os_error()
+            );
         }
     }
 }
@@ -436,7 +441,10 @@ mod imp {
         while !RNG_INIT.load(Relaxed) {
             let ret = unsafe { dlibc::randSecure() };
             if ret < 0 {
-                panic!("couldn't generate random bytes: {}", io::Error::last_os_error());
+                panic!(
+                    "couldn't generate random bytes: {}",
+                    io::Error::last_os_error()
+                );
             } else if ret > 0 {
                 RNG_INIT.store(true, Relaxed);
                 break;
@@ -444,10 +452,16 @@ mod imp {
             unsafe { dlibc::usleep(10) };
         }
         let ret = unsafe {
-            dlibc::randABytes(v.as_mut_ptr() as *mut dlibc::c_uchar, v.len() as dlibc::c_int)
+            dlibc::randABytes(
+                v.as_mut_ptr() as *mut dlibc::c_uchar,
+                v.len() as dlibc::c_int,
+            )
         };
         if ret < 0 {
-            panic!("couldn't generate random bytes: {}", io::Error::last_os_error());
+            panic!(
+                "couldn't generate random bytes: {}",
+                io::Error::last_os_error()
+            );
         }
     }
 }

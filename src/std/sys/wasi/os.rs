@@ -65,7 +65,9 @@ pub fn error_string(errno: i32) -> String {
         if dlibc::strerror_r(errno as dlibc::c_int, p, buf.len()) < 0 {
             panic!("strerror_r failure");
         }
-        str::from_utf8(CStr::from_ptr(p).to_bytes()).unwrap().to_owned()
+        str::from_utf8(CStr::from_ptr(p).to_bytes())
+            .unwrap()
+            .to_owned()
     }
 }
 
@@ -75,7 +77,9 @@ pub fn getcwd() -> io::Result<PathBuf> {
         unsafe {
             let ptr = buf.as_mut_ptr() as *mut dlibc::c_char;
             if !dlibc::getcwd(ptr, buf.capacity()).is_null() {
-                let len = CStr::from_ptr(buf.as_ptr() as *const dlibc::c_char).to_bytes().len();
+                let len = CStr::from_ptr(buf.as_ptr() as *const dlibc::c_char)
+                    .to_bytes()
+                    .len();
                 buf.set_len(len);
                 buf.shrink_to_fit();
                 return Ok(PathBuf::from(OsString::from_vec(buf)));
@@ -157,7 +161,11 @@ impl fmt::Debug for EnvStrDebug<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self { slice } = self;
         f.debug_list()
-            .entries(slice.iter().map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())))
+            .entries(
+                slice
+                    .iter()
+                    .map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())),
+            )
             .finish()
     }
 }
@@ -165,7 +173,9 @@ impl fmt::Debug for EnvStrDebug<'_> {
 impl Env {
     pub fn str_debug(&self) -> impl fmt::Debug + '_ {
         let Self { iter } = self;
-        EnvStrDebug { slice: iter.as_slice() }
+        EnvStrDebug {
+            slice: iter.as_slice(),
+        }
     }
 }
 
@@ -207,7 +217,9 @@ pub fn env() -> Env {
                 environ = environ.add(1);
             }
         }
-        return Env { iter: result.into_iter() };
+        return Env {
+            iter: result.into_iter(),
+        };
     }
 
     // See src/libstd/sys/unix/os.rs, same as that
@@ -298,5 +310,9 @@ macro_rules! impl_is_minus_one {
 impl_is_minus_one! { i8 i16 i32 i64 isize }
 
 fn cvt<T: IsMinusOne>(t: T) -> io::Result<T> {
-    if t.is_minus_one() { Err(io::Error::last_os_error()) } else { Ok(t) }
+    if t.is_minus_one() {
+        Err(io::Error::last_os_error())
+    } else {
+        Ok(t)
+    }
 }

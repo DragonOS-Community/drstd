@@ -19,7 +19,9 @@ impl LazyInit for AllocatedCondvar {
 
 impl Condvar {
     pub const fn new() -> Condvar {
-        Condvar { inner: LazyBox::new() }
+        Condvar {
+            inner: LazyBox::new(),
+        }
     }
 
     #[inline]

@@ -103,8 +103,11 @@ const KEY_SENTVAL: usize = 0;
 const KEY_SENTVAL: usize = dlibc::PTHREAD_KEYS_MAX + 1;
 
 impl StaticKey {
-        pub const fn new(dtor: Option<unsafe extern "C" fn(*mut u8)>) -> StaticKey {
-        StaticKey { key: atomic::AtomicUsize::new(KEY_SENTVAL), dtor }
+    pub const fn new(dtor: Option<unsafe extern "C" fn(*mut u8)>) -> StaticKey {
+        StaticKey {
+            key: atomic::AtomicUsize::new(KEY_SENTVAL),
+            dtor,
+        }
     }
 
     /// Gets the value associated with this TLS key

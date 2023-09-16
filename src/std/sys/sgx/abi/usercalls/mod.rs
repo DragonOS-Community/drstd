@@ -17,7 +17,9 @@ use self::raw::*;
 /// `bufs`. To read to a single buffer, just pass a slice of length one.
 pub fn read(fd: Fd, bufs: &mut [IoSliceMut<'_>]) -> IoResult<usize> {
     unsafe {
-        let total_len = bufs.iter().fold(0usize, |sum, buf| sum.saturating_add(buf.len()));
+        let total_len = bufs
+            .iter()
+            .fold(0usize, |sum, buf| sum.saturating_add(buf.len()));
         let mut userbuf = alloc::User::<[u8]>::uninitialized(total_len);
         let ret_len = raw::read(fd, userbuf.as_mut_ptr(), userbuf.len()).from_sgx_result()?;
         let userbuf = &userbuf[..ret_len];
@@ -38,7 +40,10 @@ pub fn read(fd: Fd, bufs: &mut [IoSliceMut<'_>]) -> IoResult<usize> {
 /// Usercall `read_alloc`. See the ABI documentation for more information.
 pub fn read_alloc(fd: Fd) -> IoResult<Vec<u8>> {
     unsafe {
-        let userbuf = ByteBuffer { data: crate::std::ptr::null_mut(), len: 0 };
+        let userbuf = ByteBuffer {
+            data: crate::std::ptr::null_mut(),
+            len: 0,
+        };
         let mut userbuf = alloc::User::new_from_enclave(&userbuf);
         raw::read_alloc(fd, userbuf.as_raw_mut_ptr()).from_sgx_result()?;
         Ok(userbuf.copy_user_buffer())
@@ -51,7 +56,9 @@ pub fn read_alloc(fd: Fd) -> IoResult<Vec<u8>> {
 /// `bufs`. To write from a single buffer, just pass a slice of length one.
 pub fn write(fd: Fd, bufs: &[IoSlice<'_>]) -> IoResult<usize> {
     unsafe {
-        let total_len = bufs.iter().fold(0usize, |sum, buf| sum.saturating_add(buf.len()));
+        let total_len = bufs
+            .iter()
+            .fold(0usize, |sum, buf| sum.saturating_add(buf.len()));
         let mut userbuf = alloc::User::<[u8]>::uninitialized(total_len);
         let mut index = 0;
         for buf in bufs {
@@ -99,7 +106,7 @@ pub fn accept_stream(fd: Fd) -> IoResult<(Fd, String, String)> {
     unsafe {
         let mut bufs = alloc::User::<[ByteBuffer; 2]>::uninitialized();
         let mut buf_it = alloc::UserRef::iter_mut(&mut *bufs); // FIXME: can this be done
-        // without forcing coercion?
+                                                               // without forcing coercion?
         let (local, peer) = (buf_it.next().unwrap(), buf_it.next().unwrap());
         let fd = raw::accept_stream(fd, local.as_raw_mut_ptr(), peer.as_raw_mut_ptr())
             .from_sgx_result()?;
@@ -115,7 +122,7 @@ pub fn connect_stream(addr: &str) -> IoResult<(Fd, String, String)> {
         let addr_user = alloc::User::new_from_enclave(addr.as_bytes());
         let mut bufs = alloc::User::<[ByteBuffer; 2]>::uninitialized();
         let mut buf_it = alloc::UserRef::iter_mut(&mut *bufs); // FIXME: can this be done
-        // without forcing coercion?
+                                                               // without forcing coercion?
         let (local, peer) = (buf_it.next().unwrap(), buf_it.next().unwrap());
         let fd = raw::connect_stream(
             addr_user.as_ptr(),

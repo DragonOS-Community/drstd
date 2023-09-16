@@ -91,14 +91,13 @@
 //! [book-enums]: ../../book/ch06-01-defining-an-enum.html
 //! [book-iter]: ../../book/ch13-02-iterators.html
 
-
 pub mod v1;
 
 /// The 2015 version of the prelude of The Rust Standard Library.
 ///
 /// See the [module-level documentation](self) for more.
 pub mod rust_2015 {
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use super::v1::*;
 }
 
@@ -106,7 +105,7 @@ pub mod rust_2015 {
 ///
 /// See the [module-level documentation](self) for more.
 pub mod rust_2018 {
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use super::v1::*;
 }
 
@@ -114,10 +113,10 @@ pub mod rust_2018 {
 ///
 /// See the [module-level documentation](self) for more.
 pub mod rust_2021 {
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use super::v1::*;
 
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use core::prelude::rust_2021::*;
 }
 
@@ -125,9 +124,9 @@ pub mod rust_2021 {
 ///
 /// See the [module-level documentation](self) for more.
 pub mod rust_2024 {
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use super::v1::*;
 
-        #[doc(no_inline)]
+    #[doc(no_inline)]
     pub use core::prelude::rust_2024::*;
 }

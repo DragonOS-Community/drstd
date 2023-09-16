@@ -2,7 +2,6 @@
 //!
 //! [`std::fs`]: crate::std::fs
 
-
 use crate::std::fs::Metadata;
 use crate::std::sys_common::AsInner;
 use dlibc;
@@ -36,7 +35,10 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        #[deprecated(since = "1.8.0", note = "other methods of this trait are now preferred")]
+    #[deprecated(
+        since = "1.8.0",
+        note = "other methods of this trait are now preferred"
+    )]
     #[allow(deprecated)]
     fn as_raw_stat(&self) -> &raw::stat;
 
@@ -55,7 +57,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_dev(&self) -> u64;
+    fn st_dev(&self) -> u64;
     /// Returns the inode number.
     ///
     /// # Examples
@@ -71,7 +73,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_ino(&self) -> u64;
+    fn st_ino(&self) -> u64;
     /// Returns the file type and mode.
     ///
     /// # Examples
@@ -87,7 +89,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_mode(&self) -> u32;
+    fn st_mode(&self) -> u32;
     /// Returns the number of hard links to file.
     ///
     /// # Examples
@@ -103,7 +105,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_nlink(&self) -> u64;
+    fn st_nlink(&self) -> u64;
     /// Returns the user ID of the file owner.
     ///
     /// # Examples
@@ -119,7 +121,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_uid(&self) -> u32;
+    fn st_uid(&self) -> u32;
     /// Returns the group ID of the file owner.
     ///
     /// # Examples
@@ -135,7 +137,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_gid(&self) -> u32;
+    fn st_gid(&self) -> u32;
     /// Returns the device ID that this file represents. Only relevant for special file.
     ///
     /// # Examples
@@ -151,7 +153,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_rdev(&self) -> u64;
+    fn st_rdev(&self) -> u64;
     /// Returns the size of the file (if it is a regular file or a symbolic link) in bytes.
     ///
     /// The size of a symbolic link is the length of the pathname it contains,
@@ -170,7 +172,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_size(&self) -> u64;
+    fn st_size(&self) -> u64;
     /// Returns the last access time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -186,7 +188,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_atime(&self) -> i64;
+    fn st_atime(&self) -> i64;
     /// Returns the last access time of the file, in nanoseconds since [`st_atime`].
     ///
     /// [`st_atime`]: Self::st_atime
@@ -204,7 +206,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_atime_nsec(&self) -> i64;
+    fn st_atime_nsec(&self) -> i64;
     /// Returns the last modification time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -220,7 +222,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_mtime(&self) -> i64;
+    fn st_mtime(&self) -> i64;
     /// Returns the last modification time of the file, in nanoseconds since [`st_mtime`].
     ///
     /// [`st_mtime`]: Self::st_mtime
@@ -238,7 +240,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_mtime_nsec(&self) -> i64;
+    fn st_mtime_nsec(&self) -> i64;
     /// Returns the last status change time of the file, in seconds since Unix Epoch.
     ///
     /// # Examples
@@ -254,7 +256,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_ctime(&self) -> i64;
+    fn st_ctime(&self) -> i64;
     /// Returns the last status change time of the file, in nanoseconds since [`st_ctime`].
     ///
     /// [`st_ctime`]: Self::st_ctime
@@ -272,7 +274,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_ctime_nsec(&self) -> i64;
+    fn st_ctime_nsec(&self) -> i64;
     /// Returns the "preferred" block size for efficient filesystem I/O.
     ///
     /// # Examples
@@ -288,7 +290,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_blksize(&self) -> u64;
+    fn st_blksize(&self) -> u64;
     /// Returns the number of blocks allocated to the file, 512-byte units.
     ///
     /// # Examples
@@ -304,7 +306,7 @@ pub trait MetadataExt {
     ///     Ok(())
     /// }
     /// ```
-        fn st_blocks(&self) -> u64;
+    fn st_blocks(&self) -> u64;
 }
 
 impl MetadataExt for Metadata {

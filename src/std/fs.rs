@@ -344,7 +344,7 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn open<P: AsRef<Path>>(path: P) -> io::Result<File> {
+    pub fn open<P: AsRef<Path>>(path: P) -> io::Result<File> {
         OpenOptions::new().read(true).open(path.as_ref())
     }
 
@@ -372,8 +372,12 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn create<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        OpenOptions::new().write(true).create(true).truncate(true).open(path.as_ref())
+    pub fn create<P: AsRef<Path>>(path: P) -> io::Result<File> {
+        OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(path.as_ref())
     }
 
     /// Creates a new file in read-write mode; error if the file exists.
@@ -402,8 +406,12 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn create_new<P: AsRef<Path>>(path: P) -> io::Result<File> {
-        OpenOptions::new().read(true).write(true).create_new(true).open(path.as_ref())
+    pub fn create_new<P: AsRef<Path>>(path: P) -> io::Result<File> {
+        OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create_new(true)
+            .open(path.as_ref())
     }
 
     /// Returns a new OpenOptions object.
@@ -433,7 +441,7 @@ impl File {
     /// }
     /// ```
     #[must_use]
-        pub fn options() -> OpenOptions {
+    pub fn options() -> OpenOptions {
         OpenOptions::new()
     }
 
@@ -460,7 +468,7 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn sync_all(&self) -> io::Result<()> {
+    pub fn sync_all(&self) -> io::Result<()> {
         self.inner.fsync()
     }
 
@@ -490,7 +498,7 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn sync_data(&self) -> io::Result<()> {
+    pub fn sync_data(&self) -> io::Result<()> {
         self.inner.datasync()
     }
 
@@ -527,7 +535,7 @@ impl File {
     ///
     /// Note that this method alters the content of the underlying file, even
     /// though it takes `&self` rather than `&mut self`.
-        pub fn set_len(&self, size: u64) -> io::Result<()> {
+    pub fn set_len(&self, size: u64) -> io::Result<()> {
         self.inner.truncate(size)
     }
 
@@ -544,7 +552,7 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn metadata(&self) -> io::Result<Metadata> {
+    pub fn metadata(&self) -> io::Result<Metadata> {
         self.inner.file_attr().map(Metadata)
     }
 
@@ -587,8 +595,10 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        pub fn try_clone(&self) -> io::Result<File> {
-        Ok(File { inner: self.inner.duplicate()? })
+    pub fn try_clone(&self) -> io::Result<File> {
+        Ok(File {
+            inner: self.inner.duplicate()?,
+        })
     }
 
     /// Changes the permissions on the underlying file.
@@ -623,7 +633,7 @@ impl File {
     ///
     /// Note that this method alters the permissions of the underlying file,
     /// even though it takes `&self` rather than `&mut self`.
-        pub fn set_permissions(&self, perm: Permissions) -> io::Result<()> {
+    pub fn set_permissions(&self, perm: Permissions) -> io::Result<()> {
         self.inner.set_permissions(perm.0)
     }
 
@@ -662,7 +672,7 @@ impl File {
     ///     Ok(())
     /// }
     /// ```
-        #[doc(alias = "futimens")]
+    #[doc(alias = "futimens")]
     #[doc(alias = "futimes")]
     #[doc(alias = "SetFileTime")]
     pub fn set_times(&self, times: FileTimes) -> io::Result<()> {
@@ -672,7 +682,7 @@ impl File {
     /// Changes the modification time of the underlying file.
     ///
     /// This is an alias for `set_times(FileTimes::new().set_modified(time))`.
-        #[inline]
+    #[inline]
     pub fn set_modified(&self, time: SystemTime) -> io::Result<()> {
         self.set_times(FileTimes::new().set_modified(time))
     }
@@ -875,7 +885,7 @@ impl OpenOptions {
     /// let mut options = OpenOptions::new();
     /// let file = options.read(true).open("foo.txt");
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn new() -> Self {
         OpenOptions(fs_imp::OpenOptions::new())
     }
@@ -892,7 +902,7 @@ impl OpenOptions {
     ///
     /// let file = OpenOptions::new().read(true).open("foo.txt");
     /// ```
-        pub fn read(&mut self, read: bool) -> &mut Self {
+    pub fn read(&mut self, read: bool) -> &mut Self {
         self.0.read(read);
         self
     }
@@ -912,7 +922,7 @@ impl OpenOptions {
     ///
     /// let file = OpenOptions::new().write(true).open("foo.txt");
     /// ```
-        pub fn write(&mut self, write: bool) -> &mut Self {
+    pub fn write(&mut self, write: bool) -> &mut Self {
         self.0.write(write);
         self
     }
@@ -956,7 +966,7 @@ impl OpenOptions {
     ///
     /// let file = OpenOptions::new().append(true).open("foo.txt");
     /// ```
-        pub fn append(&mut self, append: bool) -> &mut Self {
+    pub fn append(&mut self, append: bool) -> &mut Self {
         self.0.append(append);
         self
     }
@@ -975,7 +985,7 @@ impl OpenOptions {
     ///
     /// let file = OpenOptions::new().write(true).truncate(true).open("foo.txt");
     /// ```
-        pub fn truncate(&mut self, truncate: bool) -> &mut Self {
+    pub fn truncate(&mut self, truncate: bool) -> &mut Self {
         self.0.truncate(truncate);
         self
     }
@@ -995,7 +1005,7 @@ impl OpenOptions {
     ///
     /// let file = OpenOptions::new().write(true).create(true).open("foo.txt");
     /// ```
-        pub fn create(&mut self, create: bool) -> &mut Self {
+    pub fn create(&mut self, create: bool) -> &mut Self {
         self.0.create(create);
         self
     }
@@ -1027,7 +1037,7 @@ impl OpenOptions {
     ///                              .create_new(true)
     ///                              .open("foo.txt");
     /// ```
-        pub fn create_new(&mut self, create_new: bool) -> &mut Self {
+    pub fn create_new(&mut self, create_new: bool) -> &mut Self {
         self.0.create_new(create_new);
         self
     }
@@ -1074,7 +1084,7 @@ impl OpenOptions {
     /// [`InvalidInput`]: io::ErrorKind::InvalidInput
     /// [`NotFound`]: io::ErrorKind::NotFound
     /// [`PermissionDenied`]: io::ErrorKind::PermissionDenied
-        pub fn open<P: AsRef<Path>>(&self, path: P) -> io::Result<File> {
+    pub fn open<P: AsRef<Path>>(&self, path: P) -> io::Result<File> {
         self._open(path.as_ref())
     }
 
@@ -1113,7 +1123,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn file_type(&self) -> FileType {
+    pub fn file_type(&self) -> FileType {
         FileType(self.0.file_type())
     }
 
@@ -1135,7 +1145,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn is_dir(&self) -> bool {
+    pub fn is_dir(&self) -> bool {
         self.file_type().is_dir()
     }
 
@@ -1163,7 +1173,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn is_file(&self) -> bool {
+    pub fn is_file(&self) -> bool {
         self.file_type().is_file()
     }
 
@@ -1188,7 +1198,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn is_symlink(&self) -> bool {
+    pub fn is_symlink(&self) -> bool {
         self.file_type().is_symlink()
     }
 
@@ -1207,7 +1217,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn len(&self) -> u64 {
+    pub fn len(&self) -> u64 {
         self.0.size()
     }
 
@@ -1226,7 +1236,7 @@ impl Metadata {
     /// }
     /// ```
     #[must_use]
-        pub fn permissions(&self) -> Permissions {
+    pub fn permissions(&self) -> Permissions {
         Permissions(self.0.perm())
     }
 
@@ -1256,7 +1266,7 @@ impl Metadata {
     ///     Ok(())
     /// }
     /// ```
-        pub fn modified(&self) -> io::Result<SystemTime> {
+    pub fn modified(&self) -> io::Result<SystemTime> {
         self.0.modified().map(FromInner::from_inner)
     }
 
@@ -1290,7 +1300,7 @@ impl Metadata {
     ///     Ok(())
     /// }
     /// ```
-        pub fn accessed(&self) -> io::Result<SystemTime> {
+    pub fn accessed(&self) -> io::Result<SystemTime> {
         self.0.accessed().map(FromInner::from_inner)
     }
 
@@ -1321,7 +1331,7 @@ impl Metadata {
     ///     Ok(())
     /// }
     /// ```
-        pub fn created(&self) -> io::Result<SystemTime> {
+    pub fn created(&self) -> io::Result<SystemTime> {
         self.0.created().map(FromInner::from_inner)
     }
 }
@@ -1357,18 +1367,18 @@ impl FileTimes {
     /// Create a new `FileTimes` with no times set.
     ///
     /// Using the resulting `FileTimes` in [`File::set_times`] will not modify any timestamps.
-        pub fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 
     /// Set the last access time of a file.
-        pub fn set_accessed(mut self, t: SystemTime) -> Self {
+    pub fn set_accessed(mut self, t: SystemTime) -> Self {
         self.0.set_accessed(t.into_inner());
         self
     }
 
     /// Set the last modified time of a file.
-        pub fn set_modified(mut self, t: SystemTime) -> Self {
+    pub fn set_modified(mut self, t: SystemTime) -> Self {
         self.0.set_modified(t.into_inner());
         self
     }
@@ -1428,7 +1438,7 @@ impl Permissions {
     /// }
     /// ```
     #[must_use = "call `set_readonly` to modify the readonly flag"]
-        pub fn readonly(&self) -> bool {
+    pub fn readonly(&self) -> bool {
         self.0.readonly()
     }
 
@@ -1494,7 +1504,7 @@ impl Permissions {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_readonly(&mut self, readonly: bool) {
+    pub fn set_readonly(&mut self, readonly: bool) {
         self.0.set_readonly(readonly)
     }
 }
@@ -1522,7 +1532,7 @@ impl FileType {
     /// }
     /// ```
     #[must_use]
-        pub fn is_dir(&self) -> bool {
+    pub fn is_dir(&self) -> bool {
         self.0.is_dir()
     }
 
@@ -1554,7 +1564,7 @@ impl FileType {
     /// }
     /// ```
     #[must_use]
-        pub fn is_file(&self) -> bool {
+    pub fn is_file(&self) -> bool {
         self.0.is_file()
     }
 
@@ -1589,7 +1599,7 @@ impl FileType {
     /// }
     /// ```
     #[must_use]
-        pub fn is_symlink(&self) -> bool {
+    pub fn is_symlink(&self) -> bool {
         self.0.is_symlink()
     }
 }
@@ -1652,7 +1662,7 @@ impl DirEntry {
     ///
     /// The exact text, of course, depends on what files you have in `.`.
     #[must_use]
-        pub fn path(&self) -> PathBuf {
+    pub fn path(&self) -> PathBuf {
         self.0.path()
     }
 
@@ -1689,7 +1699,7 @@ impl DirEntry {
     ///     }
     /// }
     /// ```
-        pub fn metadata(&self) -> io::Result<Metadata> {
+    pub fn metadata(&self) -> io::Result<Metadata> {
         self.0.metadata().map(Metadata)
     }
 
@@ -1723,7 +1733,7 @@ impl DirEntry {
     ///     }
     /// }
     /// ```
-        pub fn file_type(&self) -> io::Result<FileType> {
+    pub fn file_type(&self) -> io::Result<FileType> {
         self.0.file_type().map(FileType)
     }
 
@@ -1751,7 +1761,7 @@ impl DirEntry {
     /// }
     /// ```
     #[must_use]
-        pub fn file_name(&self) -> OsString {
+    pub fn file_name(&self) -> OsString {
         self.0.file_name()
     }
 }
@@ -2407,9 +2417,12 @@ impl DirBuilder {
     ///
     /// let builder = DirBuilder::new();
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn new() -> DirBuilder {
-        DirBuilder { inner: fs_imp::DirBuilder::new(), recursive: false }
+        DirBuilder {
+            inner: fs_imp::DirBuilder::new(),
+            recursive: false,
+        }
     }
 
     /// Indicates that directories should be created recursively, creating all
@@ -2426,7 +2439,7 @@ impl DirBuilder {
     /// let mut builder = DirBuilder::new();
     /// builder.recursive(true);
     /// ```
-        pub fn recursive(&mut self, recursive: bool) -> &mut Self {
+    pub fn recursive(&mut self, recursive: bool) -> &mut Self {
         self.recursive = recursive;
         self
     }
@@ -2449,12 +2462,16 @@ impl DirBuilder {
     ///
     /// assert!(fs::metadata(path).unwrap().is_dir());
     /// ```
-        pub fn create<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
+    pub fn create<P: AsRef<Path>>(&self, path: P) -> io::Result<()> {
         self._create(path.as_ref())
     }
 
     fn _create(&self, path: &Path) -> io::Result<()> {
-        if self.recursive { self.create_dir_all(path) } else { self.inner.mkdir(path) }
+        if self.recursive {
+            self.create_dir_all(path)
+        } else {
+            self.inner.mkdir(path)
+        }
     }
 
     fn create_dir_all(&self, path: &Path) -> io::Result<()> {

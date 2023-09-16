@@ -71,7 +71,7 @@ macro_rules! define_usercalls {
 
 macro_rules! define_ra {
     (< $i:ident > $t:ty) => {
-                impl<$i> RegisterArgument for $t {
+        impl<$i> RegisterArgument for $t {
             fn from_register(a: Register) -> Self {
                 a as _
             }
@@ -81,7 +81,7 @@ macro_rules! define_ra {
         }
     };
     ($i:ty as $t:ty) => {
-                impl RegisterArgument for $t {
+        impl RegisterArgument for $t {
             fn from_register(a: Register) -> Self {
                 a as $i as _
             }
@@ -91,7 +91,7 @@ macro_rules! define_ra {
         }
     };
     ($t:ty) => {
-                impl RegisterArgument for $t {
+        impl RegisterArgument for $t {
             fn from_register(a: Register) -> Self {
                 a as _
             }
@@ -117,7 +117,11 @@ define_ra!(<T> *mut T);
 
 impl RegisterArgument for bool {
     fn from_register(a: Register) -> bool {
-        if a != 0 { true } else { false }
+        if a != 0 {
+            true
+        } else {
+            false
+        }
     }
     fn into_register(self) -> Register {
         self as _

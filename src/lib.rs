@@ -9,7 +9,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 #![feature(lang_items)]
-
 #![feature(std_internals)]
 #![feature(extend_one)]
 #![feature(exact_size_is_empty)]
@@ -98,12 +97,7 @@ extern crate memoffset;
 extern crate dsc;
 pub mod std;
 
-pub use dlibc::{
-    print,
-    println,
-    eprint,
-    eprintln,
-};
+pub use dlibc::{eprint, eprintln, print, println};
 
 // use core::panic::PanicInfo;
 

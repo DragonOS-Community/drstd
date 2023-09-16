@@ -41,7 +41,10 @@ fn basic() {
     });
 
     let mut stream = or_panic!(UnixStream::connect(&socket_path));
-    assert_eq!(Some(&*socket_path), stream.peer_addr().unwrap().as_pathname());
+    assert_eq!(
+        Some(&*socket_path),
+        stream.peer_addr().unwrap().as_pathname()
+    );
     or_panic!(stream.write_all(msg1));
     let mut buf = vec![];
     or_panic!(stream.read_to_end(&mut buf));
@@ -211,7 +214,11 @@ fn test_read_timeout() {
     or_panic!(stream.set_read_timeout(Some(Duration::from_millis(1000))));
 
     let mut buf = [0; 10];
-    let kind = stream.read_exact(&mut buf).err().expect("expected error").kind();
+    let kind = stream
+        .read_exact(&mut buf)
+        .err()
+        .expect("expected error")
+        .kind();
     assert!(
         kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,
         "unexpected_error: {:?}",
@@ -237,7 +244,11 @@ fn test_read_with_timeout() {
     or_panic!(stream.read(&mut buf));
     assert_eq!(b"hello world", &buf[..]);
 
-    let kind = stream.read_exact(&mut buf).err().expect("expected error").kind();
+    let kind = stream
+        .read_exact(&mut buf)
+        .err()
+        .expect("expected error")
+        .kind();
     assert!(
         kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut,
         "unexpected_error: {:?}",

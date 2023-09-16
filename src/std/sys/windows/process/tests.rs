@@ -30,7 +30,10 @@ fn test_thread_handle() {
     use crate::std::os::windows::process::{ChildExt, CommandExt};
     const CREATE_SUSPENDED: u32 = 0x00000004;
 
-    let p = Command::new("cmd").args(&["/C", "exit 0"]).creation_flags(CREATE_SUSPENDED).spawn();
+    let p = Command::new("cmd")
+        .args(&["/C", "exit 0"])
+        .creation_flags(CREATE_SUSPENDED)
+        .spawn();
     assert!(p.is_ok());
     let mut p = p.unwrap();
 
@@ -54,19 +57,31 @@ fn test_make_command_line() {
     fn test_wrapper(prog: &str, args: &[&str], force_quotes: bool) -> String {
         let command_line = &make_command_line(
             OsStr::new(prog),
-            &args.iter().map(|a| Arg::Regular(OsString::from(a))).collect::<Vec<_>>(),
+            &args
+                .iter()
+                .map(|a| Arg::Regular(OsString::from(a)))
+                .collect::<Vec<_>>(),
             force_quotes,
         )
         .unwrap();
         String::from_utf16(command_line).unwrap()
     }
 
-    assert_eq!(test_wrapper("prog", &["aaa", "bbb", "ccc"], false), "\"prog\" aaa bbb ccc");
+    assert_eq!(
+        test_wrapper("prog", &["aaa", "bbb", "ccc"], false),
+        "\"prog\" aaa bbb ccc"
+    );
 
     assert_eq!(test_wrapper("prog", &[r"C:\"], false), r#""prog" C:\"#);
-    assert_eq!(test_wrapper("prog", &[r"2slashes\\"], false), r#""prog" 2slashes\\"#);
+    assert_eq!(
+        test_wrapper("prog", &[r"2slashes\\"], false),
+        r#""prog" 2slashes\\"#
+    );
     assert_eq!(test_wrapper("prog", &[r" C:\"], false), r#""prog" " C:\\""#);
-    assert_eq!(test_wrapper("prog", &[r" 2slashes\\"], false), r#""prog" " 2slashes\\\\""#);
+    assert_eq!(
+        test_wrapper("prog", &[r" 2slashes\\"], false),
+        r#""prog" " 2slashes\\\\""#
+    );
 
     assert_eq!(
         test_wrapper("C:\\Program Files\\blah\\blah.exe", &["aaa"], false),
@@ -84,7 +99,10 @@ fn test_make_command_line() {
         test_wrapper("C:\\Program Files\\test", &["aa\"bb"], false),
         "\"C:\\Program Files\\test\" aa\\\"bb"
     );
-    assert_eq!(test_wrapper("echo", &["a b c"], false), "\"echo\" \"a b c\"");
+    assert_eq!(
+        test_wrapper("echo", &["a b c"], false),
+        "\"echo\" \"a b c\""
+    );
     assert_eq!(
         test_wrapper("echo", &["\" \\\" \\", "\\"], false),
         "\"echo\" \"\\\" \\\\\\\" \\\\\" \\"
@@ -177,16 +195,22 @@ fn windows_exe_resolver() {
 
     // Invalid file names should return InvalidInput.
     assert_eq!(
-        resolve_exe(OsStr::new(""), env_paths, None).unwrap_err().kind(),
+        resolve_exe(OsStr::new(""), env_paths, None)
+            .unwrap_err()
+            .kind(),
         io::ErrorKind::InvalidInput
     );
     assert_eq!(
-        resolve_exe(OsStr::new("\0"), env_paths, None).unwrap_err().kind(),
+        resolve_exe(OsStr::new("\0"), env_paths, None)
+            .unwrap_err()
+            .kind(),
         io::ErrorKind::InvalidInput
     );
     // Trailing slash, therefore there's no file name component.
     assert_eq!(
-        resolve_exe(OsStr::new(r"C:\Path\to\"), env_paths, None).unwrap_err().kind(),
+        resolve_exe(OsStr::new(r"C:\Path\to\"), env_paths, None)
+            .unwrap_err()
+            .kind(),
         io::ErrorKind::InvalidInput
     );
 
@@ -215,8 +239,11 @@ fn windows_exe_resolver() {
     let result = symlink("<DOES NOT EXIST>".as_ref(), &exe_path);
     if is_ci || result.is_ok() {
         result.unwrap();
-        assert!(
-            resolve_exe(OsStr::new("exists.exe"), empty_paths, Some(temp.path().as_ref())).is_ok()
-        );
+        assert!(resolve_exe(
+            OsStr::new("exists.exe"),
+            empty_paths,
+            Some(temp.path().as_ref())
+        )
+        .is_ok());
     }
 }

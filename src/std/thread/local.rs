@@ -1,6 +1,5 @@
 //! Thread local storage
 
-
 #[cfg(all(test, not(target_os = "emscripten")))]
 mod tests;
 
@@ -208,7 +207,7 @@ impl Error for AccessError {}
 
 impl<T: 'static> LocalKey<T> {
     #[doc(hidden)]
-        pub const unsafe fn new(
+    pub const unsafe fn new(
         inner: unsafe fn(Option<&mut Option<T>>) -> Option<&'static T>,
     ) -> LocalKey<T> {
         LocalKey { inner }
@@ -224,7 +223,7 @@ impl<T: 'static> LocalKey<T> {
     /// This function will `panic!()` if the key currently has its
     /// destructor running, and it **may** panic if the destructor has
     /// previously been run for this thread.
-        pub fn with<F, R>(&'static self, f: F) -> R
+    pub fn with<F, R>(&'static self, f: F) -> R
     where
         F: FnOnce(&T) -> R,
     {
@@ -244,7 +243,7 @@ impl<T: 'static> LocalKey<T> {
     ///
     /// This function will still `panic!()` if the key is uninitialized and the
     /// key's initializer panics.
-        #[inline]
+    #[inline]
     pub fn try_with<F, R>(&'static self, f: F) -> Result<R, AccessError>
     where
         F: FnOnce(&T) -> R,
@@ -309,7 +308,7 @@ impl<T: 'static> LocalKey<Cell<T>> {
     ///
     /// assert_eq!(X.get(), 123);
     /// ```
-        pub fn set(&'static self, value: T) {
+    pub fn set(&'static self, value: T) {
         self.initialize_with(Cell::new(value), |value, cell| {
             if let Some(value) = value {
                 // The cell was already initialized, so `value` wasn't used to
@@ -341,7 +340,7 @@ impl<T: 'static> LocalKey<Cell<T>> {
     ///
     /// assert_eq!(X.get(), 1);
     /// ```
-        pub fn get(&'static self) -> T
+    pub fn get(&'static self) -> T
     where
         T: Copy,
     {
@@ -370,7 +369,7 @@ impl<T: 'static> LocalKey<Cell<T>> {
     /// assert_eq!(X.take(), Some(1));
     /// assert_eq!(X.take(), None);
     /// ```
-        pub fn take(&'static self) -> T
+    pub fn take(&'static self) -> T
     where
         T: Default,
     {
@@ -399,7 +398,7 @@ impl<T: 'static> LocalKey<Cell<T>> {
     /// assert_eq!(X.replace(2), 1);
     /// assert_eq!(X.replace(3), 2);
     /// ```
-        pub fn replace(&'static self, value: T) -> T {
+    pub fn replace(&'static self, value: T) -> T {
         self.with(|cell| cell.replace(value))
     }
 }
@@ -428,7 +427,7 @@ impl<T: 'static> LocalKey<RefCell<T>> {
     ///
     /// X.with_borrow(|v| assert!(v.is_empty()));
     /// ```
-        pub fn with_borrow<F, R>(&'static self, f: F) -> R
+    pub fn with_borrow<F, R>(&'static self, f: F) -> R
     where
         F: FnOnce(&T) -> R,
     {
@@ -460,7 +459,7 @@ impl<T: 'static> LocalKey<RefCell<T>> {
     ///
     /// X.with_borrow(|v| assert_eq!(*v, vec![1]));
     /// ```
-        pub fn with_borrow_mut<F, R>(&'static self, f: F) -> R
+    pub fn with_borrow_mut<F, R>(&'static self, f: F) -> R
     where
         F: FnOnce(&mut T) -> R,
     {
@@ -495,7 +494,7 @@ impl<T: 'static> LocalKey<RefCell<T>> {
     ///
     /// X.with_borrow(|v| assert_eq!(*v, vec![1, 2, 3]));
     /// ```
-        pub fn set(&'static self, value: T) {
+    pub fn set(&'static self, value: T) {
         self.initialize_with(RefCell::new(value), |value, cell| {
             if let Some(value) = value {
                 // The cell was already initialized, so `value` wasn't used to
@@ -535,7 +534,7 @@ impl<T: 'static> LocalKey<RefCell<T>> {
     ///
     /// X.with_borrow(|v| assert!(v.is_empty()));
     /// ```
-        pub fn take(&'static self) -> T
+    pub fn take(&'static self) -> T
     where
         T: Default,
     {
@@ -565,7 +564,7 @@ impl<T: 'static> LocalKey<RefCell<T>> {
     ///
     /// X.with_borrow(|v| assert_eq!(*v, vec![1, 2, 3]));
     /// ```
-        pub fn replace(&'static self, value: T) -> T {
+    pub fn replace(&'static self, value: T) -> T {
         self.with(|cell| cell.replace(value))
     }
 }

@@ -84,7 +84,9 @@ impl<T> fmt::Debug for Key<T> {
 
 impl<T> Key<T> {
     pub const fn new() -> Key<T> {
-        Key { inner: LazyKeyInner::new() }
+        Key {
+            inner: LazyKeyInner::new(),
+        }
     }
 
     pub unsafe fn get(&self, init: impl FnOnce() -> T) -> Option<&'static T> {

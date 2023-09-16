@@ -130,10 +130,12 @@ impl OsString {
     ///
     /// let os_string = OsString::new();
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn new() -> OsString {
-        OsString { inner: Buf::from_string(String::new()) }
+        OsString {
+            inner: Buf::from_string(String::new()),
+        }
     }
 
     /// Converts bytes to an `OsString` without checking that the bytes contains
@@ -174,8 +176,10 @@ impl OsString {
     ///
     /// [conversions]: super#conversions
     #[inline]
-        pub unsafe fn from_encoded_bytes_unchecked(bytes: Vec<u8>) -> Self {
-        OsString { inner: Buf::from_encoded_bytes_unchecked(bytes) }
+    pub unsafe fn from_encoded_bytes_unchecked(bytes: Vec<u8>) -> Self {
+        OsString {
+            inner: Buf::from_encoded_bytes_unchecked(bytes),
+        }
     }
 
     /// Converts to an [`OsStr`] slice.
@@ -189,7 +193,7 @@ impl OsString {
     /// let os_str = OsStr::new("foo");
     /// assert_eq!(os_string.as_os_str(), os_str);
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn as_os_str(&self) -> &OsStr {
         self
@@ -210,7 +214,7 @@ impl OsString {
     ///
     /// [`std::ffi`]: crate::std::ffi
     #[inline]
-        pub fn into_encoded_bytes(self) -> Vec<u8> {
+    pub fn into_encoded_bytes(self) -> Vec<u8> {
         self.inner.into_encoded_bytes()
     }
 
@@ -227,9 +231,11 @@ impl OsString {
     /// let string = os_string.into_string();
     /// assert_eq!(string, Ok(String::from("foo")));
     /// ```
-        #[inline]
+    #[inline]
     pub fn into_string(self) -> Result<String, OsString> {
-        self.inner.into_string().map_err(|buf| OsString { inner: buf })
+        self.inner
+            .into_string()
+            .map_err(|buf| OsString { inner: buf })
     }
 
     /// Extends the string with the given <code>&[OsStr]</code> slice.
@@ -243,7 +249,7 @@ impl OsString {
     /// os_string.push("bar");
     /// assert_eq!(&os_string, "foobar");
     /// ```
-        #[inline]
+    #[inline]
     pub fn push<T: AsRef<OsStr>>(&mut self, s: T) {
         self.inner.push_slice(&s.as_ref().inner)
     }
@@ -270,10 +276,12 @@ impl OsString {
     ///
     /// assert_eq!(capacity, os_string.capacity());
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn with_capacity(capacity: usize) -> OsString {
-        OsString { inner: Buf::with_capacity(capacity) }
+        OsString {
+            inner: Buf::with_capacity(capacity),
+        }
     }
 
     /// Truncates the `OsString` to zero length.
@@ -289,7 +297,7 @@ impl OsString {
     /// os_string.clear();
     /// assert_eq!(&os_string, "");
     /// ```
-        #[inline]
+    #[inline]
     pub fn clear(&mut self) {
         self.inner.clear()
     }
@@ -306,7 +314,7 @@ impl OsString {
     /// let os_string = OsString::with_capacity(10);
     /// assert!(os_string.capacity() >= 10);
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn capacity(&self) -> usize {
         self.inner.capacity()
@@ -329,7 +337,7 @@ impl OsString {
     /// s.reserve(10);
     /// assert!(s.capacity() >= 10);
     /// ```
-        #[inline]
+    #[inline]
     pub fn reserve(&mut self, additional: usize) {
         self.inner.reserve(additional)
     }
@@ -367,7 +375,7 @@ impl OsString {
     /// }
     /// # process_data("123").expect("why is the test harness OOMing on 3 bytes?");
     /// ```
-        #[inline]
+    #[inline]
     pub fn try_reserve(&mut self, additional: usize) -> Result<(), TryReserveError> {
         self.inner.try_reserve(additional)
     }
@@ -393,7 +401,7 @@ impl OsString {
     /// s.reserve_exact(10);
     /// assert!(s.capacity() >= 10);
     /// ```
-        #[inline]
+    #[inline]
     pub fn reserve_exact(&mut self, additional: usize) {
         self.inner.reserve_exact(additional)
     }
@@ -436,7 +444,7 @@ impl OsString {
     /// }
     /// # process_data("123").expect("why is the test harness OOMing on 3 bytes?");
     /// ```
-        #[inline]
+    #[inline]
     pub fn try_reserve_exact(&mut self, additional: usize) -> Result<(), TryReserveError> {
         self.inner.try_reserve_exact(additional)
     }
@@ -458,7 +466,7 @@ impl OsString {
     /// s.shrink_to_fit();
     /// assert_eq!(3, s.capacity());
     /// ```
-        #[inline]
+    #[inline]
     pub fn shrink_to_fit(&mut self) {
         self.inner.shrink_to_fit()
     }
@@ -488,7 +496,7 @@ impl OsString {
     /// assert!(s.capacity() >= 3);
     /// ```
     #[inline]
-        pub fn shrink_to(&mut self, min_capacity: usize) {
+    pub fn shrink_to(&mut self, min_capacity: usize) {
         self.inner.shrink_to(min_capacity)
     }
 
@@ -504,7 +512,7 @@ impl OsString {
     /// let b: Box<OsStr> = s.into_boxed_os_str();
     /// ```
     #[must_use = "`self` will be dropped if the result is not used"]
-        pub fn into_boxed_os_str(self) -> Box<OsStr> {
+    pub fn into_boxed_os_str(self) -> Box<OsStr> {
         let rw = Box::into_raw(self.inner.into_box()) as *mut OsStr;
         unsafe { Box::from_raw(rw) }
     }
@@ -516,7 +524,9 @@ impl From<String> for OsString {
     /// This conversion does not allocate or copy memory.
     #[inline]
     fn from(s: String) -> OsString {
-        OsString { inner: Buf::from_string(s) }
+        OsString {
+            inner: Buf::from_string(s),
+        }
     }
 }
 
@@ -571,7 +581,9 @@ impl Default for OsString {
 impl Clone for OsString {
     #[inline]
     fn clone(&self) -> Self {
-        OsString { inner: self.inner.clone() }
+        OsString {
+            inner: self.inner.clone(),
+        }
     }
 
     #[inline]
@@ -685,7 +697,7 @@ impl OsStr {
     /// let os_str = OsStr::new("foo");
     /// ```
     #[inline]
-        pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &OsStr {
+    pub fn new<S: AsRef<OsStr> + ?Sized>(s: &S) -> &OsStr {
         s.as_ref()
     }
 
@@ -727,7 +739,7 @@ impl OsStr {
     ///
     /// [conversions]: super#conversions
     #[inline]
-        pub unsafe fn from_encoded_bytes_unchecked(bytes: &[u8]) -> &Self {
+    pub unsafe fn from_encoded_bytes_unchecked(bytes: &[u8]) -> &Self {
         Self::from_inner(Slice::from_encoded_bytes_unchecked(bytes))
     }
 
@@ -759,7 +771,7 @@ impl OsStr {
     /// let os_str = OsStr::new("foo");
     /// assert_eq!(os_str.to_str(), Some("foo"));
     /// ```
-        #[must_use = "this returns the result of the operation, \
+    #[must_use = "this returns the result of the operation, \
                   without modifying the original"]
     #[inline]
     pub fn to_str(&self) -> Option<&str> {
@@ -811,7 +823,7 @@ impl OsStr {
     ///     assert_eq!(os_str.to_string_lossy(), "fo�o");
     /// }
     /// ```
-        #[must_use = "this returns the result of the operation, \
+    #[must_use = "this returns the result of the operation, \
                   without modifying the original"]
     #[inline]
     pub fn to_string_lossy(&self) -> Cow<'_, str> {
@@ -829,11 +841,13 @@ impl OsStr {
     /// let os_string = os_str.to_os_string();
     /// assert_eq!(os_string, OsString::from("foo"));
     /// ```
-        #[must_use = "this returns the result of the operation, \
+    #[must_use = "this returns the result of the operation, \
                   without modifying the original"]
     #[inline]
     pub fn to_os_string(&self) -> OsString {
-        OsString { inner: self.inner.to_owned() }
+        OsString {
+            inner: self.inner.to_owned(),
+        }
     }
 
     /// Checks whether the `OsStr` is empty.
@@ -849,7 +863,7 @@ impl OsStr {
     /// let os_str = OsStr::new("foo");
     /// assert!(!os_str.is_empty());
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.inner.inner.is_empty()
@@ -882,17 +896,19 @@ impl OsStr {
     /// let os_str = OsStr::new("foo");
     /// assert_eq!(os_str.len(), 3);
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn len(&self) -> usize {
         self.inner.inner.len()
     }
 
     /// Converts a <code>[Box]<[OsStr]></code> into an [`OsString`] without copying or allocating.
-        #[must_use = "`self` will be dropped if the result is not used"]
+    #[must_use = "`self` will be dropped if the result is not used"]
     pub fn into_os_string(self: Box<OsStr>) -> OsString {
         let boxed = unsafe { Box::from_raw(Box::into_raw(self) as *mut Slice) };
-        OsString { inner: Buf::from_box(boxed) }
+        OsString {
+            inner: Buf::from_box(boxed),
+        }
     }
 
     /// Converts an OS string slice to a byte slice.  To convert the byte slice back into an OS
@@ -910,7 +926,7 @@ impl OsStr {
     ///
     /// [`std::ffi`]: crate::std::ffi
     #[inline]
-        pub fn as_encoded_bytes(&self) -> &[u8] {
+    pub fn as_encoded_bytes(&self) -> &[u8] {
         self.inner.as_encoded_bytes()
     }
 
@@ -933,7 +949,7 @@ impl OsStr {
     ///
     /// assert_eq!("grÜße, jÜrgen ❤", s);
     /// ```
-        #[inline]
+    #[inline]
     pub fn make_ascii_lowercase(&mut self) {
         self.inner.make_ascii_lowercase()
     }
@@ -957,7 +973,7 @@ impl OsStr {
     ///
     /// assert_eq!("GRüßE, JüRGEN ❤", s);
     /// ```
-        #[inline]
+    #[inline]
     pub fn make_ascii_uppercase(&mut self) {
         self.inner.make_ascii_uppercase()
     }
@@ -979,7 +995,7 @@ impl OsStr {
     /// assert_eq!("grüße, jürgen ❤", s.to_ascii_lowercase());
     /// ```
     #[must_use = "to lowercase the value in-place, use `make_ascii_lowercase`"]
-        pub fn to_ascii_lowercase(&self) -> OsString {
+    pub fn to_ascii_lowercase(&self) -> OsString {
         OsString::from_inner(self.inner.to_ascii_lowercase())
     }
 
@@ -1000,7 +1016,7 @@ impl OsStr {
     /// assert_eq!("GRüßE, JüRGEN ❤", s.to_ascii_uppercase());
     /// ```
     #[must_use = "to uppercase the value in-place, use `make_ascii_uppercase`"]
-        pub fn to_ascii_uppercase(&self) -> OsString {
+    pub fn to_ascii_uppercase(&self) -> OsString {
         OsString::from_inner(self.inner.to_ascii_uppercase())
     }
 
@@ -1017,7 +1033,7 @@ impl OsStr {
     /// assert!(ascii.is_ascii());
     /// assert!(!non_ascii.is_ascii());
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn is_ascii(&self) -> bool {
         self.inner.is_ascii()
@@ -1037,7 +1053,7 @@ impl OsStr {
     /// assert!(OsString::from("Ferrös").eq_ignore_ascii_case("FERRöS"));
     /// assert!(!OsString::from("Ferrös").eq_ignore_ascii_case("FERRÖS"));
     /// ```
-        pub fn eq_ignore_ascii_case<S: AsRef<OsStr>>(&self, other: S) -> bool {
+    pub fn eq_ignore_ascii_case<S: AsRef<OsStr>>(&self, other: S) -> bool {
         self.inner.eq_ignore_ascii_case(&other.as_ref().inner)
     }
 }
@@ -1217,7 +1233,8 @@ impl Eq for OsStr {}
 impl PartialOrd for OsStr {
     #[inline]
     fn partial_cmp(&self, other: &OsStr) -> Option<cmp::Ordering> {
-        self.as_encoded_bytes().partial_cmp(other.as_encoded_bytes())
+        self.as_encoded_bytes()
+            .partial_cmp(other.as_encoded_bytes())
     }
     #[inline]
     fn lt(&self, other: &OsStr) -> bool {
@@ -1256,28 +1273,28 @@ impl Ord for OsStr {
 
 macro_rules! impl_cmp {
     ($lhs:ty, $rhs: ty) => {
-                impl<'a, 'b> PartialEq<$rhs> for $lhs {
+        impl<'a, 'b> PartialEq<$rhs> for $lhs {
             #[inline]
             fn eq(&self, other: &$rhs) -> bool {
                 <OsStr as PartialEq>::eq(self, other)
             }
         }
 
-                impl<'a, 'b> PartialEq<$lhs> for $rhs {
+        impl<'a, 'b> PartialEq<$lhs> for $rhs {
             #[inline]
             fn eq(&self, other: &$lhs) -> bool {
                 <OsStr as PartialEq>::eq(self, other)
             }
         }
 
-                impl<'a, 'b> PartialOrd<$rhs> for $lhs {
+        impl<'a, 'b> PartialOrd<$rhs> for $lhs {
             #[inline]
             fn partial_cmp(&self, other: &$rhs) -> Option<cmp::Ordering> {
                 <OsStr as PartialOrd>::partial_cmp(self, other)
             }
         }
 
-                impl<'a, 'b> PartialOrd<$lhs> for $rhs {
+        impl<'a, 'b> PartialOrd<$lhs> for $rhs {
             #[inline]
             fn partial_cmp(&self, other: &$lhs) -> Option<cmp::Ordering> {
                 <OsStr as PartialOrd>::partial_cmp(self, other)

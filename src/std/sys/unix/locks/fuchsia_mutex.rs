@@ -80,20 +80,25 @@ fn mark_contested(state: u32) -> u32 {
 impl Mutex {
     #[inline]
     pub const fn new() -> Mutex {
-        Mutex { futex: AtomicU32::new(UNLOCKED) }
+        Mutex {
+            futex: AtomicU32::new(UNLOCKED),
+        }
     }
 
     #[inline]
     pub fn try_lock(&self) -> bool {
         let thread_self = unsafe { zx_thread_self() };
-        self.futex.compare_exchange(UNLOCKED, to_state(thread_self), Acquire, Relaxed).is_ok()
+        self.futex
+            .compare_exchange(UNLOCKED, to_state(thread_self), Acquire, Relaxed)
+            .is_ok()
     }
 
     #[inline]
     pub fn lock(&self) {
         let thread_self = unsafe { zx_thread_self() };
         if let Err(state) =
-            self.futex.compare_exchange(UNLOCKED, to_state(thread_self), Acquire, Relaxed)
+            self.futex
+                .compare_exchange(UNLOCKED, to_state(thread_self), Acquire, Relaxed)
         {
             unsafe {
                 self.lock_contested(state, thread_self);
@@ -110,7 +115,10 @@ impl Mutex {
             // Mark the mutex as contested if it is not already.
             let contested = mark_contested(state);
             if is_contested(state)
-                || self.futex.compare_exchange(state, contested, Relaxed, Relaxed).is_ok()
+                || self
+                    .futex
+                    .compare_exchange(state, contested, Relaxed, Relaxed)
+                    .is_ok()
             {
                 // The mutex has been marked as contested, wait for the state to change.
                 unsafe {
@@ -138,7 +146,10 @@ impl Mutex {
             }
 
             // The state has changed or a wakeup occurred, try to lock the mutex.
-            match self.futex.compare_exchange(UNLOCKED, owned_state, Acquire, Relaxed) {
+            match self
+                .futex
+                .compare_exchange(UNLOCKED, owned_state, Acquire, Relaxed)
+            {
                 Ok(_) => return,
                 Err(updated) => state = updated,
             }

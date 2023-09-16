@@ -98,7 +98,7 @@ impl UdpSocket {
     ///
     /// let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
     /// ```
-        pub fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<UdpSocket> {
+    pub fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<UdpSocket> {
         super::each_addr(addr, net_imp::UdpSocket::bind).map(UdpSocket)
     }
 
@@ -120,7 +120,7 @@ impl UdpSocket {
     ///                                         .expect("Didn't receive data");
     /// let filled_buf = &mut buf[..number_of_bytes];
     /// ```
-        pub fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
+    pub fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
         self.0.recv_from(buf)
     }
 
@@ -148,7 +148,7 @@ impl UdpSocket {
     ///                                         .expect("Didn't receive data");
     /// let filled_buf = &mut buf[..number_of_bytes];
     /// ```
-        pub fn peek_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
+    pub fn peek_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddr)> {
         self.0.peek_from(buf)
     }
 
@@ -176,12 +176,13 @@ impl UdpSocket {
     /// ```
     ///
     /// [Issue #34202]: https://github.com/rust-lang/rust/issues/34202
-        pub fn send_to<A: ToSocketAddrs>(&self, buf: &[u8], addr: A) -> io::Result<usize> {
+    pub fn send_to<A: ToSocketAddrs>(&self, buf: &[u8], addr: A) -> io::Result<usize> {
         match addr.to_socket_addrs()?.next() {
             Some(addr) => self.0.send_to(buf, &addr),
-            None => {
-                Err(io::const_io_error!(ErrorKind::InvalidInput, "no addresses to send data to"))
-            }
+            None => Err(io::const_io_error!(
+                ErrorKind::InvalidInput,
+                "no addresses to send data to"
+            )),
         }
     }
 
@@ -209,7 +210,7 @@ impl UdpSocket {
     /// assert_eq!(socket.peer_addr().unwrap_err().kind(),
     ///            std::io::ErrorKind::NotConnected);
     /// ```
-        pub fn peer_addr(&self) -> io::Result<SocketAddr> {
+    pub fn peer_addr(&self) -> io::Result<SocketAddr> {
         self.0.peer_addr()
     }
 
@@ -224,7 +225,7 @@ impl UdpSocket {
     /// assert_eq!(socket.local_addr().unwrap(),
     ///            SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 34254)));
     /// ```
-        pub fn local_addr(&self) -> io::Result<SocketAddr> {
+    pub fn local_addr(&self) -> io::Result<SocketAddr> {
         self.0.socket_addr()
     }
 
@@ -242,7 +243,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// let socket_clone = socket.try_clone().expect("couldn't clone the socket");
     /// ```
-        pub fn try_clone(&self) -> io::Result<UdpSocket> {
+    pub fn try_clone(&self) -> io::Result<UdpSocket> {
         self.0.duplicate().map(UdpSocket)
     }
 
@@ -284,7 +285,7 @@ impl UdpSocket {
     /// let err = result.unwrap_err();
     /// assert_eq!(err.kind(), io::ErrorKind::InvalidInput)
     /// ```
-        pub fn set_read_timeout(&self, dur: Option<Duration>) -> io::Result<()> {
+    pub fn set_read_timeout(&self, dur: Option<Duration>) -> io::Result<()> {
         self.0.set_read_timeout(dur)
     }
 
@@ -326,7 +327,7 @@ impl UdpSocket {
     /// let err = result.unwrap_err();
     /// assert_eq!(err.kind(), io::ErrorKind::InvalidInput)
     /// ```
-        pub fn set_write_timeout(&self, dur: Option<Duration>) -> io::Result<()> {
+    pub fn set_write_timeout(&self, dur: Option<Duration>) -> io::Result<()> {
         self.0.set_write_timeout(dur)
     }
 
@@ -345,7 +346,7 @@ impl UdpSocket {
     /// socket.set_read_timeout(None).expect("set_read_timeout call failed");
     /// assert_eq!(socket.read_timeout().unwrap(), None);
     /// ```
-        pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.read_timeout()
     }
 
@@ -364,7 +365,7 @@ impl UdpSocket {
     /// socket.set_write_timeout(None).expect("set_write_timeout call failed");
     /// assert_eq!(socket.write_timeout().unwrap(), None);
     /// ```
-        pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.write_timeout()
     }
 
@@ -381,7 +382,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// socket.set_broadcast(false).expect("set_broadcast call failed");
     /// ```
-        pub fn set_broadcast(&self, broadcast: bool) -> io::Result<()> {
+    pub fn set_broadcast(&self, broadcast: bool) -> io::Result<()> {
         self.0.set_broadcast(broadcast)
     }
 
@@ -398,7 +399,7 @@ impl UdpSocket {
     /// socket.set_broadcast(false).expect("set_broadcast call failed");
     /// assert_eq!(socket.broadcast().unwrap(), false);
     /// ```
-        pub fn broadcast(&self) -> io::Result<bool> {
+    pub fn broadcast(&self) -> io::Result<bool> {
         self.0.broadcast()
     }
 
@@ -415,7 +416,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// socket.set_multicast_loop_v4(false).expect("set_multicast_loop_v4 call failed");
     /// ```
-        pub fn set_multicast_loop_v4(&self, multicast_loop_v4: bool) -> io::Result<()> {
+    pub fn set_multicast_loop_v4(&self, multicast_loop_v4: bool) -> io::Result<()> {
         self.0.set_multicast_loop_v4(multicast_loop_v4)
     }
 
@@ -432,7 +433,7 @@ impl UdpSocket {
     /// socket.set_multicast_loop_v4(false).expect("set_multicast_loop_v4 call failed");
     /// assert_eq!(socket.multicast_loop_v4().unwrap(), false);
     /// ```
-        pub fn multicast_loop_v4(&self) -> io::Result<bool> {
+    pub fn multicast_loop_v4(&self) -> io::Result<bool> {
         self.0.multicast_loop_v4()
     }
 
@@ -452,7 +453,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// socket.set_multicast_ttl_v4(42).expect("set_multicast_ttl_v4 call failed");
     /// ```
-        pub fn set_multicast_ttl_v4(&self, multicast_ttl_v4: u32) -> io::Result<()> {
+    pub fn set_multicast_ttl_v4(&self, multicast_ttl_v4: u32) -> io::Result<()> {
         self.0.set_multicast_ttl_v4(multicast_ttl_v4)
     }
 
@@ -469,7 +470,7 @@ impl UdpSocket {
     /// socket.set_multicast_ttl_v4(42).expect("set_multicast_ttl_v4 call failed");
     /// assert_eq!(socket.multicast_ttl_v4().unwrap(), 42);
     /// ```
-        pub fn multicast_ttl_v4(&self) -> io::Result<u32> {
+    pub fn multicast_ttl_v4(&self) -> io::Result<u32> {
         self.0.multicast_ttl_v4()
     }
 
@@ -486,7 +487,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// socket.set_multicast_loop_v6(false).expect("set_multicast_loop_v6 call failed");
     /// ```
-        pub fn set_multicast_loop_v6(&self, multicast_loop_v6: bool) -> io::Result<()> {
+    pub fn set_multicast_loop_v6(&self, multicast_loop_v6: bool) -> io::Result<()> {
         self.0.set_multicast_loop_v6(multicast_loop_v6)
     }
 
@@ -503,7 +504,7 @@ impl UdpSocket {
     /// socket.set_multicast_loop_v6(false).expect("set_multicast_loop_v6 call failed");
     /// assert_eq!(socket.multicast_loop_v6().unwrap(), false);
     /// ```
-        pub fn multicast_loop_v6(&self) -> io::Result<bool> {
+    pub fn multicast_loop_v6(&self) -> io::Result<bool> {
         self.0.multicast_loop_v6()
     }
 
@@ -520,7 +521,7 @@ impl UdpSocket {
     /// let socket = UdpSocket::bind("127.0.0.1:34254").expect("couldn't bind to address");
     /// socket.set_ttl(42).expect("set_ttl call failed");
     /// ```
-        pub fn set_ttl(&self, ttl: u32) -> io::Result<()> {
+    pub fn set_ttl(&self, ttl: u32) -> io::Result<()> {
         self.0.set_ttl(ttl)
     }
 
@@ -537,7 +538,7 @@ impl UdpSocket {
     /// socket.set_ttl(42).expect("set_ttl call failed");
     /// assert_eq!(socket.ttl().unwrap(), 42);
     /// ```
-        pub fn ttl(&self) -> io::Result<u32> {
+    pub fn ttl(&self) -> io::Result<u32> {
         self.0.ttl()
     }
 
@@ -548,7 +549,7 @@ impl UdpSocket {
     /// address of the local interface with which the system should join the
     /// multicast group. If it's equal to `INADDR_ANY` then an appropriate
     /// interface is chosen by the system.
-        pub fn join_multicast_v4(&self, multiaddr: &Ipv4Addr, interface: &Ipv4Addr) -> io::Result<()> {
+    pub fn join_multicast_v4(&self, multiaddr: &Ipv4Addr, interface: &Ipv4Addr) -> io::Result<()> {
         self.0.join_multicast_v4(multiaddr, interface)
     }
 
@@ -557,21 +558,21 @@ impl UdpSocket {
     /// This function specifies a new multicast group for this socket to join.
     /// The address must be a valid multicast address, and `interface` is the
     /// index of the interface to join/leave (or 0 to indicate any interface).
-        pub fn join_multicast_v6(&self, multiaddr: &Ipv6Addr, interface: u32) -> io::Result<()> {
+    pub fn join_multicast_v6(&self, multiaddr: &Ipv6Addr, interface: u32) -> io::Result<()> {
         self.0.join_multicast_v6(multiaddr, interface)
     }
 
     /// Executes an operation of the `IP_DROP_MEMBERSHIP` type.
     ///
     /// For more information about this option, see [`UdpSocket::join_multicast_v4`].
-        pub fn leave_multicast_v4(&self, multiaddr: &Ipv4Addr, interface: &Ipv4Addr) -> io::Result<()> {
+    pub fn leave_multicast_v4(&self, multiaddr: &Ipv4Addr, interface: &Ipv4Addr) -> io::Result<()> {
         self.0.leave_multicast_v4(multiaddr, interface)
     }
 
     /// Executes an operation of the `IPV6_DROP_MEMBERSHIP` type.
     ///
     /// For more information about this option, see [`UdpSocket::join_multicast_v6`].
-        pub fn leave_multicast_v6(&self, multiaddr: &Ipv6Addr, interface: u32) -> io::Result<()> {
+    pub fn leave_multicast_v6(&self, multiaddr: &Ipv6Addr, interface: u32) -> io::Result<()> {
         self.0.leave_multicast_v6(multiaddr, interface)
     }
 
@@ -593,7 +594,7 @@ impl UdpSocket {
     ///     Err(error) => println!("UdpSocket.take_error failed: {error:?}"),
     /// }
     /// ```
-        pub fn take_error(&self) -> io::Result<Option<io::Error>> {
+    pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         self.0.take_error()
     }
 
@@ -625,7 +626,7 @@ impl UdpSocket {
     /// function of a UDP socket is not a useful thing to do: The OS will be
     /// unable to determine whether something is listening on the remote
     /// address without the application sending data.
-        pub fn connect<A: ToSocketAddrs>(&self, addr: A) -> io::Result<()> {
+    pub fn connect<A: ToSocketAddrs>(&self, addr: A) -> io::Result<()> {
         super::each_addr(addr, |addr| self.0.connect(addr))
     }
 
@@ -643,7 +644,7 @@ impl UdpSocket {
     /// socket.connect("127.0.0.1:8080").expect("connect function failed");
     /// socket.send(&[0, 1, 2]).expect("couldn't send message");
     /// ```
-        pub fn send(&self, buf: &[u8]) -> io::Result<usize> {
+    pub fn send(&self, buf: &[u8]) -> io::Result<usize> {
         self.0.send(buf)
     }
 
@@ -670,7 +671,7 @@ impl UdpSocket {
     ///     Err(e) => println!("recv function failed: {e:?}"),
     /// }
     /// ```
-        pub fn recv(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn recv(&self, buf: &mut [u8]) -> io::Result<usize> {
         self.0.recv(buf)
     }
 
@@ -709,7 +710,7 @@ impl UdpSocket {
     ///     Err(e) => println!("peek function failed: {e:?}"),
     /// }
     /// ```
-        pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
         self.0.peek(buf)
     }
 
@@ -753,7 +754,7 @@ impl UdpSocket {
     /// };
     /// println!("bytes: {:?}", &buf[..num_bytes_read]);
     /// ```
-        pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
+    pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         self.0.set_nonblocking(nonblocking)
     }
 }

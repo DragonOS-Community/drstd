@@ -45,12 +45,20 @@ struct Packet<T> {
 impl<T> Packet<T> {
     /// Creates an empty packet on the stack.
     fn empty_on_stack() -> Packet<T> {
-        Packet { on_stack: true, ready: AtomicBool::new(false), msg: UnsafeCell::new(None) }
+        Packet {
+            on_stack: true,
+            ready: AtomicBool::new(false),
+            msg: UnsafeCell::new(None),
+        }
     }
 
     /// Creates a packet on the stack, containing a message.
     fn message_on_stack(msg: T) -> Packet<T> {
-        Packet { on_stack: true, ready: AtomicBool::new(false), msg: UnsafeCell::new(Some(msg)) }
+        Packet {
+            on_stack: true,
+            ready: AtomicBool::new(false),
+            msg: UnsafeCell::new(Some(msg)),
+        }
     }
 
     /// Waits until the packet becomes ready for reading or writing.
@@ -182,7 +190,9 @@ impl<T> Channel<T> {
             // Prepare for blocking until a receiver wakes us up.
             let oper = Operation::hook(token);
             let mut packet = Packet::<T>::message_on_stack(msg);
-            inner.senders.register_with_packet(oper, &mut packet as *mut Packet<T> as *mut (), cx);
+            inner
+                .senders
+                .register_with_packet(oper, &mut packet as *mut Packet<T> as *mut (), cx);
             inner.receivers.notify();
             drop(inner);
 
@@ -263,11 +273,21 @@ impl<T> Channel<T> {
             match sel {
                 Selected::Waiting => unreachable!(),
                 Selected::Aborted => {
-                    self.inner.lock().unwrap().receivers.unregister(oper).unwrap();
+                    self.inner
+                        .lock()
+                        .unwrap()
+                        .receivers
+                        .unregister(oper)
+                        .unwrap();
                     Err(RecvTimeoutError::Timeout)
                 }
                 Selected::Disconnected => {
-                    self.inner.lock().unwrap().receivers.unregister(oper).unwrap();
+                    self.inner
+                        .lock()
+                        .unwrap()
+                        .receivers
+                        .unregister(oper)
+                        .unwrap();
                     Err(RecvTimeoutError::Disconnected)
                 }
                 Selected::Operation(_) => {

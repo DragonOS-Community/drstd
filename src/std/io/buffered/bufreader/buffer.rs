@@ -32,7 +32,12 @@ impl Buffer {
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
         let buf = Box::new_uninit_slice(capacity);
-        Self { buf, pos: 0, filled: 0, initialized: 0 }
+        Self {
+            buf,
+            pos: 0,
+            filled: 0,
+            initialized: 0,
+        }
     }
 
     #[inline]

@@ -15,7 +15,12 @@ struct Timespec {
 
 impl Timespec {
     const fn zero() -> Timespec {
-        Timespec { t: timespec { tv_sec: 0, tv_nsec: 0 } }
+        Timespec {
+            t: timespec {
+                tv_sec: 0,
+                tv_nsec: 0,
+            },
+        }
     }
 
     fn sub_timespec(&self, other: &Timespec) -> Result<Duration, Duration> {
@@ -49,7 +54,12 @@ impl Timespec {
             nsec -= NSEC_PER_SEC as u32;
             secs = secs.checked_add(1)?;
         }
-        Some(Timespec { t: timespec { tv_sec: secs, tv_nsec: nsec as _ } })
+        Some(Timespec {
+            t: timespec {
+                tv_sec: secs,
+                tv_nsec: nsec as _,
+            },
+        })
     }
 
     fn checked_sub_duration(&self, other: &Duration) -> Option<Timespec> {
@@ -61,7 +71,12 @@ impl Timespec {
             nsec += NSEC_PER_SEC as i32;
             secs = secs.checked_sub(1)?;
         }
-        Some(Timespec { t: timespec { tv_sec: secs, tv_nsec: nsec as _ } })
+        Some(Timespec {
+            t: timespec {
+                tv_sec: secs,
+                tv_nsec: nsec as _,
+            },
+        })
     }
 }
 
@@ -105,7 +120,7 @@ impl Instant {
         Instant(time)
     }
 
-        pub fn elapsed(&self) -> Duration {
+    pub fn elapsed(&self) -> Duration {
         Instant::now() - *self
     }
 
@@ -146,7 +161,8 @@ impl Add<Duration> for Instant {
     /// This function may panic if the resulting point in time cannot be represented by the
     /// underlying data structure. See [`Instant::checked_add`] for a version without panic.
     fn add(self, other: Duration) -> Instant {
-        self.checked_add(other).expect("overflow when adding duration to instant")
+        self.checked_add(other)
+            .expect("overflow when adding duration to instant")
     }
 }
 
@@ -160,7 +176,8 @@ impl Sub<Duration> for Instant {
     type Output = Instant;
 
     fn sub(self, other: Duration) -> Instant {
-        self.checked_sub(other).expect("overflow when subtracting duration from instant")
+        self.checked_sub(other)
+            .expect("overflow when subtracting duration from instant")
     }
 }
 

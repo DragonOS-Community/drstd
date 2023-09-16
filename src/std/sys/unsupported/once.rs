@@ -35,8 +35,10 @@ unsafe impl Sync for Once {}
 
 impl Once {
     #[inline]
-        pub const fn new() -> Once {
-        Once { state: Cell::new(State::Incomplete) }
+    pub const fn new() -> Once {
+        Once {
+            state: Cell::new(State::Incomplete),
+        }
     }
 
     #[inline]
@@ -66,8 +68,10 @@ impl Once {
             State::Incomplete | State::Poisoned => {
                 self.state.set(State::Running);
                 // `guard` will set the new state on drop.
-                let mut guard =
-                    CompletionGuard { state: &self.state, set_state_on_drop_to: State::Poisoned };
+                let mut guard = CompletionGuard {
+                    state: &self.state,
+                    set_state_on_drop_to: State::Poisoned,
+                };
                 // Run the function, letting it know if we're poisoned or not.
                 let f_state = public::OnceState {
                     inner: OnceState {

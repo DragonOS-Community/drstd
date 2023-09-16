@@ -28,7 +28,11 @@ pub fn errno() -> i32 {
 }
 
 pub fn error_string(errno: i32) -> String {
-    if let Some(name) = error::error_name(errno) { name.to_owned() } else { format!("{errno}") }
+    if let Some(name) = error::error_name(errno) {
+        name.to_owned()
+    } else {
+        format!("{errno}")
+    }
 }
 
 pub fn getcwd() -> io::Result<PathBuf> {
@@ -99,7 +103,11 @@ impl fmt::Debug for EnvStrDebug<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self { slice } = self;
         f.debug_list()
-            .entries(slice.iter().map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())))
+            .entries(
+                slice
+                    .iter()
+                    .map(|(a, b)| (a.to_str().unwrap(), b.to_str().unwrap())),
+            )
             .finish()
     }
 }
@@ -107,7 +115,9 @@ impl fmt::Debug for EnvStrDebug<'_> {
 impl Env {
     pub fn str_debug(&self) -> impl fmt::Debug + '_ {
         let Self { iter } = self;
-        EnvStrDebug { slice: iter.as_slice() }
+        EnvStrDebug {
+            slice: iter.as_slice(),
+        }
     }
 }
 
@@ -149,7 +159,9 @@ pub fn env() -> Env {
                 environ = environ.add(1);
             }
         }
-        return Env { iter: result.into_iter() };
+        return Env {
+            iter: result.into_iter(),
+        };
     }
 
     fn parse(input: &[u8]) -> Option<(OsString, OsString)> {
@@ -209,7 +221,11 @@ pub fn unsetenv(n: &OsStr) -> io::Result<()> {
 /// In kmclib, `setenv` and `unsetenv` don't always set `errno`, so this
 /// function just returns a generic error.
 fn cvt_env(t: c_int) -> io::Result<c_int> {
-    if t == -1 { Err(io::const_io_error!(io::ErrorKind::Uncategorized, "failure")) } else { Ok(t) }
+    if t == -1 {
+        Err(io::const_io_error!(io::ErrorKind::Uncategorized, "failure"))
+    } else {
+        Ok(t)
+    }
 }
 
 pub fn temp_dir() -> PathBuf {

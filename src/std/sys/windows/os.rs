@@ -175,9 +175,15 @@ pub fn env() -> Env {
     unsafe {
         let ch = c::GetEnvironmentStringsW();
         if ch.is_null() {
-            panic!("failure getting env string from OS: {}", io::Error::last_os_error());
+            panic!(
+                "failure getting env string from OS: {}",
+                io::Error::last_os_error()
+            );
         }
-        Env { base: ch, iter: EnvIterator(ch) }
+        Env {
+            base: ch,
+            iter: EnvIterator(ch),
+        }
     }
 }
 
@@ -187,7 +193,10 @@ pub struct SplitPaths<'a> {
 }
 
 pub fn split_paths(unparsed: &OsStr) -> SplitPaths<'_> {
-    SplitPaths { data: unparsed.encode_wide(), must_yield: true }
+    SplitPaths {
+        data: unparsed.encode_wide(),
+        must_yield: true,
+    }
 }
 
 impl<'a> Iterator for SplitPaths<'a> {
@@ -282,7 +291,10 @@ pub fn current_exe() -> io::Result<PathBuf> {
 }
 
 pub fn getcwd() -> io::Result<PathBuf> {
-    super::fill_utf16_buf(|buf, sz| unsafe { c::GetCurrentDirectoryW(sz, buf) }, super::os2path)
+    super::fill_utf16_buf(
+        |buf, sz| unsafe { c::GetCurrentDirectoryW(sz, buf) },
+        super::os2path,
+    )
 }
 
 pub fn chdir(p: &path::Path) -> io::Result<()> {
@@ -315,7 +327,11 @@ pub fn unsetenv(n: &OsStr) -> io::Result<()> {
 }
 
 pub fn temp_dir() -> PathBuf {
-    super::fill_utf16_buf(|buf, sz| unsafe { c::GetTempPath2W(sz, buf) }, super::os2path).unwrap()
+    super::fill_utf16_buf(
+        |buf, sz| unsafe { c::GetTempPath2W(sz, buf) },
+        super::os2path,
+    )
+    .unwrap()
 }
 
 #[cfg(not(target_vendor = "uwp"))]

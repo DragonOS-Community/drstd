@@ -1,6 +1,5 @@
 //! Owned and borrowed OS handles.
 
-
 use super::raw::{AsRawHandle, FromRawHandle, IntoRawHandle, RawHandle};
 use crate::std::fmt;
 use crate::std::fs;
@@ -137,8 +136,11 @@ impl BorrowedHandle<'_> {
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
     #[inline]
-            pub const unsafe fn borrow_raw(handle: RawHandle) -> Self {
-        Self { handle, _phantom: PhantomData }
+    pub const unsafe fn borrow_raw(handle: RawHandle) -> Self {
+        Self {
+            handle,
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -163,7 +165,7 @@ impl TryFrom<HandleOrNull> for OwnedHandle {
 impl OwnedHandle {
     /// Creates a new `OwnedHandle` instance that shares the same underlying
     /// object as the existing `OwnedHandle` instance.
-        pub fn try_clone(&self) -> crate::std::io::Result<Self> {
+    pub fn try_clone(&self) -> crate::std::io::Result<Self> {
         self.as_handle().try_clone_to_owned()
     }
 }
@@ -171,7 +173,7 @@ impl OwnedHandle {
 impl BorrowedHandle<'_> {
     /// Creates a new `OwnedHandle` instance that shares the same underlying
     /// object as the existing `BorrowedHandle` instance.
-        pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedHandle> {
+    pub fn try_clone_to_owned(&self) -> crate::std::io::Result<OwnedHandle> {
         self.duplicate(0, false, sys::c::DUPLICATE_SAME_ACCESS)
     }
 
@@ -301,7 +303,7 @@ impl HandleOrNull {
     /// Windows APIs use null for errors; see [here] for the full story.
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
-        #[inline]
+    #[inline]
     pub unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self(OwnedHandle::from_raw_handle(handle))
     }
@@ -323,7 +325,7 @@ impl HandleOrInvalid {
     /// `INVALID_HANDLE_VALUE` for errors; see [here] for the full story.
     ///
     /// [here]: https://devblogs.microsoft.com/oldnewthing/20040302-00/?p=40443
-        #[inline]
+    #[inline]
     pub unsafe fn from_raw_handle(handle: RawHandle) -> Self {
         Self(OwnedHandle::from_raw_handle(handle))
     }
@@ -340,13 +342,17 @@ impl Drop for OwnedHandle {
 
 impl fmt::Debug for BorrowedHandle<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BorrowedHandle").field("handle", &self.handle).finish()
+        f.debug_struct("BorrowedHandle")
+            .field("handle", &self.handle)
+            .finish()
     }
 }
 
 impl fmt::Debug for OwnedHandle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("OwnedHandle").field("handle", &self.handle).finish()
+        f.debug_struct("OwnedHandle")
+            .field("handle", &self.handle)
+            .finish()
     }
 }
 
@@ -380,7 +386,7 @@ pub trait AsHandle {
     /// let borrowed_handle: BorrowedHandle<'_> = f.as_handle();
     /// # Ok::<(), io::Error>(())
     /// ```
-        fn as_handle(&self) -> BorrowedHandle<'_>;
+    fn as_handle(&self) -> BorrowedHandle<'_>;
 }
 
 impl<T: AsHandle> AsHandle for &T {

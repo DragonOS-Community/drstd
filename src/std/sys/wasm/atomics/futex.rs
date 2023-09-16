@@ -8,7 +8,9 @@ use crate::std::time::Duration;
 ///
 /// Returns false on timeout, and true in all other cases.
 pub fn futex_wait(futex: &AtomicU32, expected: u32, timeout: Option<Duration>) -> bool {
-    let timeout = timeout.and_then(|t| t.as_nanos().try_into().ok()).unwrap_or(-1);
+    let timeout = timeout
+        .and_then(|t| t.as_nanos().try_into().ok())
+        .unwrap_or(-1);
     unsafe {
         wasm32::memory_atomic_wait32(
             futex as *const AtomicU32 as *mut i32,

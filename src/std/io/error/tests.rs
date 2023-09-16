@@ -19,7 +19,9 @@ fn test_debug_error() {
     let err = Error {
         repr: Repr::new_custom(Box::new(Custom {
             kind: ErrorKind::InvalidInput,
-            error: Box::new(Error { repr: super::Repr::new_os(code) }),
+            error: Box::new(Error {
+                repr: super::Repr::new_os(code),
+            }),
         })),
     };
     let expected = format!(
@@ -84,8 +86,14 @@ fn test_os_packing() {
 #[test]
 fn test_errorkind_packing() {
     assert_eq!(Error::from(ErrorKind::NotFound).kind(), ErrorKind::NotFound);
-    assert_eq!(Error::from(ErrorKind::PermissionDenied).kind(), ErrorKind::PermissionDenied);
-    assert_eq!(Error::from(ErrorKind::Uncategorized).kind(), ErrorKind::Uncategorized);
+    assert_eq!(
+        Error::from(ErrorKind::PermissionDenied).kind(),
+        ErrorKind::PermissionDenied
+    );
+    assert_eq!(
+        Error::from(ErrorKind::Uncategorized).kind(),
+        ErrorKind::Uncategorized
+    );
     // Check that the innards look like what we want.
     assert_matches!(
         Error::from(ErrorKind::OutOfMemory).repr.data(),
@@ -105,7 +113,10 @@ fn test_simple_message_packing() {
             // and we got what we expected
             assert_matches!(
                 e.repr.data(),
-                ErrorData::SimpleMessage(SimpleMessage { kind: $kind, message: $msg })
+                ErrorData::SimpleMessage(SimpleMessage {
+                    kind: $kind,
+                    message: $msg
+                })
             );
         }};
     }
@@ -184,8 +195,10 @@ fn test_std_io_error_downcast() {
     assert_eq!(kind, io_error.kind());
 
     // Case 5: simple message
-    const SIMPLE_MESSAGE: SimpleMessage =
-        SimpleMessage { kind: ErrorKind::Other, message: "simple message error test" };
+    const SIMPLE_MESSAGE: SimpleMessage = SimpleMessage {
+        kind: ErrorKind::Other,
+        message: "simple message error test",
+    };
     let io_error = Error::from_static_message(&SIMPLE_MESSAGE);
     let io_error = io_error.downcast::<E>().unwrap_err();
 

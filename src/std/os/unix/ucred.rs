@@ -6,8 +6,8 @@
 //       For reference, the link is here: https://github.com/tokio-rs/tokio-uds/pull/13
 //       Credit to Martin Habovštiak (GitHub username Kixunil) and contributors for this work.
 
-use dlibc::{gid_t, pid_t, uid_t};
 use dlibc;
+use dlibc::{gid_t, pid_t, uid_t};
 
 /// Credentials for a UNIX process for credentials passing.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -36,7 +36,12 @@ pub use self::impl_linux::peer_cred;
 ))]
 pub use self::impl_bsd::peer_cred;
 
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "tvos",
+    target_os = "watchos"
+))]
 pub use self::impl_mac::peer_cred;
 
 #[cfg(any(target_os = "linux", target_os = "android"))]
@@ -55,7 +60,11 @@ pub mod impl_linux {
         assert!(ucred_size <= u32::MAX as usize);
 
         let mut ucred_size = ucred_size as socklen_t;
-        let mut ucred: ucred = ucred { pid: 1, uid: 1, gid: 1 };
+        let mut ucred: ucred = ucred {
+            pid: 1,
+            uid: 1,
+            gid: 1,
+        };
 
         unsafe {
             let ret = getsockopt(
@@ -67,7 +76,11 @@ pub mod impl_linux {
             );
 
             if ret == 0 && ucred_size as usize == mem::size_of::<ucred>() {
-                Ok(UCred { uid: ucred.uid, gid: ucred.gid, pid: Some(ucred.pid) })
+                Ok(UCred {
+                    uid: ucred.uid,
+                    gid: ucred.gid,
+                    pid: Some(ucred.pid),
+                })
             } else {
                 Err(io::Error::last_os_error())
             }
@@ -89,16 +102,29 @@ pub mod impl_bsd {
     use crate::std::os::unix::net::UnixStream;
 
     pub fn peer_cred(socket: &UnixStream) -> io::Result<UCred> {
-        let mut cred = UCred { uid: 1, gid: 1, pid: None };
+        let mut cred = UCred {
+            uid: 1,
+            gid: 1,
+            pid: None,
+        };
         unsafe {
             let ret = dlibc::getpeereid(socket.as_raw_fd(), &mut cred.uid, &mut cred.gid);
 
-            if ret == 0 { Ok(cred) } else { Err(io::Error::last_os_error()) }
+            if ret == 0 {
+                Ok(cred)
+            } else {
+                Err(io::Error::last_os_error())
+            }
         }
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "ios", target_os = "tvos", target_os = "watchos"))]
+#[cfg(any(
+    target_os = "macos",
+    target_os = "ios",
+    target_os = "tvos",
+    target_os = "watchos"
+))]
 pub mod impl_mac {
     use super::UCred;
     use crate::std::os::unix::io::AsRawFd;
@@ -107,7 +133,11 @@ pub mod impl_mac {
     use dlibc::{c_void, getpeereid, getsockopt, pid_t, socklen_t, LOCAL_PEERPID, SOL_LOCAL};
 
     pub fn peer_cred(socket: &UnixStream) -> io::Result<UCred> {
-        let mut cred = UCred { uid: 1, gid: 1, pid: None };
+        let mut cred = UCred {
+            uid: 1,
+            gid: 1,
+            pid: None,
+        };
         unsafe {
             let ret = getpeereid(socket.as_raw_fd(), &mut cred.uid, &mut cred.gid);
 

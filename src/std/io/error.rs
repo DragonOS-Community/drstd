@@ -172,49 +172,49 @@ struct Custom {
 #[non_exhaustive]
 pub enum ErrorKind {
     /// An entity was not found, often a file.
-        NotFound,
+    NotFound,
     /// The operation lacked the necessary privileges to complete.
-        PermissionDenied,
+    PermissionDenied,
     /// The connection was refused by the remote server.
-        ConnectionRefused,
+    ConnectionRefused,
     /// The connection was reset by the remote server.
-        ConnectionReset,
+    ConnectionReset,
     /// The remote host is not reachable.
-        HostUnreachable,
+    HostUnreachable,
     /// The network containing the remote host is not reachable.
-        NetworkUnreachable,
+    NetworkUnreachable,
     /// The connection was aborted (terminated) by the remote server.
-        ConnectionAborted,
+    ConnectionAborted,
     /// The network operation failed because it was not connected yet.
-        NotConnected,
+    NotConnected,
     /// A socket address could not be bound because the address is already in
     /// use elsewhere.
-        AddrInUse,
+    AddrInUse,
     /// A nonexistent interface was requested or the requested address was not
     /// local.
-        AddrNotAvailable,
+    AddrNotAvailable,
     /// The system's networking is down.
-        NetworkDown,
+    NetworkDown,
     /// The operation failed because a pipe was closed.
-        BrokenPipe,
+    BrokenPipe,
     /// An entity already exists, often a file.
-        AlreadyExists,
+    AlreadyExists,
     /// The operation needs to block to complete, but the blocking operation was
     /// requested to not occur.
-        WouldBlock,
+    WouldBlock,
     /// A filesystem object is, unexpectedly, not a directory.
     ///
     /// For example, a filesystem path was specified where one of the intermediate directory
     /// components was, in fact, a plain file.
-        NotADirectory,
+    NotADirectory,
     /// The filesystem object is, unexpectedly, a directory.
     ///
     /// A directory was specified when a non-directory was expected.
-        IsADirectory,
+    IsADirectory,
     /// A non-empty directory was specified where an empty directory was expected.
-        DirectoryNotEmpty,
+    DirectoryNotEmpty,
     /// The filesystem or storage medium is read-only, but a write operation was attempted.
-        ReadOnlyFilesystem,
+    ReadOnlyFilesystem,
     /// Loop in the filesystem or IO subsystem; often, too many levels of symbolic links.
     ///
     /// There was a loop (or excessively long chain) resolving a filesystem object
@@ -222,14 +222,14 @@ pub enum ErrorKind {
     ///
     /// On Unix this is usually the result of a symbolic link loop; or, of exceeding the
     /// system-specific limit on the depth of symlink traversal.
-        FilesystemLoop,
+    FilesystemLoop,
     /// Stale network file handle.
     ///
     /// With some network filesystems, notably NFS, an open file (or directory) can be invalidated
     /// by problems with the network or server.
-        StaleNetworkFileHandle,
+    StaleNetworkFileHandle,
     /// A parameter was incorrect.
-        InvalidInput,
+    InvalidInput,
     /// Data not valid for the operation were encountered.
     ///
     /// Unlike [`InvalidInput`], this typically means that the operation
@@ -240,9 +240,9 @@ pub enum ErrorKind {
     /// `InvalidData` if the file's contents are not valid UTF-8.
     ///
     /// [`InvalidInput`]: ErrorKind::InvalidInput
-        InvalidData,
+    InvalidData,
     /// The I/O operation's timeout expired, causing it to be canceled.
-        TimedOut,
+    TimedOut,
     /// An error returned when an operation could not be completed because a
     /// call to [`write`] returned [`Ok(0)`].
     ///
@@ -252,60 +252,60 @@ pub enum ErrorKind {
     ///
     /// [`write`]: crate::std::io::Write::write
     /// [`Ok(0)`]: Ok
-        WriteZero,
+    WriteZero,
     /// The underlying storage (typically, a filesystem) is full.
     ///
     /// This does not include out of quota errors.
-        StorageFull,
+    StorageFull,
     /// Seek on unseekable file.
     ///
     /// Seeking was attempted on an open file handle which is not suitable for seeking - for
     /// example, on Unix, a named pipe opened with `File::open`.
-        NotSeekable,
+    NotSeekable,
     /// Filesystem quota was exceeded.
-        FilesystemQuotaExceeded,
+    FilesystemQuotaExceeded,
     /// File larger than allowed or supported.
     ///
     /// This might arise from a hard limit of the underlying filesystem or file access API, or from
     /// an administratively imposed resource limitation.  Simple disk full, and out of quota, have
     /// their own errors.
-        FileTooLarge,
+    FileTooLarge,
     /// Resource is busy.
-        ResourceBusy,
+    ResourceBusy,
     /// Executable file is busy.
     ///
     /// An attempt was made to write to a file which is also in use as a running program.  (Not all
     /// operating systems detect this situation.)
-        ExecutableFileBusy,
+    ExecutableFileBusy,
     /// Deadlock (avoided).
     ///
     /// A file locking operation would result in deadlock.  This situation is typically detected, if
     /// at all, on a best-effort basis.
-        Deadlock,
+    Deadlock,
     /// Cross-device or cross-filesystem (hard) link or rename.
-        CrossesDevices,
+    CrossesDevices,
     /// Too many (hard) links to the same filesystem object.
     ///
     /// The filesystem does not support making so many hardlinks to the same file.
-        TooManyLinks,
+    TooManyLinks,
     /// A filename was invalid.
     ///
     /// This error can also cause if it exceeded the filename length limit.
-        InvalidFilename,
+    InvalidFilename,
     /// Program argument list too long.
     ///
     /// When trying to run an external program, a system or process limit on the size of the
     /// arguments would have been exceeded.
-        ArgumentListTooLong,
+    ArgumentListTooLong,
     /// This operation was interrupted.
     ///
     /// Interrupted operations can typically be retried.
-        Interrupted,
+    Interrupted,
 
     /// This operation is unsupported on this platform.
     ///
     /// This means that the operation can never succeed.
-        Unsupported,
+    Unsupported,
 
     // ErrorKinds which are primarily categorisations for OS error
     // codes should be added above.
@@ -316,11 +316,11 @@ pub enum ErrorKind {
     /// This typically means that an operation could only succeed if it read a
     /// particular number of bytes but only a smaller number of bytes could be
     /// read.
-        UnexpectedEof,
+    UnexpectedEof,
 
     /// An operation could not be completed, because it failed
     /// to allocate enough memory.
-        OutOfMemory,
+    OutOfMemory,
 
     // "Unusual" error kinds which do not correspond simply to (sets
     // of) OS error codes, should be added just above this comment.
@@ -336,14 +336,14 @@ pub enum ErrorKind {
     /// Errors from the standard library that do not fall under any of the I/O
     /// error kinds cannot be `match`ed on, and will only match a wildcard (`_`) pattern.
     /// New [`ErrorKind`]s might be added in the future for some of those.
-        Other,
+    Other,
 
     /// Any I/O error from the standard library that's not part of this list.
     ///
     /// Errors that are `Uncategorized` now may move to a different or a new
     /// [`ErrorKind`] variant in the future. It is not recommended to match
     /// an error against `Uncategorized`; use a wildcard match (`_`) instead.
-        #[doc(hidden)]
+    #[doc(hidden)]
     Uncategorized,
 }
 
@@ -431,7 +431,9 @@ impl From<ErrorKind> for Error {
     /// ```
     #[inline]
     fn from(kind: ErrorKind) -> Error {
-        Error { repr: Repr::new_simple(kind) }
+        Error {
+            repr: Repr::new_simple(kind),
+        }
     }
 }
 
@@ -461,7 +463,7 @@ impl Error {
     /// // creating an error without payload (and without memory allocation)
     /// let eof_error = Error::from(ErrorKind::UnexpectedEof);
     /// ```
-        pub fn new<E>(kind: ErrorKind, error: E) -> Error
+    pub fn new<E>(kind: ErrorKind, error: E) -> Error
     where
         E: Into<Box<dyn error::Error + Send + Sync>>,
     {
@@ -487,7 +489,7 @@ impl Error {
     /// // errors can also be created from other errors
     /// let custom_error2 = Error::other(custom_error);
     /// ```
-        pub fn other<E>(error: E) -> Error
+    pub fn other<E>(error: E) -> Error
     where
         E: Into<Box<dyn error::Error + Send + Sync>>,
     {
@@ -495,7 +497,9 @@ impl Error {
     }
 
     fn _new(kind: ErrorKind, error: Box<dyn error::Error + Send + Sync>) -> Error {
-        Error { repr: Repr::new_custom(Box::new(Custom { kind, error })) }
+        Error {
+            repr: Repr::new_custom(Box::new(Custom { kind, error })),
+        }
     }
 
     /// Creates a new I/O error from a known kind of error as well as a constant
@@ -510,7 +514,9 @@ impl Error {
     /// str>(kind: ErrorKind)` in the future, when const generics allow that.
     #[inline]
     pub(crate) const fn from_static_message(msg: &'static SimpleMessage) -> Error {
-        Self { repr: Repr::new_simple_message(msg) }
+        Self {
+            repr: Repr::new_simple_message(msg),
+        }
     }
 
     /// Returns an error representing the last OS error which occurred.
@@ -532,7 +538,7 @@ impl Error {
     /// let os_error = Error::last_os_error();
     /// println!("last OS error: {os_error:?}");
     /// ```
-        #[doc(alias = "GetLastError")]
+    #[doc(alias = "GetLastError")]
     #[doc(alias = "errno")]
     #[must_use]
     #[inline]
@@ -565,10 +571,12 @@ impl Error {
     /// assert_eq!(error.kind(), io::ErrorKind::InvalidInput);
     /// # }
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn from_raw_os_error(code: RawOsError) -> Error {
-        Error { repr: Repr::new_os(code) }
+        Error {
+            repr: Repr::new_os(code),
+        }
     }
 
     /// Returns the OS error that this error represents (if any).
@@ -600,7 +608,7 @@ impl Error {
     ///     print_os_error(&Error::new(ErrorKind::Other, "oh no!"));
     /// }
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn raw_os_error(&self) -> Option<RawOsError> {
         match self.repr.data() {
@@ -638,7 +646,7 @@ impl Error {
     ///     print_error(&Error::new(ErrorKind::Other, "oh no!"));
     /// }
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn get_ref(&self) -> Option<&(dyn error::Error + Send + Sync + 'static)> {
         match self.repr.data() {
@@ -711,7 +719,7 @@ impl Error {
     ///     print_error(&change_error(Error::new(ErrorKind::Other, MyError::new())));
     /// }
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn get_mut(&mut self) -> Option<&mut (dyn error::Error + Send + Sync + 'static)> {
         match self.repr.data_mut() {
@@ -749,7 +757,7 @@ impl Error {
     ///     print_error(Error::new(ErrorKind::Other, "oh no!"));
     /// }
     /// ```
-        #[must_use = "`self` will be dropped if the result is not used"]
+    #[must_use = "`self` will be dropped if the result is not used"]
     #[inline]
     pub fn into_inner(self) -> Option<Box<dyn error::Error + Send + Sync>> {
         match self.repr.into_data() {
@@ -801,7 +809,7 @@ impl Error {
     ///     }
     /// }
     /// ```
-        pub fn downcast<E>(self) -> result::Result<Box<E>, Self>
+    pub fn downcast<E>(self) -> result::Result<Box<E>, Self>
     where
         E: error::Error + Send + Sync + 'static,
     {
@@ -817,7 +825,9 @@ impl Error {
                 // returns true.
                 Ok(res.unwrap())
             }
-            repr_data => Err(Self { repr: Repr::new(repr_data) }),
+            repr_data => Err(Self {
+                repr: Repr::new(repr_data),
+            }),
         }
     }
 
@@ -847,7 +857,7 @@ impl Error {
     ///     print_error(Error::new(ErrorKind::AddrInUse, "oh no!"));
     /// }
     /// ```
-        #[must_use]
+    #[must_use]
     #[inline]
     pub fn kind(&self) -> ErrorKind {
         match self.repr.data() {

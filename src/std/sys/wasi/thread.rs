@@ -150,7 +150,10 @@ impl Thread {
 
         let in_ = wasi::Subscription {
             userdata: USERDATA,
-            u: wasi::SubscriptionU { tag: 0, u: wasi::SubscriptionUU { clock } },
+            u: wasi::SubscriptionU {
+                tag: 0,
+                u: wasi::SubscriptionUU { clock },
+            },
         };
         unsafe {
             let mut event: wasi::Event = mem::zeroed();

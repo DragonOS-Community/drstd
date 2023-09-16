@@ -2,7 +2,6 @@
 //!
 //! [`std::process`]: crate::std::process
 
-
 use crate::std::ffi::OsStr;
 use crate::std::os::windows::io::{
     AsHandle, AsRawHandle, BorrowedHandle, FromRawHandle, IntoRawHandle, OwnedHandle, RawHandle,
@@ -100,7 +99,7 @@ impl IntoRawHandle for process::ChildStderr {
 pub trait ExitStatusExt: Sealed {
     /// Creates a new `ExitStatus` from the raw underlying `u32` return value of
     /// a process.
-        fn from_raw(raw: u32) -> Self;
+    fn from_raw(raw: u32) -> Self;
 }
 
 impl ExitStatusExt for process::ExitStatus {
@@ -119,7 +118,7 @@ pub trait CommandExt: Sealed {
     /// These will always be ORed with `CREATE_UNICODE_ENVIRONMENT`.
     ///
     /// [1]: https://docs.microsoft.com/en-us/windows/win32/procthread/process-creation-flags
-        fn creation_flags(&mut self, flags: u32) -> &mut process::Command;
+    fn creation_flags(&mut self, flags: u32) -> &mut process::Command;
 
     /// Forces all arguments to be wrapped in quote (`"`) characters.
     ///
@@ -134,13 +133,13 @@ pub trait CommandExt: Sealed {
     ///
     /// [1]: <https://github.com/msys2/MSYS2-packages/issues/2176>
     /// [2]: <https://msdn.microsoft.com/en-us/library/17w5ykft.aspx>
-        fn force_quotes(&mut self, enabled: bool) -> &mut process::Command;
+    fn force_quotes(&mut self, enabled: bool) -> &mut process::Command;
 
     /// Append literal text to the command line without any quoting or escaping.
     ///
     /// This is useful for passing arguments to `cmd.exe /c`, which doesn't follow
     /// `CommandLineToArgvW` escaping rules.
-        fn raw_arg<S: AsRef<OsStr>>(&mut self, text_to_append_as_is: S) -> &mut process::Command;
+    fn raw_arg<S: AsRef<OsStr>>(&mut self, text_to_append_as_is: S) -> &mut process::Command;
 
     /// When [`process::Command`] creates pipes, request that our side is always async.
     ///
@@ -170,7 +169,7 @@ pub trait CommandExt: Sealed {
     ///     .stdout(Stdio::piped())
     ///     .stderr(Stdio::piped());
     /// ```
-        fn async_pipes(&mut self, always_async: bool) -> &mut process::Command;
+    fn async_pipes(&mut self, always_async: bool) -> &mut process::Command;
 
     /// Sets a raw attribute on the command, providing extended configuration options for Windows processes.
     ///
@@ -225,7 +224,7 @@ pub trait CommandExt: Sealed {
     /// # Safety Note
     ///
     /// Remember that improper use of raw attributes can lead to undefined behavior or security vulnerabilities. Always consult the documentation and ensure proper attribute values are used.
-        unsafe fn raw_attribute<T: Copy + Send + Sync + 'static>(
+    unsafe fn raw_attribute<T: Copy + Send + Sync + 'static>(
         &mut self,
         attribute: usize,
         value: T,
@@ -269,7 +268,7 @@ impl CommandExt for process::Command {
 
 pub trait ChildExt: Sealed {
     /// Extracts the main thread raw handle, without taking ownership
-        fn main_thread_handle(&self) -> BorrowedHandle<'_>;
+    fn main_thread_handle(&self) -> BorrowedHandle<'_>;
 }
 
 impl ChildExt for process::Child {
@@ -289,7 +288,7 @@ pub trait ExitCodeExt: Sealed {
     /// The exit code should not be 259, as this conflicts with the `STILL_ACTIVE`
     /// macro returned from the `GetExitCodeProcess` function to signal that the
     /// process has yet to run to completion.
-        fn from_raw(raw: u32) -> Self;
+    fn from_raw(raw: u32) -> Self;
 }
 
 impl ExitCodeExt for process::ExitCode {

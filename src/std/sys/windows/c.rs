@@ -49,9 +49,15 @@ pub type CONDITION_VARIABLE = RTL_CONDITION_VARIABLE;
 pub type SRWLOCK = RTL_SRWLOCK;
 pub type INIT_ONCE = RTL_RUN_ONCE;
 
-pub const CONDITION_VARIABLE_INIT: CONDITION_VARIABLE = CONDITION_VARIABLE { Ptr: ptr::null_mut() };
-pub const SRWLOCK_INIT: SRWLOCK = SRWLOCK { Ptr: ptr::null_mut() };
-pub const INIT_ONCE_STATIC_INIT: INIT_ONCE = INIT_ONCE { Ptr: ptr::null_mut() };
+pub const CONDITION_VARIABLE_INIT: CONDITION_VARIABLE = CONDITION_VARIABLE {
+    Ptr: ptr::null_mut(),
+};
+pub const SRWLOCK_INIT: SRWLOCK = SRWLOCK {
+    Ptr: ptr::null_mut(),
+};
+pub const INIT_ONCE_STATIC_INIT: INIT_ONCE = INIT_ONCE {
+    Ptr: ptr::null_mut(),
+};
 
 // Some windows_sys types have different signs than the types we use.
 pub const OBJ_DONT_REPARSE: u32 = windows_sys::OBJ_DONT_REPARSE as u32;
@@ -81,7 +87,11 @@ pub fn nt_success(status: NTSTATUS) -> bool {
 impl UNICODE_STRING {
     pub fn from_ref(slice: &[u16]) -> Self {
         let len = slice.len() * mem::size_of::<u16>();
-        Self { Length: len as _, MaximumLength: len as _, Buffer: slice.as_ptr() as _ }
+        Self {
+            Length: len as _,
+            MaximumLength: len as _,
+            Buffer: slice.as_ptr() as _,
+        }
     }
 }
 
@@ -99,8 +109,12 @@ impl Default for OBJECT_ATTRIBUTES {
 }
 
 impl IO_STATUS_BLOCK {
-    pub const PENDING: Self =
-        IO_STATUS_BLOCK { Anonymous: IO_STATUS_BLOCK_0 { Status: STATUS_PENDING }, Information: 0 };
+    pub const PENDING: Self = IO_STATUS_BLOCK {
+        Anonymous: IO_STATUS_BLOCK_0 {
+            Status: STATUS_PENDING,
+        },
+        Information: 0,
+    };
     pub fn status(&self) -> NTSTATUS {
         // SAFETY: If `self.Anonymous.Status` was set then this is obviously safe.
         // If `self.Anonymous.Pointer` was set then this is the equivalent to converting

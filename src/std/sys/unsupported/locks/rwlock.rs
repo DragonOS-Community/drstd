@@ -10,7 +10,7 @@ unsafe impl Sync for RwLock {} // no threads on this platform
 
 impl RwLock {
     #[inline]
-        pub const fn new() -> RwLock {
+    pub const fn new() -> RwLock {
         RwLock { mode: Cell::new(0) }
     }
 

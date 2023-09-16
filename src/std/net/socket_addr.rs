@@ -8,16 +8,19 @@ use crate::std::mem;
 use crate::std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use crate::std::option;
 use crate::std::slice;
-use dlibc as c;
 use crate::std::sys_common::net::LookupHost;
 use crate::std::sys_common::{FromInner, IntoInner};
 use crate::std::vec;
+use dlibc as c;
 
 pub use core::net::{SocketAddr, SocketAddrV4, SocketAddrV6};
 
 impl FromInner<c::sockaddr_in> for SocketAddrV4 {
     fn from_inner(addr: c::sockaddr_in) -> SocketAddrV4 {
-        SocketAddrV4::new(Ipv4Addr::from_inner(addr.sin_addr), u16::from_be(addr.sin_port))
+        SocketAddrV4::new(
+            Ipv4Addr::from_inner(addr.sin_addr),
+            u16::from_be(addr.sin_port),
+        )
     }
 }
 
@@ -166,7 +169,7 @@ impl IntoInner<c::sockaddr_in6> for SocketAddrV6 {
 pub trait ToSocketAddrs {
     /// Returned iterator over socket addresses which this type may correspond
     /// to.
-        type Iter: Iterator<Item = SocketAddr>;
+    type Iter: Iterator<Item = SocketAddr>;
 
     /// Converts this object to an iterator of resolved [`SocketAddr`]s.
     ///
@@ -175,7 +178,7 @@ pub trait ToSocketAddrs {
     ///
     /// Note that this function may block the current thread while resolution is
     /// performed.
-        fn to_socket_addrs(&self) -> io::Result<Self::Iter>;
+    fn to_socket_addrs(&self) -> io::Result<Self::Iter>;
 }
 
 impl ToSocketAddrs for SocketAddr {

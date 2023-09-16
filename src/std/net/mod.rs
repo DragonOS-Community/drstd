@@ -19,7 +19,6 @@
 //! example, through the use of the `CLOEXEC` flag in UNIX systems or the `HANDLE_FLAG_INHERIT`
 //! flag on Windows.
 
-
 use crate::std::io::{self, ErrorKind};
 
 pub use self::ip_addr::{IpAddr, Ipv4Addr, Ipv6Addr, Ipv6MulticastScope};
@@ -44,17 +43,17 @@ pub enum Shutdown {
     /// All currently blocked and future [reads] will return <code>[Ok]\(0)</code>.
     ///
     /// [reads]: crate::std::io::Read "io::Read"
-        Read,
+    Read,
     /// The writing portion of the [`TcpStream`] should be shut down.
     ///
     /// All currently blocked and future [writes] will return an error.
     ///
     /// [writes]: crate::std::io::Write "io::Write"
-        Write,
+    Write,
     /// Both the reading and the writing portions of the [`TcpStream`] should be shut down.
     ///
     /// See [`Shutdown::Read`] and [`Shutdown::Write`] for more information.
-        Both,
+    Both,
 }
 
 fn each_addr<A: ToSocketAddrs, F, T>(addr: A, mut f: F) -> io::Result<T>
@@ -73,6 +72,9 @@ where
         }
     }
     Err(last_err.unwrap_or_else(|| {
-        io::const_io_error!(ErrorKind::InvalidInput, "could not resolve to any addresses")
+        io::const_io_error!(
+            ErrorKind::InvalidInput,
+            "could not resolve to any addresses"
+        )
     }))
 }

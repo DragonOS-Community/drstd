@@ -59,7 +59,7 @@ impl WaitTimeoutResult {
     /// }
     /// ```
     #[must_use]
-        pub fn timed_out(&self) -> bool {
+    pub fn timed_out(&self) -> bool {
         self.0
     }
 }
@@ -116,10 +116,12 @@ impl Condvar {
     ///
     /// let condvar = Condvar::new();
     /// ```
-            #[must_use]
+    #[must_use]
     #[inline]
     pub const fn new() -> Condvar {
-        Condvar { inner: sys::Condvar::new() }
+        Condvar {
+            inner: sys::Condvar::new(),
+        }
     }
 
     /// Blocks the current thread until this condition variable receives a
@@ -177,13 +179,17 @@ impl Condvar {
     ///     started = cvar.wait(started).unwrap();
     /// }
     /// ```
-        pub fn wait<'a, T>(&self, guard: MutexGuard<'a, T>) -> LockResult<MutexGuard<'a, T>> {
+    pub fn wait<'a, T>(&self, guard: MutexGuard<'a, T>) -> LockResult<MutexGuard<'a, T>> {
         let poisoned = unsafe {
             let lock = mutex::guard_lock(&guard);
             self.inner.wait(lock);
             mutex::guard_poison(&guard).get()
         };
-        if poisoned { Err(PoisonError::new(guard)) } else { Ok(guard) }
+        if poisoned {
+            Err(PoisonError::new(guard))
+        } else {
+            Ok(guard)
+        }
     }
 
     /// Blocks the current thread until this condition variable receives a
@@ -228,7 +234,7 @@ impl Condvar {
     /// // As long as the value inside the `Mutex<bool>` is `true`, we wait.
     /// let _guard = cvar.wait_while(lock.lock().unwrap(), |pending| { *pending }).unwrap();
     /// ```
-        pub fn wait_while<'a, T, F>(
+    pub fn wait_while<'a, T, F>(
         &self,
         mut guard: MutexGuard<'a, T>,
         mut condition: F,
@@ -295,7 +301,10 @@ impl Condvar {
     ///     }
     /// }
     /// ```
-        #[deprecated(since = "1.6.0", note = "replaced by `std::sync::Condvar::wait_timeout`")]
+    #[deprecated(
+        since = "1.6.0",
+        note = "replaced by `std::sync::Condvar::wait_timeout`"
+    )]
     pub fn wait_timeout_ms<'a, T>(
         &self,
         guard: MutexGuard<'a, T>,
@@ -366,7 +375,7 @@ impl Condvar {
     ///     }
     /// }
     /// ```
-        pub fn wait_timeout<'a, T>(
+    pub fn wait_timeout<'a, T>(
         &self,
         guard: MutexGuard<'a, T>,
         dur: Duration,
@@ -374,9 +383,16 @@ impl Condvar {
         let (poisoned, result) = unsafe {
             let lock = mutex::guard_lock(&guard);
             let success = self.inner.wait_timeout(lock, dur);
-            (mutex::guard_poison(&guard).get(), WaitTimeoutResult(!success))
+            (
+                mutex::guard_poison(&guard).get(),
+                WaitTimeoutResult(!success),
+            )
         };
-        if poisoned { Err(PoisonError::new((guard, result))) } else { Ok((guard, result)) }
+        if poisoned {
+            Err(PoisonError::new((guard, result)))
+        } else {
+            Ok((guard, result))
+        }
     }
 
     /// Waits on this condition variable for a notification, timing out after a
@@ -431,7 +447,7 @@ impl Condvar {
     /// }
     /// // access the locked mutex via result.0
     /// ```
-        pub fn wait_timeout_while<'a, T, F>(
+    pub fn wait_timeout_while<'a, T, F>(
         &self,
         mut guard: MutexGuard<'a, T>,
         dur: Duration,
@@ -490,7 +506,7 @@ impl Condvar {
     ///     started = cvar.wait(started).unwrap();
     /// }
     /// ```
-        pub fn notify_one(&self) {
+    pub fn notify_one(&self) {
         self.inner.notify_one()
     }
 
@@ -529,7 +545,7 @@ impl Condvar {
     ///     started = cvar.wait(started).unwrap();
     /// }
     /// ```
-        pub fn notify_all(&self) {
+    pub fn notify_all(&self) {
         self.inner.notify_all()
     }
 }

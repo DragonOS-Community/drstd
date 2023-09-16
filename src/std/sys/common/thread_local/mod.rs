@@ -1,4 +1,3 @@
-
 // There are three thread-local implementations: "static", "fast", "OS".
 // The "OS" thread local key type is accessed via platform-specific API calls and is slow, while the
 // "fast" key type is accessed via code generated via LLVM, where TLS keys are set up by the linker.
@@ -34,7 +33,9 @@ mod lazy {
 
     impl<T> LazyKeyInner<T> {
         pub const fn new() -> LazyKeyInner<T> {
-            LazyKeyInner { inner: UnsafeCell::new(None) }
+            LazyKeyInner {
+                inner: UnsafeCell::new(None),
+            }
         }
 
         pub unsafe fn get(&self) -> Option<&'static T> {

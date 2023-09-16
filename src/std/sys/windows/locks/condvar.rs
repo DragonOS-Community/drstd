@@ -14,7 +14,9 @@ unsafe impl Sync for Condvar {}
 impl Condvar {
     #[inline]
     pub const fn new() -> Condvar {
-        Condvar { inner: UnsafeCell::new(c::CONDITION_VARIABLE_INIT) }
+        Condvar {
+            inner: UnsafeCell::new(c::CONDITION_VARIABLE_INIT),
+        }
     }
 
     #[inline]

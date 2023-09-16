@@ -73,7 +73,9 @@ fn test_named_thread_truncation() {
 #[test]
 #[should_panic]
 fn test_invalid_named_thread() {
-    let _ = Builder::new().name("ada l\0velace".to_string()).spawn(|| {});
+    let _ = Builder::new()
+        .name("ada l\0velace".to_string())
+        .spawn(|| {});
 }
 
 #[test]
@@ -335,7 +337,10 @@ fn sleep_ms_smoke() {
 
 #[test]
 fn test_size_of_option_thread_id() {
-    assert_eq!(mem::size_of::<Option<ThreadId>>(), mem::size_of::<ThreadId>());
+    assert_eq!(
+        mem::size_of::<Option<ThreadId>>(),
+        mem::size_of::<ThreadId>()
+    );
 }
 
 #[test]

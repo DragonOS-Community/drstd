@@ -151,7 +151,10 @@ impl DirEntry {
             _ => {}
         }
 
-        Some(DirEntry { root: root.clone(), data: *wfd })
+        Some(DirEntry {
+            root: root.clone(),
+            data: *wfd,
+        })
     }
 
     pub fn path(&self) -> PathBuf {
@@ -281,7 +284,11 @@ impl OpenOptions {
         self.custom_flags
             | self.attributes
             | self.security_qos_flags
-            | if self.create_new { c::FILE_FLAG_OPEN_REPARSE_POINT } else { 0 }
+            | if self.create_new {
+                c::FILE_FLAG_OPEN_REPARSE_POINT
+            } else {
+                0
+            }
     }
 }
 
@@ -301,7 +308,9 @@ impl File {
         };
         let handle = unsafe { HandleOrInvalid::from_raw_handle(handle) };
         if let Ok(handle) = handle.try_into() {
-            Ok(File { handle: Handle::from_inner(handle) })
+            Ok(File {
+                handle: Handle::from_inner(handle),
+            })
         } else {
             Err(Error::last_os_error())
         }
@@ -317,7 +326,9 @@ impl File {
     }
 
     pub fn truncate(&self, size: u64) -> io::Result<()> {
-        let mut info = c::FILE_END_OF_FILE_INFO { EndOfFile: size as c::LARGE_INTEGER };
+        let mut info = c::FILE_END_OF_FILE_INFO {
+            EndOfFile: size as c::LARGE_INTEGER,
+        };
         let size = mem::size_of_val(&info);
         cvt(unsafe {
             c::SetFileInformationByHandle(
@@ -334,7 +345,10 @@ impl File {
     pub fn file_attr(&self) -> io::Result<FileAttr> {
         unsafe {
             let mut info: c::BY_HANDLE_FILE_INFORMATION = mem::zeroed();
-            cvt(c::GetFileInformationByHandle(self.handle.as_raw_handle(), &mut info))?;
+            cvt(c::GetFileInformationByHandle(
+                self.handle.as_raw_handle(),
+                &mut info,
+            ))?;
             let mut reparse_tag = 0;
             if info.dwFileAttributes & c::FILE_ATTRIBUTE_REPARSE_POINT != 0 {
                 let mut attr_tag: c::FILE_ATTRIBUTE_TAG_INFO = mem::zeroed();
@@ -342,7 +356,9 @@ impl File {
                     self.handle.as_raw_handle(),
                     c::FileAttributeTagInfo,
                     ptr::addr_of_mut!(attr_tag).cast(),
-                    mem::size_of::<c::FILE_ATTRIBUTE_TAG_INFO>().try_into().unwrap(),
+                    mem::size_of::<c::FILE_ATTRIBUTE_TAG_INFO>()
+                        .try_into()
+                        .unwrap(),
                 ))?;
                 if attr_tag.FileAttributes & c::FILE_ATTRIBUTE_REPARSE_POINT != 0 {
                     reparse_tag = attr_tag.ReparseTag;
@@ -411,7 +427,9 @@ impl File {
                     self.handle.as_raw_handle(),
                     c::FileAttributeTagInfo,
                     ptr::addr_of_mut!(attr_tag).cast(),
-                    mem::size_of::<c::FILE_ATTRIBUTE_TAG_INFO>().try_into().unwrap(),
+                    mem::size_of::<c::FILE_ATTRIBUTE_TAG_INFO>()
+                        .try_into()
+                        .unwrap(),
                 ))?;
                 if attr_tag.FileAttributes & c::FILE_ATTRIBUTE_REPARSE_POINT != 0 {
                     attr.reparse_tag = attr_tag.ReparseTag;
@@ -478,7 +496,9 @@ impl File {
     }
 
     pub fn duplicate(&self) -> io::Result<File> {
-        Ok(Self { handle: self.handle.try_clone()? })
+        Ok(Self {
+            handle: self.handle.try_clone()?,
+        })
     }
 
     // NB: returned pointer is derived from `space`, and has provenance to
@@ -556,7 +576,9 @@ impl File {
                 let user = super::args::from_wide_to_user_path(
                     subst.iter().copied().chain([0]).collect(),
                 )?;
-                Ok(PathBuf::from(OsString::from_wide(&user.strip_suffix(&[0]).unwrap_or(&user))))
+                Ok(PathBuf::from(OsString::from_wide(
+                    &user.strip_suffix(&[0]).unwrap_or(&user),
+                )))
             } else {
                 Ok(PathBuf::from(OsString::from_wide(subst)))
             }
@@ -606,12 +628,21 @@ impl File {
             ));
         }
         cvt(unsafe {
-            let created =
-                times.created.as_ref().map(|a| a as *const c::FILETIME).unwrap_or(ptr::null());
-            let accessed =
-                times.accessed.as_ref().map(|a| a as *const c::FILETIME).unwrap_or(ptr::null());
-            let modified =
-                times.modified.as_ref().map(|a| a as *const c::FILETIME).unwrap_or(ptr::null());
+            let created = times
+                .created
+                .as_ref()
+                .map(|a| a as *const c::FILETIME)
+                .unwrap_or(ptr::null());
+            let accessed = times
+                .accessed
+                .as_ref()
+                .map(|a| a as *const c::FILETIME)
+                .unwrap_or(ptr::null());
+            let modified = times
+                .modified
+                .as_ref()
+                .map(|a| a as *const c::FILETIME)
+                .unwrap_or(ptr::null());
             c::SetFileTime(self.as_raw_handle(), created, accessed, modified)
         })?;
         Ok(())
@@ -661,7 +692,9 @@ impl File {
     /// until all file handles are closed. However, marking a file for deletion
     /// will prevent anyone from opening a new handle to the file.
     fn win32_delete(&self) -> io::Result<()> {
-        let mut info = c::FILE_DISPOSITION_INFO { DeleteFile: c::TRUE as _ };
+        let mut info = c::FILE_DISPOSITION_INFO {
+            DeleteFile: c::TRUE as _,
+        };
         let size = mem::size_of_val(&info);
         cvt(unsafe {
             c::SetFileInformationByHandle(
@@ -688,8 +721,11 @@ impl File {
     /// So if you open a link (not its target) and iterate the directory,
     /// you will always iterate an empty directory regardless of the target.
     fn fill_dir_buff(&self, buffer: &mut DirBuff, restart: bool) -> io::Result<bool> {
-        let class =
-            if restart { c::FileIdBothDirectoryRestartInfo } else { c::FileIdBothDirectoryInfo };
+        let class = if restart {
+            c::FileIdBothDirectoryRestartInfo
+        } else {
+            c::FileIdBothDirectoryInfo
+        };
 
         unsafe {
             let result = cvt(c::GetFileInformationByHandleEx(
@@ -746,7 +782,10 @@ struct DirBuffIter<'a> {
 }
 impl<'a> DirBuffIter<'a> {
     fn new(buffer: &'a DirBuff) -> Self {
-        Self { buffer: Some(buffer.as_ref()), cursor: 0 }
+        Self {
+            buffer: Some(buffer.as_ref()),
+            cursor: 0,
+        }
     }
 }
 impl<'a> Iterator for DirBuffIter<'a> {
@@ -856,7 +895,9 @@ fn open_link_no_reparse(parent: &File, name: &[u16], access: u32) -> io::Result<
             ATTRIBUTES.store(0, Ordering::Relaxed);
             open_link_no_reparse(parent, name, access)
         } else {
-            Err(io::Error::from_raw_os_error(c::RtlNtStatusToDosError(status) as _))
+            Err(io::Error::from_raw_os_error(
+                c::RtlNtStatusToDosError(status) as _,
+            ))
         }
     }
 }
@@ -900,7 +941,9 @@ impl IntoRawHandle for File {
 
 impl FromRawHandle for File {
     unsafe fn from_raw_handle(raw_handle: RawHandle) -> Self {
-        Self { handle: FromInner::from_inner(FromRawHandle::from_raw_handle(raw_handle)) }
+        Self {
+            handle: FromInner::from_inner(FromRawHandle::from_raw_handle(raw_handle)),
+        }
     }
 }
 
@@ -922,7 +965,9 @@ impl FileAttr {
     }
 
     pub fn perm(&self) -> FilePermissions {
-        FilePermissions { attrs: self.attributes }
+        FilePermissions {
+            attrs: self.attributes,
+        }
     }
 
     pub fn attrs(&self) -> u32 {
@@ -1024,7 +1069,10 @@ impl FileTimes {
 
 impl FileType {
     fn new(attrs: c::DWORD, reparse_tag: c::DWORD) -> FileType {
-        FileType { attributes: attrs, reparse_tag }
+        FileType {
+            attributes: attrs,
+            reparse_tag,
+        }
     }
     pub fn is_dir(&self) -> bool {
         !self.is_symlink() && self.is_directory()
@@ -1231,7 +1279,11 @@ pub fn symlink(original: &Path, link: &Path) -> io::Result<()> {
 pub fn symlink_inner(original: &Path, link: &Path, dir: bool) -> io::Result<()> {
     let original = to_u16s(original)?;
     let link = maybe_verbatim(link)?;
-    let flags = if dir { c::SYMBOLIC_LINK_FLAG_DIRECTORY } else { 0 };
+    let flags = if dir {
+        c::SYMBOLIC_LINK_FLAG_DIRECTORY
+    } else {
+        0
+    };
     // Formerly, symlink creation required the SeCreateSymbolicLink privilege. For the Windows 10
     // Creators Update, Microsoft loosened this to allow unprivileged symlink creation if the
     // computer is in Developer Mode, but SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE must be
@@ -1315,8 +1367,11 @@ fn metadata(path: &Path, reparse: ReparsePoint) -> io::Result<FileAttr> {
     match File::open(path, &opts) {
         Ok(file) => file.file_attr(),
         Err(e)
-            if [Some(c::ERROR_SHARING_VIOLATION as _), Some(c::ERROR_ACCESS_DENIED as _)]
-                .contains(&e.raw_os_error()) =>
+            if [
+                Some(c::ERROR_SHARING_VIOLATION as _),
+                Some(c::ERROR_ACCESS_DENIED as _),
+            ]
+            .contains(&e.raw_os_error()) =>
         {
             // `ERROR_ACCESS_DENIED` is returned when the user doesn't have permission for the resource.
             // One such example is `System Volume Information` as default but can be created as well

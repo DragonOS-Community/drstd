@@ -5,7 +5,6 @@ use crate::std::fmt;
 use crate::std::io::{self, IoSlice, IoSliceMut};
 use crate::std::net::Shutdown;
 use crate::std::os::unix::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
-use dlibc;
 #[cfg(any(
     target_os = "android",
     target_os = "linux",
@@ -24,6 +23,7 @@ use crate::std::sys::cvt;
 use crate::std::sys::net::Socket;
 use crate::std::sys_common::{AsInner, FromInner};
 use crate::std::time::Duration;
+use dlibc;
 
 #[cfg(any(
     target_os = "android",
@@ -88,12 +88,16 @@ impl UnixStream {
     ///     }
     /// };
     /// ```
-        pub fn connect<P: AsRef<Path>>(path: P) -> io::Result<UnixStream> {
+    pub fn connect<P: AsRef<Path>>(path: P) -> io::Result<UnixStream> {
         unsafe {
             let inner = Socket::new_raw(dlibc::AF_UNIX, dlibc::SOCK_STREAM)?;
             let (addr, len) = sockaddr_un(path.as_ref())?;
 
-            cvt(dlibc::connect(inner.as_raw_fd(), &addr as *const _ as *const _, len))?;
+            cvt(dlibc::connect(
+                inner.as_raw_fd(),
+                &addr as *const _ as *const _,
+                len,
+            ))?;
             Ok(UnixStream(inner))
         }
     }
@@ -121,7 +125,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ````
-        pub fn connect_addr(socket_addr: &SocketAddr) -> io::Result<UnixStream> {
+    pub fn connect_addr(socket_addr: &SocketAddr) -> io::Result<UnixStream> {
         unsafe {
             let inner = Socket::new_raw(dlibc::AF_UNIX, dlibc::SOCK_STREAM)?;
             cvt(dlibc::connect(
@@ -150,7 +154,7 @@ impl UnixStream {
     ///     }
     /// };
     /// ```
-        pub fn pair() -> io::Result<(UnixStream, UnixStream)> {
+    pub fn pair() -> io::Result<(UnixStream, UnixStream)> {
         let (i1, i2) = Socket::new_pair(dlibc::AF_UNIX, dlibc::SOCK_STREAM)?;
         Ok((UnixStream(i1), UnixStream(i2)))
     }
@@ -173,7 +177,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn try_clone(&self) -> io::Result<UnixStream> {
+    pub fn try_clone(&self) -> io::Result<UnixStream> {
         self.0.duplicate().map(UnixStream)
     }
 
@@ -190,7 +194,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn local_addr(&self) -> io::Result<SocketAddr> {
+    pub fn local_addr(&self) -> io::Result<SocketAddr> {
         SocketAddr::new(|addr, len| unsafe { dlibc::getsockname(self.as_raw_fd(), addr, len) })
     }
 
@@ -207,7 +211,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn peer_addr(&self) -> io::Result<SocketAddr> {
+    pub fn peer_addr(&self) -> io::Result<SocketAddr> {
         SocketAddr::new(|addr, len| unsafe { dlibc::getpeername(self.as_raw_fd(), addr, len) })
     }
 
@@ -225,7 +229,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        #[cfg(any(
+    #[cfg(any(
         target_os = "android",
         target_os = "linux",
         target_os = "dragonfly",
@@ -278,7 +282,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_read_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
+    pub fn set_read_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
         self.0.set_timeout(timeout, dlibc::SO_RCVTIMEO)
     }
 
@@ -320,7 +324,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_write_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
+    pub fn set_write_timeout(&self, timeout: Option<Duration>) -> io::Result<()> {
         self.0.set_timeout(timeout, dlibc::SO_SNDTIMEO)
     }
 
@@ -339,7 +343,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn read_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.timeout(dlibc::SO_RCVTIMEO)
     }
 
@@ -359,7 +363,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
+    pub fn write_timeout(&self) -> io::Result<Option<Duration>> {
         self.0.timeout(dlibc::SO_SNDTIMEO)
     }
 
@@ -376,7 +380,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
+    pub fn set_nonblocking(&self, nonblocking: bool) -> io::Result<()> {
         self.0.set_nonblocking(nonblocking)
     }
 
@@ -420,7 +424,7 @@ impl UnixStream {
         target_os = "netbsd",
         target_os = "freebsd"
     ))]
-        pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
+    pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
         self.0.set_passcred(passcred)
     }
 
@@ -437,7 +441,7 @@ impl UnixStream {
         target_os = "netbsd",
         target_os = "freebsd"
     ))]
-        pub fn passcred(&self) -> io::Result<bool> {
+    pub fn passcred(&self) -> io::Result<bool> {
         self.0.passcred()
     }
 
@@ -461,7 +465,7 @@ impl UnixStream {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "linux", target_os = "freebsd", target_os = "openbsd",))]
-        pub fn set_mark(&self, mark: u32) -> io::Result<()> {
+    pub fn set_mark(&self, mark: u32) -> io::Result<()> {
         self.0.set_mark(mark)
     }
 
@@ -483,7 +487,7 @@ impl UnixStream {
     ///
     /// # Platform specific
     /// On Redox this always returns `None`.
-        pub fn take_error(&self) -> io::Result<Option<io::Error>> {
+    pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         self.0.take_error()
     }
 
@@ -505,7 +509,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn shutdown(&self, how: Shutdown) -> io::Result<()> {
+    pub fn shutdown(&self, how: Shutdown) -> io::Result<()> {
         self.0.shutdown(how)
     }
 
@@ -530,7 +534,7 @@ impl UnixStream {
     ///     Ok(())
     /// }
     /// ```
-        pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn peek(&self, buf: &mut [u8]) -> io::Result<usize> {
         self.0.peek(buf)
     }
 
@@ -541,7 +545,10 @@ impl UnixStream {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixStream, SocketAncillary, AncillaryData};
     /// use std::io::IoSliceMut;
@@ -572,7 +579,7 @@ impl UnixStream {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn recv_vectored_with_ancillary(
+    pub fn recv_vectored_with_ancillary(
         &self,
         bufs: &mut [IoSliceMut<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -589,7 +596,10 @@ impl UnixStream {
     /// # Examples
     ///
     #[cfg_attr(any(target_os = "android", target_os = "linux"), doc = "```no_run")]
-    #[cfg_attr(not(any(target_os = "android", target_os = "linux")), doc = "```ignore")]
+    #[cfg_attr(
+        not(any(target_os = "android", target_os = "linux")),
+        doc = "```ignore"
+    )]
     /// #![feature(unix_socket_ancillary_data)]
     /// use std::os::unix::net::{UnixStream, SocketAncillary};
     /// use std::io::IoSlice;
@@ -614,7 +624,7 @@ impl UnixStream {
     /// }
     /// ```
     #[cfg(any(doc, target_os = "android", target_os = "linux"))]
-        pub fn send_vectored_with_ancillary(
+    pub fn send_vectored_with_ancillary(
         &self,
         bufs: &[IoSlice<'_>],
         ancillary: &mut SocketAncillary<'_>,
@@ -702,7 +712,9 @@ impl AsRawFd for UnixStream {
 impl FromRawFd for UnixStream {
     #[inline]
     unsafe fn from_raw_fd(fd: RawFd) -> UnixStream {
-        UnixStream(Socket::from_inner(FromInner::from_inner(OwnedFd::from_raw_fd(fd))))
+        UnixStream(Socket::from_inner(FromInner::from_inner(
+            OwnedFd::from_raw_fd(fd),
+        )))
     }
 }
 

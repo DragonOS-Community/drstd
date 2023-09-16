@@ -399,7 +399,6 @@
 //! assert_eq!(map.keys().next().unwrap().b, "baz");
 //! ```
 
-
 // FIXME(#82080) The deprecation here is only theoretical, and does not actually produce a warning.
 #[deprecated(note = "moved to `std::ops::Bound`", since = "1.26.0")]
 #[doc(hidden)]
@@ -425,10 +424,10 @@ mod hash;
 
 pub mod hash_map {
     //! A hash map implemented with quadratic probing and SIMD lookup.
-        pub use super::hash::map::*;
+    pub use super::hash::map::*;
 }
 
 pub mod hash_set {
     //! A hash set implemented as a `HashMap` where the value is `()`.
-        pub use super::hash::set::*;
+    pub use super::hash::set::*;
 }

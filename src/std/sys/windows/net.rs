@@ -1,4 +1,3 @@
-
 use crate::std::cmp;
 use crate::std::io::{self, BorrowedBuf, BorrowedCursor, IoSlice, IoSliceMut, Read};
 use crate::std::mem;
@@ -81,12 +80,20 @@ impl_is_minus_one! { i8 i16 i32 i64 isize }
 /// and if so, returns the last error from the Windows socket interface. This
 /// function must be called before another call to the socket API is made.
 pub fn cvt<T: IsMinusOne>(t: T) -> io::Result<T> {
-    if t.is_minus_one() { Err(last_error()) } else { Ok(t) }
+    if t.is_minus_one() {
+        Err(last_error())
+    } else {
+        Ok(t)
+    }
 }
 
 /// A variant of `cvt` for `getaddrinfo` which return 0 for a success.
 pub fn cvt_gai(err: c_int) -> io::Result<()> {
-    if err == 0 { Ok(()) } else { Err(last_error()) }
+    if err == 0 {
+        Ok(())
+    } else {
+        Err(last_error())
+    }
 }
 
 /// Just to provide the same interface as sys/unix/net.rs
@@ -184,7 +191,10 @@ impl Socket {
                 };
 
                 match count {
-                    0 => Err(io::const_io_error!(io::ErrorKind::TimedOut, "connection timed out")),
+                    0 => Err(io::const_io_error!(
+                        io::ErrorKind::TimedOut,
+                        "connection timed out"
+                    )),
                     _ => {
                         if writefds.fd_count != 1 {
                             if let Some(e) = self.take_error()? {
@@ -218,7 +228,12 @@ impl Socket {
         // do the same on windows to map a shut down socket to returning EOF.
         let length = cmp::min(buf.capacity(), i32::MAX as usize) as i32;
         let result = unsafe {
-            c::recv(self.as_raw_socket(), buf.as_mut().as_mut_ptr() as *mut _, length, flags)
+            c::recv(
+                self.as_raw_socket(),
+                buf.as_mut().as_mut_ptr() as *mut _,
+                length,
+                flags,
+            )
         };
 
         match result {
@@ -323,7 +338,10 @@ impl Socket {
                     Err(io::Error::from_raw_os_error(error))
                 }
             }
-            _ => Ok((result as usize, net::sockaddr_to_addr(&storage, addrlen as usize)?)),
+            _ => Ok((
+                result as usize,
+                net::sockaddr_to_addr(&storage, addrlen as usize)?,
+            )),
         }
     }
 
@@ -428,7 +446,11 @@ impl Socket {
 
     pub fn take_error(&self) -> io::Result<Option<io::Error>> {
         let raw: c_int = net::getsockopt(self, c::SOL_SOCKET, c::SO_ERROR)?;
-        if raw == 0 { Ok(None) } else { Ok(Some(io::Error::from_raw_os_error(raw as i32))) }
+        if raw == 0 {
+            Ok(None)
+        } else {
+            Ok(Some(io::Error::from_raw_os_error(raw as i32)))
+        }
     }
 
     // This is used by sys_common code to abstract over Windows and Unix.

@@ -280,8 +280,11 @@ impl Builder {
     ///
     /// handler.join().unwrap();
     /// ```
-        pub fn new() -> Builder {
-        Builder { name: None, stack_size: None }
+    pub fn new() -> Builder {
+        Builder {
+            name: None,
+            stack_size: None,
+        }
     }
 
     /// Names the thread-to-be. Currently the name is used for identification
@@ -308,7 +311,7 @@ impl Builder {
     /// ```
     ///
     /// [naming-threads]: ./index.html#naming-threads
-        pub fn name(mut self, name: String) -> Builder {
+    pub fn name(mut self, name: String) -> Builder {
         self.name = Some(name);
         self
     }
@@ -330,7 +333,7 @@ impl Builder {
     /// ```
     ///
     /// [stack-size]: ./index.html#stack-size
-        pub fn stack_size(mut self, size: usize) -> Builder {
+    pub fn stack_size(mut self, size: usize) -> Builder {
         self.stack_size = Some(size);
         self
     }
@@ -370,7 +373,7 @@ impl Builder {
     ///
     /// handler.join().unwrap();
     /// ```
-        pub fn spawn<F, T>(self, f: F) -> io::Result<JoinHandle<T>>
+    pub fn spawn<F, T>(self, f: F) -> io::Result<JoinHandle<T>>
     where
         F: FnOnce() -> T,
         F: Send + 'static,
@@ -437,7 +440,7 @@ impl Builder {
     /// ```
     ///
     /// [`io::Result`]: crate::std::io::Result
-        pub unsafe fn spawn_unchecked<'a, F, T>(self, f: F) -> io::Result<JoinHandle<T>>
+    pub unsafe fn spawn_unchecked<'a, F, T>(self, f: F) -> io::Result<JoinHandle<T>>
     where
         F: FnOnce() -> T,
         F: Send + 'a,
@@ -1123,7 +1126,7 @@ impl ThreadId {
     /// it is not guaranteed which values new threads will return, and this may
     /// change across Rust versions.
     #[must_use]
-        pub fn as_u64(&self) -> NonZeroU64 {
+    pub fn as_u64(&self) -> NonZeroU64 {
         self.0
     }
 }
@@ -1219,7 +1222,7 @@ impl Thread {
     ///
     /// parked_thread.join().unwrap();
     /// ```
-        #[inline]
+    #[inline]
     pub fn unpark(&self) {
         self.inner.as_ref().parker().unpark();
     }
@@ -1238,7 +1241,7 @@ impl Thread {
     /// let other_thread_id = other_thread.join().unwrap();
     /// assert!(thread::current().id() != other_thread_id);
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn id(&self) -> ThreadId {
         self.inner.id
     }
@@ -1280,9 +1283,10 @@ impl Thread {
     /// ```
     ///
     /// [naming-threads]: ./index.html#naming-threads
-        #[must_use]
+    #[must_use]
     pub fn name(&self) -> Option<&str> {
-        self.cname().map(|s| unsafe { str::from_utf8_unchecked(s.to_bytes()) })
+        self.cname()
+            .map(|s| unsafe { str::from_utf8_unchecked(s.to_bytes()) })
     }
 
     fn cname(&self) -> Option<&CStr> {
@@ -1408,7 +1412,12 @@ struct JoinInner<'scope, T> {
 impl<'scope, T> JoinInner<'scope, T> {
     fn join(mut self) -> Result<T> {
         self.native.join();
-        Arc::get_mut(&mut self.packet).unwrap().result.get_mut().take().unwrap()
+        Arc::get_mut(&mut self.packet)
+            .unwrap()
+            .result
+            .get_mut()
+            .take()
+            .unwrap()
     }
 }
 
@@ -1496,7 +1505,7 @@ impl<T> JoinHandle<T> {
     /// let thread = join_handle.thread();
     /// println!("thread id: {:?}", thread.id());
     /// ```
-        #[must_use]
+    #[must_use]
     pub fn thread(&self) -> &Thread {
         &self.0.thread
     }
@@ -1534,7 +1543,7 @@ impl<T> JoinHandle<T> {
     /// }).unwrap();
     /// join_handle.join().expect("Couldn't join on the associated thread");
     /// ```
-        pub fn join(self) -> Result<T> {
+    pub fn join(self) -> Result<T> {
         self.0.join()
     }
 
@@ -1548,7 +1557,7 @@ impl<T> JoinHandle<T> {
     /// function has returned, but before the thread itself has stopped running.
     /// However, once this returns `true`, [`join`][Self::join] can be expected
     /// to return quickly, without blocking for any significant amount of time.
-        pub fn is_finished(&self) -> bool {
+    pub fn is_finished(&self) -> bool {
         Arc::strong_count(&self.0.packet) == 1
     }
 }
