@@ -266,7 +266,7 @@ impl<'a> PosixRegexBuilder<'a> {
                         last.1 = match c {
                             b'?' => Range(0, Some(1)),
                             b'+' => Range(1, None),
-                            _ => unreachable!(c)
+                            _ => unreachable!("{}", c)
                         };
                         continue;
                     } else {

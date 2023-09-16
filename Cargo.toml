@@ -10,7 +10,7 @@ edition = "2021"
 #crate-type = ["staticlib"]
 
 #[workspace]
-#members = [ "src/ld_so"]
+members = [ "dlibc" ]
 
 [build-dependencies]
 cbindgen = "0.24.3"
