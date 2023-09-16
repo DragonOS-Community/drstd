@@ -524,29 +524,6 @@ fn panic_in_write_doesnt_flush_in_drop() {
     assert_eq!(WRITES.load(Ordering::SeqCst), 1);
 }
 
-#[bench]
-fn bench_buffered_reader(b: &mut test::Bencher) {
-    b.iter(|| BufReader::new(io::empty()));
-}
-
-#[bench]
-fn bench_buffered_reader_small_reads(b: &mut test::Bencher) {
-    let data = (0..u8::MAX).cycle().take(1024 * 4).collect::<Vec<_>>();
-    b.iter(|| {
-        let mut reader = BufReader::new(&data[..]);
-        let mut buf = [0u8; 4];
-        for _ in 0..1024 {
-            reader.read_exact(&mut buf).unwrap();
-            core::hint::black_box(&buf);
-        }
-    });
-}
-
-#[bench]
-fn bench_buffered_writer(b: &mut test::Bencher) {
-    b.iter(|| BufWriter::new(io::sink()));
-}
-
 /// A simple `Write` target, designed to be wrapped by `LineWriter` /
 /// `BufWriter` / etc, that can have its `write` & `flush` behavior
 /// configured

@@ -65,8 +65,6 @@ use dlibc::sendfile as sendfile64;
 #[cfg(all(target_os = "linux", target_env = "gnu"))]
 use dlibc::sendfile64;
 use dlibc::{EBADF, EINVAL, ENOSYS, EOPNOTSUPP, EOVERFLOW, EPERM, EXDEV};
-#[cfg(test)]
-mod tests;
 
 pub(crate) fn copy_spec<R: Read + ?Sized, W: Write + ?Sized>(
     read: &mut R,

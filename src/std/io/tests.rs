@@ -333,17 +333,6 @@ fn chain_zero_length_read_is_not_eof() {
     assert_eq!("AB", s);
 }
 
-#[bench]
-#[cfg_attr(target_os = "emscripten", ignore)]
-#[cfg_attr(miri, ignore)] // Miri isn't fast...
-fn bench_read_to_end(b: &mut test::Bencher) {
-    b.iter(|| {
-        let mut lr = repeat(1).take(10000000);
-        let mut vec = Vec::with_capacity(1024);
-        super::default_read_to_end(&mut lr, &mut vec, None)
-    });
-}
-
 #[test]
 fn seek_len() -> io::Result<()> {
     let mut c = Cursor::new(vec![0; 15]);
@@ -643,24 +632,4 @@ fn test_take_wrong_length() {
     let mut reader = LieAboutSize(true).take(4);
     // Primed the `Limit` by lying about the read size.
     let _ = reader.read(&mut buffer[..]);
-}
-
-#[bench]
-fn bench_take_read(b: &mut test::Bencher) {
-    b.iter(|| {
-        let mut buf = [0; 64];
-
-        [255; 128].take(64).read(&mut buf).unwrap();
-    });
-}
-
-#[bench]
-fn bench_take_read_buf(b: &mut test::Bencher) {
-    b.iter(|| {
-        let buf: &mut [_] = &mut [MaybeUninit::uninit(); 64];
-
-        let mut buf: BorrowedBuf<'_> = buf.into();
-
-        [255; 128].take(64).read_buf(buf.unfilled()).unwrap();
-    });
 }

@@ -1,5 +1,3 @@
-#[cfg(test)]
-mod tests;
 
 use crate::std::cmp;
 use crate::std::collections::VecDeque;

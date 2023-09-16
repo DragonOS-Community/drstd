@@ -1247,20 +1247,6 @@ mod tests {
         assert_eq!(WRITES.load(Ordering::SeqCst), 1);
     }
 
-    #[bench]
-    fn bench_buffered_reader(b: &mut test::Bencher) {
-        b.iter(|| {
-            BufReader::new(io::empty())
-        });
-    }
-
-    #[bench]
-    fn bench_buffered_writer(b: &mut test::Bencher) {
-        b.iter(|| {
-            BufWriter::new(io::sink())
-        });
-    }
-
     struct AcceptOneThenFail {
         written: bool,
         flushed: bool,
