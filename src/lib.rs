@@ -95,7 +95,9 @@ extern crate memoffset;
 #[cfg(target_os = "dragonos")]
 #[macro_use]
 extern crate dsc;
+
 pub mod std;
+pub use self::std::*;
 
 #[cfg(target_os = "dragonos")]
 #[macro_use]
