@@ -97,6 +97,8 @@ extern crate memoffset;
 extern crate dsc;
 pub mod std;
 
+#[cfg(target_os = "dragonos")]
+#[macro_use]
 pub use dlibc::{eprint, eprintln, print, println};
 
 // use core::panic::PanicInfo;
