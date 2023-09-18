@@ -2125,7 +2125,7 @@ impl Path {
             // FIXME: Allow Redox prefixes
             self.has_root() || has_redox_scheme(self.as_u8_slice())
         } else {
-            self.has_root() && (cfg!(any(unix, target_os = "wasi")) || self.prefix().is_some())
+            self.has_root() && (cfg!(any(unix, target_os = "wasi", target_os = "dragonos")) || self.prefix().is_some())
         }
     }
 
