@@ -12,7 +12,7 @@
 // use crate::std::error::Error;
 // use crate::std::fmt::{self, Debug};
 // #[allow(deprecated)]
-// use crate::std::hash::{BuildHasher, Hash, Hasher, SipHasher13};
+use core::hash::{BuildHasher, Hash, Hasher, SipHasher13};
 // use crate::std::iter::FusedIterator;
 // use crate::std::ops::Index;
 // use crate::std::sys;
@@ -2972,58 +2972,58 @@
 //     }
 // }
 
-// /// The default [`Hasher`] used by [`RandomState`].
-// ///
-// /// The internal algorithm is not specified, and so it and its hashes should
-// /// not be relied upon over releases.
-// #[allow(deprecated)]
-// #[derive(Clone, Debug)]
-// pub struct DefaultHasher(SipHasher13);
+/// The default [`Hasher`] used by [`RandomState`].
+///
+/// The internal algorithm is not specified, and so it and its hashes should
+/// not be relied upon over releases.
+#[allow(deprecated)]
+#[derive(Clone, Debug)]
+pub struct DefaultHasher(SipHasher13);
 
-// impl DefaultHasher {
-//     /// Creates a new `DefaultHasher`.
-//     ///
-//     /// This hasher is not guaranteed to be the same as all other
-//     /// `DefaultHasher` instances, but is the same as all other `DefaultHasher`
-//     /// instances created through `new` or `default`.
-//         #[inline]
-//     #[allow(deprecated)]
-//         #[must_use]
-//     pub const fn new() -> DefaultHasher {
-//         DefaultHasher(SipHasher13::new_with_keys(0, 0))
-//     }
-// }
+impl DefaultHasher {
+    /// Creates a new `DefaultHasher`.
+    ///
+    /// This hasher is not guaranteed to be the same as all other
+    /// `DefaultHasher` instances, but is the same as all other `DefaultHasher`
+    /// instances created through `new` or `default`.
+        #[inline]
+    #[allow(deprecated)]
+        #[must_use]
+    pub const fn new() -> DefaultHasher {
+        DefaultHasher(SipHasher13::new_with_keys(0, 0))
+    }
+}
 
-// impl Default for DefaultHasher {
-//     /// Creates a new `DefaultHasher` using [`new`].
-//     /// See its documentation for more.
-//     ///
-//     /// [`new`]: DefaultHasher::new
-//     #[inline]
-//     fn default() -> DefaultHasher {
-//         DefaultHasher::new()
-//     }
-// }
+impl Default for DefaultHasher {
+    /// Creates a new `DefaultHasher` using [`new`].
+    /// See its documentation for more.
+    ///
+    /// [`new`]: DefaultHasher::new
+    #[inline]
+    fn default() -> DefaultHasher {
+        DefaultHasher::new()
+    }
+}
 
-// impl Hasher for DefaultHasher {
-//     // The underlying `SipHasher13` doesn't override the other
-//     // `write_*` methods, so it's ok not to forward them here.
+impl Hasher for DefaultHasher {
+    // The underlying `SipHasher13` doesn't override the other
+    // `write_*` methods, so it's ok not to forward them here.
 
-//     #[inline]
-//     fn write(&mut self, msg: &[u8]) {
-//         self.0.write(msg)
-//     }
+    #[inline]
+    fn write(&mut self, msg: &[u8]) {
+        self.0.write(msg)
+    }
 
-//     #[inline]
-//     fn write_str(&mut self, s: &str) {
-//         self.0.write_str(s);
-//     }
+    #[inline]
+    fn write_str(&mut self, s: &str) {
+        self.0.write_str(s);
+    }
 
-//     #[inline]
-//     fn finish(&self) -> u64 {
-//         self.0.finish()
-//     }
-// }
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.0.finish()
+    }
+}
 
 // impl Default for RandomState {
 //     /// Constructs a new `RandomState`.
