@@ -84,6 +84,7 @@
 #![feature(panic_info_message)]
 #![feature(panic_can_unwind)]
 #![feature(const_mut_refs)]
+#![feature(const_hash)]
 
 #[macro_use]
 extern crate alloc;
