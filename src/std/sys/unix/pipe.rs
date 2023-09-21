@@ -32,8 +32,10 @@ pub fn anon_pipe() -> io::Result<(AnonPipe, AnonPipe)> {
                 Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
             }
         }else if #[cfg(target_os = "dragonos")] {
-            cvt(dlibc::pipe(fds.as_mut_ptr()))?;
-            Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
+            unsafe{
+                cvt(dlibc::pipe(fds.as_mut_ptr()))?;
+                Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
+            }
         }else {
             unsafe {
                 cvt(dlibc::pipe(fds.as_mut_ptr()))?;
