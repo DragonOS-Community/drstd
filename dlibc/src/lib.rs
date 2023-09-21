@@ -128,7 +128,7 @@ static ALLOCATOR: crate::unix::platform::allocator::Allocator = crate::unix::pla
 #[cfg(target_os = "dragonos")]
 pub use crate::unix::macros::*;
 
-use core::panic::PanicInfo;
+
 
 #[lang = "eh_personality"]
 extern "C" fn eh_personality() {}

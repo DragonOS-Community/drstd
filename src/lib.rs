@@ -97,6 +97,9 @@ extern crate memoffset;
 #[macro_use]
 extern crate dsc;
 
+#[macro_use]
+extern crate dlibc;
+
 pub mod std;
 pub use self::std::*;
 

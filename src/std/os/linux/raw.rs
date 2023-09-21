@@ -10,7 +10,7 @@
 #![allow(deprecated)]
 
 use crate::std::os::raw::c_ulong;
-use dlibc;
+
 
 pub type dev_t = u64;
 pub type mode_t = u32;

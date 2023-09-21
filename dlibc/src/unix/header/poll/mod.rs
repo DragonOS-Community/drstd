@@ -53,7 +53,7 @@ pub fn poll_epoll(fds: &mut [pollfd], timeout: ::c_int) -> ::c_int {
     };
 
     for i in 0..fds.len() {
-        let mut pfd = &mut fds[i];
+        let pfd = &mut fds[i];
 
         let mut event = epoll_event {
             events: 0,

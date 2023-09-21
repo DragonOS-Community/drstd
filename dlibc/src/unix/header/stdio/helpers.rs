@@ -1,6 +1,6 @@
 use alloc::boxed::Box;
 
-use super::{constants::*, Buffer, FILE};
+use super::{Buffer, FILE};
 use crate::unix::header::{errno, fcntl::*, string::strchr};
 use crate::unix::{
     fs::File,

@@ -2,12 +2,11 @@ use alloc::{boxed::Box, vec::Vec};
 use core::{fmt::Debug, intrinsics, ptr};
 use unix::platform::allocator::new_mspace;
 use crate::unix::{
-    header::{libgen, stdio, stdlib},
-    ld_so::{self, linker::Linker,init},
+    header::{libgen},
+    ld_so::{self, linker::Linker},
     platform::{self, get_auxvs},
     sync::mutex::Mutex,
     allocator::ALLOCATOR,
-    alloc,
 };
 
 #[repr(C)]
@@ -192,7 +191,7 @@ pub unsafe extern "C" fn relibc_start(sp: &'static Stack) -> ! {
 
     // Ensure correct host system before executing more system calls
     relibc_verify_host();
-    use core::arch::asm;
+    
 
     // Initialize TLS, if necessary
     ld_so::init(sp);

@@ -4,7 +4,7 @@ use super::{
     linker::Symbol,
     tcb::{round_up, Master},
 };
-use unix::header::{errno::STR_ERROR, sys_mman};
+use unix::header::{errno::STR_ERROR};
 
 use alloc::{
     collections::BTreeMap,
@@ -258,7 +258,7 @@ impl DSO {
         // Copy data
         for ph in elf.program_headers.iter() {
             let voff = ph.p_vaddr % ph.p_align;
-            let vaddr = (ph.p_vaddr - voff) as usize;
+            let _vaddr = (ph.p_vaddr - voff) as usize;
             let vsize = round_up((ph.p_memsz + voff) as usize, ph.p_align as usize);
 
             match ph.p_type {

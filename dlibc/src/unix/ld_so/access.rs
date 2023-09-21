@@ -3,7 +3,7 @@
 
 #[cfg(target_os = "redox")]
 use crate::unix::header::unistd::{F_OK, R_OK, W_OK, X_OK};
-use crate::unix::c_str::{CStr, CString};
+use crate::unix::c_str::{CString};
 
 pub fn accessible(path: &str, mode: ::c_int) -> ::c_int {
     let path_c = CString::new(path.as_bytes()).unwrap(); /*.map_err(|err| {
@@ -19,7 +19,7 @@ unsafe fn access(path: *const ::c_char, mode: ::c_int) -> ::c_int {
 }
 
 #[cfg(target_os = "dragonos")]
-unsafe fn access(path: *const ::c_char, mode: ::c_int) -> ::c_int {
+unsafe fn access(_path: *const ::c_char, _mode: ::c_int) -> ::c_int {
     // let path = CStr::from_ptr(path);
     // syscall!(ACCESS, (path).as_ptr(), mode) as ::c_int
     return -1;

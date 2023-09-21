@@ -112,7 +112,7 @@ pub unsafe extern "C" fn mbsinit(ps: *const mbstate_t) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mbrlen(s: *const ::c_char, n: ::size_t, ps: *mut mbstate_t) -> ::size_t {
+pub unsafe extern "C" fn mbrlen(s: *const ::c_char, n: ::size_t, _ps: *mut mbstate_t) -> ::size_t {
     static mut INTERNAL: mbstate_t = mbstate_t;
     mbrtowc(ptr::null_mut(), s, n, &mut INTERNAL)
 }
@@ -128,7 +128,7 @@ pub unsafe extern "C" fn mbrtowc(
     static mut INTERNAL: mbstate_t = mbstate_t;
 
     if ps.is_null() {
-        let ps = &mut INTERNAL;
+        let _ps = &mut INTERNAL;
     }
     if s.is_null() {
         let xs: [::c_char; 1] = [0];
@@ -151,7 +151,7 @@ pub unsafe extern "C" fn mbsnrtowcs(
     static mut INTERNAL: mbstate_t = mbstate_t;
 
     if ps.is_null() {
-        let ps = &mut INTERNAL;
+        let _ps = &mut INTERNAL;
     }
 
     let mut src = *src_ptr;
@@ -221,40 +221,40 @@ pub unsafe extern "C" fn putwchar(wc: ::wchar_t) -> ::wint_t {
 
 // #[no_mangle]
 pub extern "C" fn swprintf(
-    s: *mut ::wchar_t,
-    n: ::size_t,
-    format: *const ::wchar_t,
-    ap: va_list,
+    _s: *mut ::wchar_t,
+    _n: ::size_t,
+    _format: *const ::wchar_t,
+    _ap: va_list,
 ) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn swscanf(s: *const ::wchar_t, format: *const ::wchar_t, ap: va_list) -> ::c_int {
+pub extern "C" fn swscanf(_s: *const ::wchar_t, _format: *const ::wchar_t, _ap: va_list) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn ungetwc(wc: ::wint_t, stream: *mut FILE) -> ::wint_t {
+pub extern "C" fn ungetwc(_wc: ::wint_t, _stream: *mut FILE) -> ::wint_t {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn vfwprintf(stream: *mut FILE, format: *const ::wchar_t, arg: va_list) -> ::c_int {
+pub extern "C" fn vfwprintf(_stream: *mut FILE, _format: *const ::wchar_t, _arg: va_list) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn vwprintf(format: *const ::wchar_t, arg: va_list) -> ::c_int {
+pub extern "C" fn vwprintf(_format: *const ::wchar_t, _arg: va_list) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
 pub extern "C" fn vswprintf(
-    s: *mut ::wchar_t,
-    n: ::size_t,
-    format: *const ::wchar_t,
-    arg: va_list,
+    _s: *mut ::wchar_t,
+    _n: ::size_t,
+    _format: *const ::wchar_t,
+    _arg: va_list,
 ) -> ::c_int {
     unimplemented!();
 }
@@ -330,10 +330,10 @@ pub unsafe extern "C" fn wcscspn(wcs: *const ::wchar_t, set: *const ::wchar_t) -
 
 // #[no_mangle]
 pub extern "C" fn wcsftime(
-    wcs: *mut ::wchar_t,
-    maxsize: ::size_t,
-    format: *const ::wchar_t,
-    timptr: *mut tm,
+    _wcs: *mut ::wchar_t,
+    _maxsize: ::size_t,
+    _format: *const ::wchar_t,
+    _timptr: *mut tm,
 ) -> ::size_t {
     unimplemented!();
 }
@@ -435,10 +435,10 @@ pub unsafe extern "C" fn wcsrchr(ws1: *const ::wchar_t, wc: ::wchar_t) -> *mut :
 
 // #[no_mangle]
 pub extern "C" fn wcsrtombs(
-    dst: *mut ::c_char,
-    src: *mut *const ::wchar_t,
-    len: ::size_t,
-    ps: *mut mbstate_t,
+    _dst: *mut ::c_char,
+    _src: *mut *const ::wchar_t,
+    _len: ::size_t,
+    _ps: *mut mbstate_t,
 ) -> ::size_t {
     unimplemented!();
 }
@@ -630,7 +630,7 @@ pub unsafe extern "C" fn wcstoul(
 }
 
 // #[no_mangle]
-pub extern "C" fn wcswcs(ws1: *const ::wchar_t, ws2: *const ::wchar_t) -> *mut ::wchar_t {
+pub extern "C" fn wcswcs(_ws1: *const ::wchar_t, _ws2: *const ::wchar_t) -> *mut ::wchar_t {
     unimplemented!();
 }
 
@@ -648,7 +648,7 @@ pub unsafe extern "C" fn wcswidth(pwcs: *const ::wchar_t, n: ::size_t) -> ::c_in
 }
 
 // #[no_mangle]
-pub extern "C" fn wcsxfrm(ws1: *mut ::wchar_t, ws2: *const ::wchar_t, n: ::size_t) -> ::size_t {
+pub extern "C" fn wcsxfrm(_ws1: *mut ::wchar_t, _ws2: *const ::wchar_t, _n: ::size_t) -> ::size_t {
     unimplemented!();
 }
 
@@ -729,12 +729,12 @@ pub unsafe extern "C" fn wmemset(ws: *mut ::wchar_t, wc: ::wchar_t, n: ::size_t)
 }
 
 // #[no_mangle]
-pub extern "C" fn wprintf(format: *const ::wchar_t, ap: va_list) -> ::c_int {
+pub extern "C" fn wprintf(_format: *const ::wchar_t, _ap: va_list) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn wscanf(format: *const ::wchar_t, ap: va_list) -> ::c_int {
+pub extern "C" fn wscanf(_format: *const ::wchar_t, _ap: va_list) -> ::c_int {
     unimplemented!();
 }
 

@@ -13,17 +13,17 @@ pub struct fenv_t {
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn feclearexcept(excepts: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn feclearexcept(_excepts: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fegenenv(envp: *mut fenv_t) -> ::c_int {
+pub unsafe extern "C" fn fegenenv(_envp: *mut fenv_t) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fegetexceptflag(flagp: *mut fexcept_t, excepts: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn fegetexceptflag(_flagp: *mut fexcept_t, _excepts: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
@@ -33,36 +33,36 @@ pub unsafe extern "C" fn fegetround() -> ::c_int {
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn feholdexcept(envp: *mut fenv_t) -> ::c_int {
+pub unsafe extern "C" fn feholdexcept(_envp: *mut fenv_t) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn feraiseexcept(except: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn feraiseexcept(_except: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fesetenv(envp: *const fenv_t) -> ::c_int {
+pub unsafe extern "C" fn fesetenv(_envp: *const fenv_t) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fesetexceptflag(flagp: *const fexcept_t, excepts: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn fesetexceptflag(_flagp: *const fexcept_t, _excepts: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fesetround(round: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn fesetround(_round: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn fetestexcept(excepts: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn fetestexcept(_excepts: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub unsafe extern "C" fn feupdateenv(envp: *const fenv_t) -> ::c_int {
+pub unsafe extern "C" fn feupdateenv(_envp: *const fenv_t) -> ::c_int {
     unimplemented!();
 }

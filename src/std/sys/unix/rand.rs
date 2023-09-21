@@ -9,140 +9,6 @@ pub fn hashmap_random_keys() -> (u64, u64) {
 
     (u64::from_ne_bytes(key1), u64::from_ne_bytes(key2))
 }
-#[cfg(target_os = "dragonos")]
-mod imp {
-    use crate::std::fs::File;
-    use crate::std::io::Read;
-    use dlibc;
-
-    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
-    use crate::std::sys::weak::syscall;
-
-    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
-    fn getrandom(buf: &mut [u8]) -> dlibc::ssize_t {
-        use crate::std::sync::atomic::{AtomicBool, Ordering};
-        use crate::std::sys::os::errno;
-
-        // A weak symbol allows interposition, e.g. for perf measurements that want to
-        // disable randomness for consistency. Otherwise, we'll try a raw syscall.
-        // (`getrandom` was added in glibc 2.25, musl 1.1.20, android API level 28)
-        syscall! {
-            fn getrandom(
-                buffer: *mut dlibc::c_void,
-                length: dlibc::size_t,
-                flags: dlibc::c_uint
-            ) -> dlibc::ssize_t
-        }
-
-        // This provides the best quality random numbers available at the given moment
-        // without ever blocking, and is preferable to falling back to /dev/urandom.
-        static GRND_INSECURE_AVAILABLE: AtomicBool = AtomicBool::new(true);
-        if GRND_INSECURE_AVAILABLE.load(Ordering::Relaxed) {
-            let ret =
-                unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_INSECURE) };
-            if ret == -1 && errno() as dlibc::c_int == dlibc::EINVAL {
-                GRND_INSECURE_AVAILABLE.store(false, Ordering::Relaxed);
-            } else {
-                return ret;
-            }
-        }
-
-        unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), dlibc::GRND_NONBLOCK) }
-    }
-
-    #[cfg(any(target_os = "espidf", target_os = "horizon"))]
-    fn getrandom(buf: &mut [u8]) -> dlibc::ssize_t {
-        unsafe { dlibc::getrandom(buf.as_mut_ptr().cast(), buf.len(), 0) }
-    }
-
-    #[cfg(target_os = "freebsd")]
-    fn getrandom(buf: &mut [u8]) -> dlibc::ssize_t {
-        // FIXME: using the above when libary std's libc is updated
-        extern "C" {
-            fn getrandom(
-                buffer: *mut dlibc::c_void,
-                length: dlibc::size_t,
-                flags: dlibc::c_uint,
-            ) -> dlibc::ssize_t;
-        }
-        unsafe { getrandom(buf.as_mut_ptr().cast(), buf.len(), 0) }
-    }
-
-    #[cfg(not(any(
-        target_os = "linux",
-        target_os = "android",
-        target_os = "espidf",
-        target_os = "horizon",
-        target_os = "freebsd",
-        target_os = "dragonos"
-    )))]
-    fn getrandom_fill_bytes(_buf: &mut [u8]) -> bool {
-        false
-    }
-
-    #[cfg(any(
-        target_os = "linux",
-        target_os = "android",
-        target_os = "espidf",
-        target_os = "horizon",
-        target_os = "freebsd",
-        target_os = "dragonos"
-    ))]
-    fn getrandom_fill_bytes(v: &mut [u8]) -> bool {
-        use crate::std::sync::atomic::{AtomicBool, Ordering};
-        use crate::std::sys::os::errno;
-
-        static GETRANDOM_UNAVAILABLE: AtomicBool = AtomicBool::new(false);
-        if GETRANDOM_UNAVAILABLE.load(Ordering::Relaxed) {
-            return false;
-        }
-
-        let mut read = 0;
-        while read < v.len() {
-            let result = getrandom(&mut v[read..]);
-            if result == -1 {
-                let err = errno() as dlibc::c_int;
-                if err == dlibc::EINTR {
-                    continue;
-                } else if err == dlibc::ENOSYS || err == dlibc::EPERM {
-                    // Fall back to reading /dev/urandom if `getrandom` is not
-                    // supported on the current kernel.
-                    //
-                    // Also fall back in case it is disabled by something like
-                    // seccomp or inside of virtual machines.
-                    GETRANDOM_UNAVAILABLE.store(true, Ordering::Relaxed);
-                    return false;
-                } else if err == dlibc::EAGAIN {
-                    return false;
-                } else {
-                    panic!("unexpected getrandom error: {err}");
-                }
-            } else {
-                read += result as usize;
-            }
-        }
-        true
-    }
-
-    pub fn fill_bytes(v: &mut [u8]) {
-        // getrandom_fill_bytes here can fail if getrandom() returns EAGAIN,
-        // meaning it would have blocked because the non-blocking pool (urandom)
-        // has not initialized in the kernel yet due to a lack of entropy. The
-        // fallback we do here is to avoid blocking applications which could
-        // depend on this call without ever knowing they do and don't have a
-        // work around. The PRNG of /dev/urandom will still be used but over a
-        // possibly predictable entropy pool.
-        if getrandom_fill_bytes(v) {
-            return;
-        }
-
-        // getrandom failed because it is permanently or temporarily (because
-        // of missing entropy) unavailable. Open /dev/urandom, read from it,
-        // and close it again.
-        let mut file = File::open("/dev/urandom").expect("failed to open /dev/urandom");
-        file.read_exact(v).expect("failed to read /dev/urandom")
-    }
-}
 
 #[cfg(all(
     unix,
@@ -163,10 +29,10 @@ mod imp {
     use crate::std::io::Read;
     use dlibc;
 
-    #[cfg(any(target_os = "linux", target_os = "android"))]
+    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
     use crate::std::sys::weak::syscall;
 
-    #[cfg(any(target_os = "linux", target_os = "android"))]
+    #[cfg(any(target_os = "linux", target_os = "android", target_os = "dragonos"))]
     fn getrandom(buf: &mut [u8]) -> dlibc::ssize_t {
         use crate::std::sync::atomic::{AtomicBool, Ordering};
         use crate::std::sys::os::errno;
@@ -221,7 +87,8 @@ mod imp {
         target_os = "android",
         target_os = "espidf",
         target_os = "horizon",
-        target_os = "freebsd"
+        target_os = "freebsd",
+        target_os = "dragonos"
     )))]
     fn getrandom_fill_bytes(_buf: &mut [u8]) -> bool {
         false
@@ -232,7 +99,8 @@ mod imp {
         target_os = "android",
         target_os = "espidf",
         target_os = "horizon",
-        target_os = "freebsd"
+        target_os = "freebsd",
+        target_os = "dragonos"
     ))]
     fn getrandom_fill_bytes(v: &mut [u8]) -> bool {
         use crate::std::sync::atomic::{AtomicBool, Ordering};

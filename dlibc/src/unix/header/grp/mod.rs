@@ -11,33 +11,33 @@ pub struct group {
 }
 
 // #[no_mangle]
-pub extern "C" fn getgrgid(gid: ::gid_t) -> *mut group {
+pub extern "C" fn getgrgid(_gid: ::gid_t) -> *mut group {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn getgrnam(name: *const ::c_char) -> *mut group {
+pub extern "C" fn getgrnam(_name: *const ::c_char) -> *mut group {
     unimplemented!();
 }
 
 // #[no_mangle]
 pub extern "C" fn getgrgid_r(
-    gid: ::gid_t,
-    grp: *mut group,
-    buffer: *mut ::c_char,
-    bufsize: usize,
-    result: *mut *mut group,
+    _gid: ::gid_t,
+    _grp: *mut group,
+    _buffer: *mut ::c_char,
+    _bufsize: usize,
+    _result: *mut *mut group,
 ) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
 pub extern "C" fn getgrnam_r(
-    name: *const ::c_char,
-    grp: *mut group,
-    buffer: *mut ::c_char,
-    bufsize: usize,
-    result: *mut *mut group,
+    _name: *const ::c_char,
+    _grp: *mut group,
+    _buffer: *mut ::c_char,
+    _bufsize: usize,
+    _result: *mut *mut group,
 ) -> ::c_int {
     unimplemented!();
 }

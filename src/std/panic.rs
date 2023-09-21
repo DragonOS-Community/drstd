@@ -1,7 +1,7 @@
 //! Panic support in the standard library.
 
 use crate::std::any::Any;
-use crate::std::collections;
+
 use crate::std::panicking;
 use crate::std::sync::atomic::{AtomicUsize, Ordering};
 use crate::std::sync::{Mutex, RwLock};

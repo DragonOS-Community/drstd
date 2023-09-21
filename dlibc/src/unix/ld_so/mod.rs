@@ -107,7 +107,7 @@ pub fn static_init(sp: &'static Stack) {
 
         let page_size = platform::pal::getpagesize();
         let voff = ph.p_vaddr as usize % page_size;
-        let vaddr = ph.p_vaddr as usize - voff;
+        let _vaddr = ph.p_vaddr as usize - voff;
         let vsize = ((ph.p_memsz as usize + voff + page_size - 1) / page_size) * page_size;
 
         match ph.p_type {
@@ -140,8 +140,8 @@ pub fn static_init(sp: &'static Stack) {
 }
 
 #[cfg(any(target_os = "linux", target_os = "redox", target_os = "dragonos"))]
-pub unsafe fn init(sp: &'static Stack) {
-    let mut tp = 0usize;
+pub unsafe fn init(_sp: &'static Stack) {
+    let _tp = 0usize;
 
     #[cfg(target_os = "linux")]
     {

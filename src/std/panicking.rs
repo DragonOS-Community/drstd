@@ -9,7 +9,7 @@
 
 #![deny(unsafe_op_in_unsafe_fn)]
 
-use crate::std::panic::BacktraceStyle;
+
 use core::panic::{BoxMeUp, Location, PanicInfo};
 
 use crate::std::any::Any;
@@ -17,15 +17,14 @@ use crate::std::fmt;
 use crate::std::intrinsics;
 use crate::std::mem::{self, ManuallyDrop};
 use crate::std::process;
-use crate::std::sync::atomic::{AtomicBool, Ordering};
+
 use crate::std::sync::{PoisonError, RwLock};
-use crate::std::sys::stdio::panic_output;
-use crate::std::sys_common::backtrace;
-use crate::std::sys_common::thread_info;
+
+
+
 use crate::std::thread;
 
-#[cfg(not(test))]
-use crate::std::io::set_output_capture;
+
 // make sure to use the stderr output configured
 // by libtest in the real copy of std
 #[cfg(test)]
@@ -239,7 +238,7 @@ fn default_hook(info: &PanicInfo<'_>) {
 /// The implementation of the default panic handler.
 ///
 /// It can also write the backtrace to a given `path`. This functionality is used only by `rustc`.
-pub fn panic_hook_with_disk_dump(info: &PanicInfo<'_>, path: Option<&crate::std::path::Path>) {
+pub fn panic_hook_with_disk_dump(_info: &PanicInfo<'_>, _path: Option<&crate::std::path::Path>) {
     // If this is a double panic, make sure that we print a backtrace
     // for this panic. Otherwise only print it if logging is enabled.
     // let backtrace = if info.force_no_backtrace() {
@@ -704,10 +703,10 @@ pub const fn begin_panic<M: Any + Send>(msg: M) -> ! {
 /// abort or unwind.
 fn rust_panic_with_hook(
     payload: &mut dyn BoxMeUp,
-    message: Option<&fmt::Arguments<'_>>,
-    location: &Location<'_>,
-    can_unwind: bool,
-    force_no_backtrace: bool,
+    _message: Option<&fmt::Arguments<'_>>,
+    _location: &Location<'_>,
+    _can_unwind: bool,
+    _force_no_backtrace: bool,
 ) -> ! {
     // let must_abort = panic_count::increase(true);
 

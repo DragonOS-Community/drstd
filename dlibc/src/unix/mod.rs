@@ -61,7 +61,7 @@ impl ::Clone for DIR {
 pub type locale_t = *mut ::c_void;
 
 #[cfg(target_os = "dragonos")]
-#[derive(Default,Copy,Clone)]
+#[derive(Default, Copy, Clone)]
 pub struct timespec {
     pub tv_sec: time_t,
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
@@ -73,7 +73,7 @@ pub struct timespec {
 // linux x32 compatibility
 // See https://sourceware.org/bugzilla/show_bug.cgi?id=16437
 #[cfg(not(target_os = "dragonos"))]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct timespec {
     pub tv_sec: time_t,
     #[cfg(all(target_arch = "x86_64", target_pointer_width = "32"))]
@@ -1606,16 +1606,14 @@ cfg_if! {
 #[macro_use]
 pub mod macros;
 
-pub mod header;
-pub mod ld_so;
-pub mod start;
-pub mod fs;
-pub mod sync;
 pub mod c_str;
 pub mod c_vec;
 pub mod crt0;
-
-
+pub mod fs;
+pub mod header;
+pub mod ld_so;
+pub mod start;
+pub mod sync;
 
 mod io;
 

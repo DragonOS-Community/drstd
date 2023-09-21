@@ -32,7 +32,7 @@ pub unsafe extern "C" fn __getdelim(
         let mut stream = (*stream).lock();
         match stream.read_until(delim, &mut buf) {
             Ok(ok) => ok,
-            Err(err) => return -1,
+            Err(_err) => return -1,
         }
     };
 

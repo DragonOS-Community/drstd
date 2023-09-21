@@ -1,6 +1,6 @@
 //! fcntl implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/fcntl.h.html
 
-use crate::unix::c_str::CStr;
+
 
 pub use self::platform::*;
 use crate::unix::platform;
@@ -29,4 +29,4 @@ pub unsafe extern "C" fn sys_open(path: *const ::c_char, oflag: ::c_int, mode: :
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn cbindgen_stupid_struct_user_for_fcntl(a: flock) {}
+pub unsafe extern "C" fn cbindgen_stupid_struct_user_for_fcntl(_a: flock) {}

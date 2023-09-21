@@ -10,11 +10,9 @@ use crate::unix::header::{
     errno::*,
     netinet_in::{in_addr, sockaddr_in, IPPROTO_UDP},
     sys_socket::{
-        self,
         constants::{AF_INET, SOCK_DGRAM},
         socklen_t,
     },
-    time,
 };
 use unix::platform;
 use super::{
@@ -92,7 +90,7 @@ pub fn lookup_host(host: &str) -> Result<LookupHost, ::c_int> {
             Box::from_raw(packet_data_ptr);
         }
 
-        let i = 0 as socklen_t;
+        let _i = 0 as socklen_t;
         let mut buf = vec![0u8; 65536];
         let buf_ptr = buf.as_mut_ptr() as *mut ::c_void;
 
@@ -208,7 +206,7 @@ pub fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>, ::c_int> {
             Box::from_raw(packet_data_ptr);
         }
 
-        let i = mem::size_of::<sockaddr_in>() as socklen_t;
+        let _i = mem::size_of::<sockaddr_in>() as socklen_t;
         let mut buf = [0u8; 65536];
         let buf_ptr = buf.as_mut_ptr() as *mut ::c_void;
 

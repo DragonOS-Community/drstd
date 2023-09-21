@@ -18,7 +18,6 @@ use crate::unix::header::{
     errno::{self, STR_ERROR},
     fcntl, stdlib,
     string::{self, strlen},
-    unistd,
 };
 use unix::{
     c_str::CStr,
@@ -992,7 +991,7 @@ pub unsafe extern "C" fn setbuf(stream: *mut FILE, buf: *mut ::c_char) {
 pub unsafe extern "C" fn setvbuf(
     stream: *mut FILE,
     buf: *mut ::c_char,
-    mode: ::c_int,
+    _mode: ::c_int,
     mut size: ::size_t,
 ) -> ::c_int {
     let mut stream = (*stream).lock();

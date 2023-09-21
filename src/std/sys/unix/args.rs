@@ -8,7 +8,7 @@
 use crate::std::ffi::OsString;
 use crate::std::fmt;
 use crate::std::vec;
-use dlibc;
+
 
 /// One-time global initialization.
 pub unsafe fn init(argc: isize, argv: *const *const u8) {

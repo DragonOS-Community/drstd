@@ -8,8 +8,7 @@ use crate::std::os::hermit::io::OwnedFd;
 use crate::std::os::raw;
 #[cfg(all(doc, not(target_arch = "wasm32")))]
 use crate::std::os::unix::io::AsFd;
-#[cfg(target_os = "dragonos")]
-use crate::std::os::unix::io::OwnedFd;
+
 #[cfg(unix)]
 use crate::std::os::unix::io::OwnedFd;
 #[cfg(target_os = "wasi")]

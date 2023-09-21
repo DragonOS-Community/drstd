@@ -6,7 +6,7 @@ use core::{
 };
 use crate::unix::c_str::*;
 use crate::unix::platform;
-use unix;
+
 use crate::unix::header::{
     errno::*,
     netinet_in::{in_addr, in_addr_t, INADDR_NONE},

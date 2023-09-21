@@ -1,7 +1,6 @@
 //! ::statvfs implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstatvfs.h.html
 
 use crate::unix::{
-    c_str::CStr,
     header::fcntl::O_PATH,
     platform,
 };

@@ -3,7 +3,7 @@ use crate::unix::{
     header::fcntl,
 };
 
-use crate::unix::platform;
+
 
 pub const MADV_NORMAL: ::c_int = 0;
 pub const MADV_RANDOM: ::c_int = 1;

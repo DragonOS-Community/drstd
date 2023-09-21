@@ -24,9 +24,9 @@ rand = { version = "0.5.5", default-features = false }
 memchr = { version = "2.2.0", default-features = false }
 plain = "0.2"
 unicode-width = "0.1"
-hashbrown = { version = "0.14", default-features = false}
-cfg-if = { version = "1.0"}
-dlibc = {path = "dlibc"}
+hashbrown = { version = "0.14", default-features = false }
+cfg-if = { version = "1.0" }
+dlibc = { path = "./dlibc" }
 
 [dependencies.goblin]
 version = "0.0.21"

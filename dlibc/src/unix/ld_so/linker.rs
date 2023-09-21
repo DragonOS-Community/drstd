@@ -15,7 +15,6 @@ use crate::unix::{
     fs::File,
     header::{
         dl_tls::{__tls_get_addr, dl_tls_index},
-        fcntl, sys_mman,
         unistd::F_OK,
     },
     io::Read,
@@ -35,7 +34,7 @@ use O_CLOEXEC;
 
 use crate::trace;
 use PROT_EXEC;
-use PROT_NONE;
+
 use PROT_READ;
 use PROT_WRITE;
 use mprotect;
@@ -109,7 +108,7 @@ impl Linker {
     pub fn get_sym(&self, lib_id: usize, name: &str) -> Option<*mut ::c_void> {
         match self.objects.get(&lib_id) {
             Some(obj) => {
-                return obj.get_sym(name).map(|(s, strong)| {
+                return obj.get_sym(name).map(|(s, _strong)| {
                     if s.sym_type != STT_TLS {
                         s.as_ptr()
                     } else {
