@@ -142,16 +142,15 @@ pub mod vxworks;
 #[cfg(target_os = "watchos")]
 pub(crate) mod watchos;
 
-#[cfg(any(unix, target_os = "wasi", doc))]
+#[cfg(any(unix, target_os = "wasi", doc, target_os = "dragonos"))]
 pub mod fd;
-#[cfg(any(target_os = "linux", target_os = "android", doc))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "android",
+    target_os = "dragonos",
+    doc
+))]
 mod net;
 
 #[cfg(target_os = "dragonos")]
-pub mod fd;
-#[cfg(target_os = "dragonos")]
 pub mod linux;
-#[cfg(target_os = "dragonos")]
-mod net;
-#[cfg(target_os = "dragonos")]
-pub mod unix;

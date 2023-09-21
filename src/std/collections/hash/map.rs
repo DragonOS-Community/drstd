@@ -2986,9 +2986,9 @@ impl DefaultHasher {
     /// This hasher is not guaranteed to be the same as all other
     /// `DefaultHasher` instances, but is the same as all other `DefaultHasher`
     /// instances created through `new` or `default`.
-        #[inline]
+    #[inline]
     #[allow(deprecated)]
-        #[must_use]
+    #[must_use]
     pub const fn new() -> DefaultHasher {
         DefaultHasher(SipHasher13::new_with_keys(0, 0))
     }

@@ -1,4 +1,3 @@
-
 pub mod relibc_adapter;
 pub use self::relibc_adapter::*;
 
@@ -19,180 +18,19 @@ pub extern "C" fn e(sys: usize) -> usize {
 }
 
 #[no_mangle]
-pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
-    unimplemented!()
+pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t {
+    0
 }
 
-// #[no_mangle]
-// pub extern "C" fn pthread_key_delete(key: pthread_key_t) -> ::c_int{
-//     0
-// }
-// #[no_mangle]
-// pub extern "C" fn syscall(num: ::c_long) -> ::c_long{
-//     0
-// }
-// #[no_mangle]
-// pub extern "C" fn isalnum(c: ::c_int) -> ::c_int{
-//  ::c_int::from(isdigit(c) != 0 || isalpha(c) != 0)
-// }
-// #[no_mangle]
-// pub extern "C" fn isalpha(c: ::c_int) -> ::c_int {
-//     ::c_int::from(islower(c) != 0 || isupper(c) != 0)
-// }
+#[no_mangle]
+pub extern "C" fn pthread_key_delete(key: ::pthread_key_t) -> ::c_int {
+    0
+}
+#[no_mangle]
+pub extern "C" fn syscall(num: ::c_long) -> ::c_long {
+    0
+}
 
-// #[no_mangle]
-// pub extern "C" fn isascii(c: ::c_int) -> ::c_int {
-//     ::c_int::from((c & !0x7f) == 0)
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isblank(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c == ::c_int::from(b' ') || c == ::c_int::from(b'\t'))
-// }
-
-// #[no_mangle]
-// pub extern "C" fn iscntrl(c: ::c_int) -> ::c_int {
-//     ::c_int::from((c >= 0x00 && c <= 0x1f) || c == 0x7f)
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isdigit(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c >= ::c_int::from(b'0') && c <= ::c_int::from(b'9'))
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isgraph(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c >= 0x21 && c <= 0x7e)
-// }
-
-// #[no_mangle]
-// pub extern "C" fn islower(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c >= ::c_int::from(b'a') && c <= ::c_int::from(b'z'))
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isprint(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c >= 0x20 && c < 0x7f)
-// }
-
-// #[no_mangle]
-// pub extern "C" fn ispunct(c: ::c_int) -> ::c_int {
-//     ::c_int::from(
-//         (c >= ::c_int::from(b'!') && c <= ::c_int::from(b'/'))
-//             || (c >= ::c_int::from(b':') && c <= ::c_int::from(b'@'))
-//             || (c >= ::c_int::from(b'[') && c <= ::c_int::from(b'`'))
-//             || (c >= ::c_int::from(b'{') && c <= ::c_int::from(b'~')),
-//     )
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isspace(c: ::c_int) -> ::c_int {
-//     ::c_int::from(
-//         c == ::c_int::from(b' ')
-//             || c == ::c_int::from(b'\t')
-//             || c == ::c_int::from(b'\n')
-//             || c == ::c_int::from(b'\r')
-//             || c == 0x0b
-//             || c == 0x0c,
-//     )
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isupper(c: ::c_int) -> ::c_int {
-//     ::c_int::from(c >= ::c_int::from(b'A') && c <= ::c_int::from(b'Z'))
-// }
-
-// #[no_mangle]
-// pub extern "C" fn isxdigit(c: ::c_int) -> ::c_int {
-//     ::c_int::from(isdigit(c) != 0 || (c | 32 >= ::c_int::from(b'a') && c | 32 <= ::c_int::from(b'f')))
-// }
-
-// #[no_mangle]
-// /// The comment in musl:
-// /// "nonsense function that should NEVER be used!"
-// pub extern "C" fn toascii(c: ::c_int) -> ::c_int {
-//     c & 0x7f
-// }
-
-// #[no_mangle]
-// pub extern "C" fn tolower(c: ::c_int) -> ::c_int {
-//     if isupper(c) != 0 {
-//         c | 0x20
-//     } else {
-//         c
-//     }
-// }
-
-// #[no_mangle]
-// pub extern "C" fn toupper(c: ::c_int) -> ::c_int {
-//     if islower(c) != 0 {
-//         c & !0x20
-//     } else {
-//         c
-//     }
-// }
-// #[no_mangle]
-// pub extern "C" fn qsort(
-//     base: *mut c_void,
-//     num: ::size_t,
-//     size: ::size_t,
-//     compar: ::Option<unsafe extern "C" fn(*const c_void, *const c_void) -> ::c_int>,
-// ){
-// 	unimplemented!()
-// }
-// unsafe extern "C" fn void_cmp(a: *const c_void, b: *const c_void) -> ::c_int {
-//     *(a as *const i32) - *(b as *const i32) as ::c_int
-// }
-// #[no_mangle]
-// pub unsafe extern "C" fn bsearch(
-//     key: *const c_void,
-//     base: *const c_void,
-//     num: ::size_t,
-//     size: ::size_t,
-//     compar: ::Option<unsafe extern "C" fn(*const c_void, *const c_void) -> ::c_int>,
-// ) -> *mut c_void{
-// 	let mut start = base;
-//     let mut len = num;
-//     let cmp_fn = compar.unwrap_or(void_cmp);
-//     while len > 0 {
-//         let med = (start as ::size_t + (len >> 1) * size) as *const c_void;
-//         let diff = cmp_fn(key, med);
-//         if diff == 0 {
-//             return med as *mut c_void;
-//         } else if diff > 0 {
-//             start = (med as usize + size) as *const c_void;
-//             len -= 1;
-//         }
-//         len >>= 1;
-//     }
-//     ptr::null_mut()
-// }
-
-// pub unsafe fn parse_mode_flags(mode_str: *const ::c_char) -> i32 {
-//     let mut flags = if !strchr(mode_str, b'+' as i32).is_null() {
-//         O_RDWR
-//     } else if (*mode_str) == b'r' as i8 {
-//         O_RDONLY
-//     } else {
-//         O_WRONLY
-//     };
-//     if !strchr(mode_str, b'x' as i32).is_null() {
-//         flags |= O_EXCL;
-//     }
-//     if !strchr(mode_str, b'e' as i32).is_null() {
-//         flags |= O_CLOEXEC;
-//     }
-//     if (*mode_str) != b'r' as i8 {
-//         flags |= O_CREAT;
-//     }
-//     if (*mode_str) == b'w' as i8 {
-//         flags |= O_TRUNC;
-//     } else if (*mode_str) == b'a' as i8 {
-//         flags |= O_APPEND;
-//     }
-
-//     flags
-// }
 // #[no_mangle]
 // pub extern "C" fn fopen(filename: *const ::c_char, mode: *const ::c_char) -> *mut FILE{
 // 	unimplemented!()
@@ -696,8 +534,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 //     target_vendor = "nintendo"
 // )))]
 
-
-
 // #[cfg_attr(
 //     all(target_os = "macos", not(target_arch = "aarch64")),
 //     link_name = "stat$INODE64"
@@ -729,7 +565,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[cfg_attr(
 //     all(target_os = "macos", target_arch = "x86"),
 //     link_name = "creat$UNIX2003"
@@ -739,8 +574,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn creat(path: *const ::c_char, mode: mode_t) -> ::c_int{
 // 	unimplemented!()
 // }
-
-
 
 // #[cfg_attr(
 //     all(target_os = "macos", target_arch = "x86_64"),
@@ -855,16 +688,10 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn alarm(seconds: ::c_uint) -> ::c_uint{
 // 	unimplemented!()
 // }
-
-
-
-
-
 
 // #[no_mangle]
 // pub extern "C" fn execl(path: *const ::c_char, arg0: *const ::c_char) -> ::c_int{
@@ -888,14 +715,10 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn fpathconf(filedes: ::c_int, name: ::c_int) -> c_long{
 // 	unimplemented!()
 // }
-
-
-
 
 // #[no_mangle]
 // pub extern "C" fn getgroups(ngroups_max: ::c_int, groups: *mut gid_t) -> ::c_int{
@@ -920,13 +743,10 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
-
 // #[no_mangle]
 // pub extern "C" fn isatty(fd: ::c_int) -> ::c_int{
 // 	unimplemented!()
 // }
-
 
 // #[no_mangle]
 // pub extern "C" fn pathconf(path: *const ::c_char, name: ::c_int) -> c_long{
@@ -944,7 +764,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 //     all(target_os = "macos", target_arch = "x86"),
 //     link_name = "read$UNIX2003"
 // )]
-
 
 // #[no_mangle]
 // pub extern "C" fn seteuid(uid: uid_t) -> ::c_int{
@@ -967,7 +786,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn setuid(uid: uid_t) -> ::c_int{
 // 	unimplemented!()
 // }
-
 
 // #[cfg_attr(
 //     all(target_os = "macos", target_arch = "x86"),
@@ -1034,7 +852,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[cfg_attr(target_os = "netbsd", link_name = "__utime50")]
 // #[no_mangle]
 // pub extern "C" fn utime(file: *const ::c_char, buf: *const utimbuf) -> ::c_int{
@@ -1057,13 +874,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn killpg(pgrp: ::pid_t, sig: ::c_int) -> ::c_int{
 // 	unimplemented!()
 // }
-
-
-
-
-
-
-
 
 // #[no_mangle]
 // pub extern "C" fn if_nametoindex(ifname: *const ::c_char) -> ::c_uint{
@@ -1088,8 +898,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
-
 // #[cfg_attr(
 //     all(target_os = "macos", target_arch = "x86"),
 //     link_name = "setenv$UNIX2003"
@@ -1108,13 +916,10 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
-
 // #[no_mangle]
 // pub extern "C" fn truncate(path: *const ::c_char, length: off_t) -> ::c_int{
 // 	unimplemented!()
 // }
-
 
 // #[no_mangle]
 // pub extern "C" fn signal(signum: ::c_int, handler: sighandler_t) -> sighandler_t{
@@ -1140,8 +945,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn realpath(pathname: *const ::c_char, resolved: *mut ::c_char) -> *mut ::c_char{
 // 	unimplemented!()
 // }
-
-
 
 // #[cfg_attr(target_os = "netbsd", link_name = "__times13")]
 // #[no_mangle]
@@ -1187,21 +990,21 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // }
 // #[cfg_attr(target_os = "netbsd", link_name = "__libc_thr_yield")]
 
-// #[no_mangle]
-// pub extern "C" fn pthread_key_create(
-//     key: *mut pthread_key_t,
-//     dtor: ::Option<unsafe extern "C" fn(*mut ::c_void)>,
-// ) -> ::c_int{
-// 	unimplemented!()
-// }
-// #[no_mangle]
-// pub extern "C" fn pthread_getspecific(key: pthread_key_t) -> *mut ::c_void{
-// 	unimplemented!()
-// }
-// #[no_mangle]
-// pub extern "C" fn pthread_setspecific(key: pthread_key_t, value: *const ::c_void) -> ::c_int{
-// 	unimplemented!()
-// }
+#[no_mangle]
+pub extern "C" fn pthread_key_create(
+    key: *mut ::pthread_key_t,
+    dtor: ::Option<unsafe extern "C" fn(*mut ::c_void)>,
+) -> ::c_int {
+    0
+}
+#[no_mangle]
+pub extern "C" fn pthread_getspecific(key: ::pthread_key_t) -> *mut ::c_void {
+    core::ptr::null_mut()
+}
+#[no_mangle]
+pub extern "C" fn pthread_setspecific(key: ::pthread_key_t, value: *const ::c_void) -> ::c_int {
+    0
+}
 // #[no_mangle]
 // pub extern "C" fn pthread_mutex_init(
 //     lock: *mut pthread_mutex_t,
@@ -1658,7 +1461,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[cfg_attr(target_os = "netbsd", link_name = "__sigemptyset14")]
 // #[no_mangle]
 // pub extern "C" fn sigemptyset(set: *mut sigset_t) -> ::c_int{
@@ -1700,8 +1502,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn sysconf(name: ::c_int) -> ::c_long{
 // 	unimplemented!()
 // }
-
-
 
 // #[no_mangle]
 // pub extern "C" fn fseeko(stream: *mut ::FILE, offset: ::off_t, whence: ::c_int) -> ::c_int{
@@ -2007,7 +1807,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn duplocale(base: ::locale_t) -> ::locale_t{
 // 	unimplemented!()
@@ -2175,12 +1974,10 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn strchrnul(s: *const ::c_char, c: ::c_int) -> *mut ::c_char{
 // 	unimplemented!()
 // }
-
 
 // #[no_mangle]
 // pub extern "C" fn pause() -> ::c_int{
@@ -2225,7 +2022,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn setrlimit(resource: ::c_int, rlim: *const ::rlimit) -> ::c_int{
 // 	unimplemented!()
@@ -2239,7 +2035,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // ) -> ::c_int{
 // 	unimplemented!()
 // }
-
 
 // #[no_mangle]
 // pub extern "C" fn getpriority(which: ::c_int, who: ::id_t) -> ::c_int{
@@ -2753,7 +2548,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
 // #[no_mangle]
 // pub extern "C" fn __errno_location() -> *mut ::c_int{
 // 	unimplemented!()
@@ -3017,7 +2811,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn madvise(addr: *mut ::c_void, len: ::size_t, advice: ::c_int) -> ::c_int{
 // 	unimplemented!()
 // }
-
 
 // #[no_mangle]
 // pub extern "C" fn remap_file_pages(
@@ -3748,8 +3541,6 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // 	unimplemented!()
 // }
 
-
-
 // #[no_mangle]
 // pub extern "C" fn timer_create(
 // 	clockid: ::clockid_t,
@@ -3902,8 +3693,3 @@ pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t{
 // pub extern "C" fn atexit(cb: extern "C" fn()) -> ::c_int{
 //     unimplemented!()
 // }
-
-
-
-
-
