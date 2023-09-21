@@ -387,7 +387,6 @@ impl Command {
                 #[cfg(not(target_os = "android"))]
                 {
                     let ret = sys::signal(dlibc::SIGPIPE, dlibc::SIG_DFL);
-                    println!("398");
                     if ret == dlibc::SIG_ERR {
                         return Err(io::Error::last_os_error());
                     }

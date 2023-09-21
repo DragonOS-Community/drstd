@@ -230,8 +230,6 @@ pub extern "C" fn fdatasync(_fildes: ::c_int) -> ::c_int {
 
 #[no_mangle]
 pub extern "C" fn fork() -> ::pid_t {
-    use crate::{println,print};
-    println!("fork");
     let fork_hooks = unsafe { init_fork_hooks() };
     for prepare in &fork_hooks[0] {
         prepare();
