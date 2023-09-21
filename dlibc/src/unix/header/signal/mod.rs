@@ -192,7 +192,8 @@ extern "C" {
     fn __restore_rt();
 }
 
-#[no_mangle]
+//TODO: 该行为不一致,使用系统调用signal
+//#[no_mangle]
 pub extern "C" fn signal(
     sig: ::c_int,
     func: Option<extern "C" fn(::c_int)>,

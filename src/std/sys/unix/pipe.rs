@@ -25,13 +25,17 @@ pub fn anon_pipe() -> io::Result<(AnonPipe, AnonPipe)> {
             target_os = "linux",
             target_os = "netbsd",
             target_os = "openbsd",
-            target_os = "redox"
+            target_os = "redox",
+            target_os = "dragonos"
         ))] {
             unsafe {
                 cvt(dlibc::pipe2(fds.as_mut_ptr(), dlibc::O_CLOEXEC))?;
                 Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
             }
-        } else {
+        }else if #[cfg(target_os = "dragonos")] {
+            cvt(dlibc::pipe(fds.as_mut_ptr()))?;
+            Ok((AnonPipe(FileDesc::from_raw_fd(fds[0])), AnonPipe(FileDesc::from_raw_fd(fds[1]))))
+        }else {
             unsafe {
                 cvt(dlibc::pipe(fds.as_mut_ptr()))?;
 

@@ -9,7 +9,6 @@ use crate::std::ffi::OsString;
 use crate::std::fmt;
 use crate::std::vec;
 
-
 /// One-time global initialization.
 pub unsafe fn init(argc: isize, argv: *const *const u8) {
     imp::init(argc, argv)

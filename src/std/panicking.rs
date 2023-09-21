@@ -9,7 +9,6 @@
 
 #![deny(unsafe_op_in_unsafe_fn)]
 
-
 use core::panic::{BoxMeUp, Location, PanicInfo};
 
 use crate::std::any::Any;
@@ -20,10 +19,7 @@ use crate::std::process;
 
 use crate::std::sync::{PoisonError, RwLock};
 
-
-
 use crate::std::thread;
-
 
 // make sure to use the stderr output configured
 // by libtest in the real copy of std

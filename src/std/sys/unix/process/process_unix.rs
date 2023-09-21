@@ -1,10 +1,12 @@
 use crate::std::fmt;
-use crate::std::io::{self, ErrorKind};
+use crate::std::io::{self, Error, ErrorKind};
 
+use crate::mem;
 use crate::std::num::NonZeroI32;
 use crate::std::sys;
 use crate::std::sys::cvt;
 use crate::std::sys::process::process_common::*;
+use crate::{print, println};
 use core::ffi::NonZero_c_int;
 use dlibc;
 
@@ -70,116 +72,121 @@ cfg_if::cfg_if! {
 impl Command {
     pub fn spawn(
         &mut self,
-        _default: Stdio,
-        _needs_stdin: bool,
+        default: Stdio,
+        needs_stdin: bool,
     ) -> io::Result<(Process, StdioPipes)> {
-        // const CLOEXEC_MSG_FOOTER: [u8; 4] = *b"NOEX";
+        const CLOEXEC_MSG_FOOTER: [u8; 4] = *b"NOEX";
+        let envp = self.capture_env();
 
-        // let envp = self.capture_env();
+        if self.saw_nul() {
+            return Err(io::const_io_error!(
+                ErrorKind::InvalidInput,
+                "nul byte found in provided data",
+            ));
+        }
 
-        // if self.saw_nul() {
-        //     return Err(io::const_io_error!(
-        //         ErrorKind::InvalidInput,
-        //         "nul byte found in provided data",
-        //     ));
-        // }
+        let (ours, theirs) = self.setup_io(default, needs_stdin)?;
 
-        // let (ours, theirs) = self.setup_io(default, needs_stdin)?;
+        if let Some(ret) = self.posix_spawn(&theirs, envp.as_ref())? {
+            return Ok((ret, ours));
+        }
 
-        // if let Some(ret) = self.posix_spawn(&theirs, envp.as_ref())? {
-        //     return Ok((ret, ours));
-        // }
+        #[cfg(target_os = "linux")]
+        let (input, output) = sys::net::Socket::new_pair(dlibc::AF_UNIX, dlibc::SOCK_SEQPACKET)?;
 
-        // #[cfg(target_os = "linux")]
-        // let (input, output) = sys::net::Socket::new_pair(dlibc::AF_UNIX, dlibc::SOCK_SEQPACKET)?;
+        #[cfg(not(target_os = "linux"))]
+        let (input, output) = sys::pipe::anon_pipe()?;
 
-        // #[cfg(not(target_os = "linux"))]
-        // let (input, output) = sys::pipe::anon_pipe()?;
+        // Whatever happens after the fork is almost for sure going to touch or
+        // look at the environment in one way or another (PATH in `execvp` or
+        // accessing the `environ` pointer ourselves). Make sure no other thread
+        // is accessing the environment when we do the fork itself.
+        //
+        // Note that as soon as we're done with the fork there's no need to hold
+        // a lock any more because the parent won't do anything and the child is
+        // in its own process. Thus the parent drops the lock guard immediately.
+        // The child calls `mem::forget` to leak the lock, which is crucial because
+        // releasing a lock is not async-signal-safe.
+        let env_lock = sys::os::env_read_lock();
+        let pid = unsafe { self.do_fork()? };
+        if pid == 0 {
+            crate::std::panic::always_abort();
+            mem::forget(env_lock); // avoid non-async-signal-safe unlocking
+                                   //TODO:此处和标准库不一致
+                                   //drop(input);
+            #[cfg(target_os = "linux")]
+            if self.get_create_pidfd() {
+                self.send_pidfd(&output);
+            }
+            //TODO:此处和标准库不一致
+            if let Err(err) = unsafe { self.do_exec(theirs, envp.as_ref()) } {
+                let errno = err.raw_os_error().unwrap_or(dlibc::EINVAL) as u32;
+                let errno = errno.to_be_bytes();
+                let bytes = [
+                    errno[0],
+                    errno[1],
+                    errno[2],
+                    errno[3],
+                    CLOEXEC_MSG_FOOTER[0],
+                    CLOEXEC_MSG_FOOTER[1],
+                    CLOEXEC_MSG_FOOTER[2],
+                    CLOEXEC_MSG_FOOTER[3],
+                ];
+                // pipe I/O up to PIPE_BUF bytes should be atomic, and then
+                // we want to be sure we *don't* run at_exit destructors as
+                // we're being torn down regardless
+                rtassert!(output.write(&bytes).is_ok());
+                unsafe { dlibc::_exit(1) }
+            }
+        }
 
-        // // Whatever happens after the fork is almost for sure going to touch or
-        // // look at the environment in one way or another (PATH in `execvp` or
-        // // accessing the `environ` pointer ourselves). Make sure no other thread
-        // // is accessing the environment when we do the fork itself.
-        // //
-        // // Note that as soon as we're done with the fork there's no need to hold
-        // // a lock any more because the parent won't do anything and the child is
-        // // in its own process. Thus the parent drops the lock guard immediately.
-        // // The child calls `mem::forget` to leak the lock, which is crucial because
-        // // releasing a lock is not async-signal-safe.
-        // let env_lock = sys::os::env_read_lock();
-        // let pid = unsafe { self.do_fork()? };
+        //TODO:此处和标准库不一致
+        //drop(env_lock);
+        drop(output);
 
-        // if pid == 0 {
-        //     crate::std::panic::always_abort();
-        //     mem::forget(env_lock); // avoid non-async-signal-safe unlocking
-        //     drop(input);
-        //     #[cfg(target_os = "linux")]
-        //     if self.get_create_pidfd() {
-        //         self.send_pidfd(&output);
-        //     }
-        //     let Err(err) = unsafe { self.do_exec(theirs, envp.as_ref()) };
-        //     let errno = err.raw_os_error().unwrap_or(dlibc::EINVAL) as u32;
-        //     let errno = errno.to_be_bytes();
-        //     let bytes = [
-        //         errno[0],
-        //         errno[1],
-        //         errno[2],
-        //         errno[3],
-        //         CLOEXEC_MSG_FOOTER[0],
-        //         CLOEXEC_MSG_FOOTER[1],
-        //         CLOEXEC_MSG_FOOTER[2],
-        //         CLOEXEC_MSG_FOOTER[3],
-        //     ];
-        //     // pipe I/O up to PIPE_BUF bytes should be atomic, and then
-        //     // we want to be sure we *don't* run at_exit destructors as
-        //     // we're being torn down regardless
-        //     rtassert!(output.write(&bytes).is_ok());
-        //     unsafe { dlibc::_exit(1) }
-        // }
+        #[cfg(target_os = "linux")]
+        let pidfd = if self.get_create_pidfd() {
+            self.recv_pidfd(&input)
+        } else {
+            -1
+        };
 
-        // drop(env_lock);
-        // drop(output);
+        #[cfg(not(target_os = "linux"))]
+        let pidfd = -1;
 
-        // #[cfg(target_os = "linux")]
-        // let pidfd = if self.get_create_pidfd() { self.recv_pidfd(&input) } else { -1 };
+        // Safety: We obtained the pidfd from calling `clone3` with
+        // `CLONE_PIDFD` so it's valid an otherwise unowned.
+        let mut p = unsafe { Process::new(pid, pidfd) };
+        let mut bytes = [0; 8];
 
-        // #[cfg(not(target_os = "linux"))]
-        // let pidfd = -1;
-
-        // // Safety: We obtained the pidfd from calling `clone3` with
-        // // `CLONE_PIDFD` so it's valid an otherwise unowned.
-        // let mut p = unsafe { Process::new(pid, pidfd) };
-        // let mut bytes = [0; 8];
-
-        // // loop to handle EINTR
-        // loop {
-        //     match input.read(&mut bytes) {
-        //         Ok(0) => return Ok((p, ours)),
-        //         Ok(8) => {
-        //             let (errno, footer) = bytes.split_at(4);
-        //             assert_eq!(
-        //                 CLOEXEC_MSG_FOOTER, footer,
-        //                 "Validation on the CLOEXEC pipe failed: {:?}",
-        //                 bytes
-        //             );
-        //             let errno = i32::from_be_bytes(errno.try_into().unwrap());
-        //             assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-        //             return Err(Error::from_raw_os_error(errno));
-        //         }
-        //         Err(ref e) if e.is_interrupted() => {}
-        //         Err(e) => {
-        //             assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-        //             panic!("the CLOEXEC pipe failed: {e:?}")
-        //         }
-        //         Ok(..) => {
-        //             // pipe I/O up to PIPE_BUF bytes should be atomic
-        //             // similarly SOCK_SEQPACKET messages should arrive whole
-        //             assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-        //             panic!("short read on the CLOEXEC pipe")
-        //         }
-        //     }
-        // }
-        unimplemented!();
+        // loop to handle EINTR
+        loop {
+            match input.read(&mut bytes) {
+                Ok(0) => return Ok((p, ours)),
+                Ok(8) => {
+                    let (errno, footer) = bytes.split_at(4);
+                    assert_eq!(
+                        CLOEXEC_MSG_FOOTER, footer,
+                        "Validation on the CLOEXEC pipe failed: {:?}",
+                        bytes
+                    );
+                    let errno = i32::from_be_bytes(errno.try_into().unwrap());
+                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                    return Err(Error::from_raw_os_error(errno));
+                }
+                Err(ref e) if e.is_interrupted() => {}
+                Err(e) => {
+                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                    panic!("the CLOEXEC pipe failed: {e:?}")
+                }
+                Ok(..) => {
+                    // pipe I/O up to PIPE_BUF bytes should be atomic
+                    // similarly SOCK_SEQPACKET messages should arrive whole
+                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                    panic!("short read on the CLOEXEC pipe")
+                }
+            }
+        }
     }
 
     pub fn output(&mut self) -> io::Result<(ExitStatus, Vec<u8>, Vec<u8>)> {
@@ -309,6 +316,8 @@ impl Command {
         stdio: ChildPipes,
         maybe_envp: Option<&CStringArray>,
     ) -> Result<!, io::Error> {
+        use crate::{print, println};
+
         use crate::std::sys::{self, cvt_r};
 
         if let Some(fd) = stdio.stdin.fd() {
@@ -378,6 +387,7 @@ impl Command {
                 #[cfg(not(target_os = "android"))]
                 {
                     let ret = sys::signal(dlibc::SIGPIPE, dlibc::SIG_DFL);
+                    println!("398");
                     if ret == dlibc::SIG_ERR {
                         return Err(io::Error::last_os_error());
                     }

@@ -136,15 +136,16 @@ extern "C" fn init_array() {
     //     init_complete = true
     // }
 }
+use stdio;
 
 fn io_init() {
     unsafe {
         // Initialize stdin/stdout/stderr,
         // see https://github.com/rust-lang/rust/issues/51718
         
-        // stdio::stdin = stdio::default_stdin.get();
-        // stdio::stdout = stdio::default_stdout.get();
-        // stdio::stderr = stdio::default_stderr.get();
+        stdio::stdin = stdio::default_stdin.get();
+        stdio::stdout = stdio::default_stdout.get();
+        stdio::stderr = stdio::default_stderr.get();
     }
 }
 
