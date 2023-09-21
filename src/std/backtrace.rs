@@ -224,7 +224,7 @@ impl fmt::Debug for BacktraceSymbol {
 }
 
 impl fmt::Debug for BytesOrWide {
-    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         // output_filename(
         //     fmt,
         //     match self {
@@ -313,7 +313,7 @@ impl Backtrace {
 
     // Capture a backtrace which start just before the function addressed by
     // `ip`
-    fn create(ip: usize) -> Backtrace {
+    fn create(_ip: usize) -> Backtrace {
         // let _lock = lock();
         // let mut frames = Vec::new();
         // let mut actual_start = None;
@@ -373,7 +373,7 @@ impl<'a> Backtrace {
 }
 
 impl fmt::Display for Backtrace {
-    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, _fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         // let capture = match &self.inner {
         //     Inner::Unsupported => return fmt.write_str("unsupported backtrace"),
         //     Inner::Disabled => return fmt.write_str("disabled backtrace"),
@@ -423,7 +423,7 @@ impl fmt::Display for Backtrace {
 
 type LazyResolve = impl (FnOnce() -> Capture) + Send + Sync + UnwindSafe;
 
-fn lazy_resolve(mut capture: Capture) -> LazyResolve {
+fn lazy_resolve(capture: Capture) -> LazyResolve {
     move || {
         // Use the global backtrace lock to synchronize this as it's a
         // requirement of the `backtrace` crate, and then actually resolve

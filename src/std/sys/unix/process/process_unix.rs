@@ -1,6 +1,6 @@
 use crate::std::fmt;
-use crate::std::io::{self, Error, ErrorKind};
-use crate::std::mem;
+use crate::std::io::{self, ErrorKind};
+
 use crate::std::num::NonZeroI32;
 use crate::std::sys;
 use crate::std::sys::cvt;
@@ -70,8 +70,8 @@ cfg_if::cfg_if! {
 impl Command {
     pub fn spawn(
         &mut self,
-        default: Stdio,
-        needs_stdin: bool,
+        _default: Stdio,
+        _needs_stdin: bool,
     ) -> io::Result<(Process, StdioPipes)> {
         // const CLOEXEC_MSG_FOOTER: [u8; 4] = *b"NOEX";
 

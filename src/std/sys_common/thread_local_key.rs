@@ -52,7 +52,7 @@ mod tests;
 
 use crate::std::sync::atomic::{self, AtomicUsize, Ordering};
 use crate::std::sys::thread_local_key as imp;
-use dlibc;
+
 
 /// A type for TLS keys that are statically allocated.
 ///
