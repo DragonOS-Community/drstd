@@ -18,16 +18,16 @@ pub extern "C" fn e(sys: usize) -> usize {
 }
 
 #[no_mangle]
-pub extern "C" fn getrandom(buf: &mut [u8], flags: ::c_uint) -> ::ssize_t {
+pub extern "C" fn getrandom(_buf: &mut [u8], _flags: ::c_uint) -> ::ssize_t {
     0
 }
 
 #[no_mangle]
-pub extern "C" fn pthread_key_delete(key: ::pthread_key_t) -> ::c_int {
+pub extern "C" fn pthread_key_delete(_key: ::pthread_key_t) -> ::c_int {
     0
 }
 #[no_mangle]
-pub extern "C" fn syscall(num: ::c_long) -> ::c_long {
+pub extern "C" fn syscall(_num: ::c_long) -> ::c_long {
     0
 }
 
@@ -992,17 +992,17 @@ pub extern "C" fn syscall(num: ::c_long) -> ::c_long {
 
 #[no_mangle]
 pub extern "C" fn pthread_key_create(
-    key: *mut ::pthread_key_t,
-    dtor: ::Option<unsafe extern "C" fn(*mut ::c_void)>,
+    _key: *mut ::pthread_key_t,
+    _dtor: ::Option<unsafe extern "C" fn(*mut ::c_void)>,
 ) -> ::c_int {
     0
 }
 #[no_mangle]
-pub extern "C" fn pthread_getspecific(key: ::pthread_key_t) -> *mut ::c_void {
+pub extern "C" fn pthread_getspecific(_key: ::pthread_key_t) -> *mut ::c_void {
     core::ptr::null_mut()
 }
 #[no_mangle]
-pub extern "C" fn pthread_setspecific(key: ::pthread_key_t, value: *const ::c_void) -> ::c_int {
+pub extern "C" fn pthread_setspecific(_key: ::pthread_key_t, _value: *const ::c_void) -> ::c_int {
     0
 }
 // #[no_mangle]

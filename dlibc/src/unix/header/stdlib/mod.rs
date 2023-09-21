@@ -254,10 +254,10 @@ pub unsafe extern "C" fn drand48() -> ::c_double {
 
 // #[no_mangle]
 pub extern "C" fn ecvt(
-    value: ::c_double,
-    ndigit: ::c_int,
-    decpt: *mut ::c_int,
-    sign: *mut ::c_int,
+    _value: ::c_double,
+    _ndigit: ::c_int,
+    _decpt: *mut ::c_int,
+    _sign: *mut ::c_int,
 ) -> *mut ::c_char {
     unimplemented!();
 }
@@ -305,10 +305,10 @@ pub unsafe extern "C" fn exit(status: ::c_int) {
 
 // #[no_mangle]
 pub extern "C" fn fcvt(
-    value: ::c_double,
-    ndigit: ::c_int,
-    decpt: *mut ::c_int,
-    sign: *mut ::c_int,
+    _value: ::c_double,
+    _ndigit: ::c_int,
+    _decpt: *mut ::c_int,
+    _sign: *mut ::c_int,
 ) -> *mut ::c_char {
     unimplemented!();
 }
@@ -319,7 +319,7 @@ pub unsafe extern "C" fn free(ptr: *mut ::c_void) {
 }
 
 // #[no_mangle]
-pub extern "C" fn gcvt(value: ::c_double, ndigit: ::c_int, buf: *mut ::c_char) -> *mut ::c_char {
+pub extern "C" fn gcvt(_value: ::c_double, _ndigit: ::c_int, _buf: *mut ::c_char) -> *mut ::c_char {
     unimplemented!();
 }
 
@@ -357,15 +357,15 @@ pub unsafe extern "C" fn getenv(name: *const ::c_char) -> *mut ::c_char {
 
 // #[no_mangle]
 pub extern "C" fn getsubopt(
-    optionp: *mut *mut ::c_char,
-    tokens: *const *mut ::c_char,
-    valuep: *mut *mut ::c_char,
+    _optionp: *mut *mut ::c_char,
+    _tokens: *const *mut ::c_char,
+    _valuep: *mut *mut ::c_char,
 ) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn grantpt(fildes: ::c_int) -> ::c_int {
+pub extern "C" fn grantpt(_fildes: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
@@ -680,7 +680,7 @@ pub unsafe extern "C" fn posix_memalign(
 }
 
 // #[no_mangle]
-pub extern "C" fn ptsname(fildes: ::c_int) -> *mut ::c_char {
+pub extern "C" fn ptsname(_fildes: ::c_int) -> *mut ::c_char {
     unimplemented!();
 }
 
@@ -917,7 +917,7 @@ pub unsafe extern "C" fn setenv(
 }
 
 // #[no_mangle]
-pub extern "C" fn setkey(key: *const ::c_char) {
+pub extern "C" fn setkey(_key: *const ::c_char) {
     unimplemented!();
 }
 
@@ -1182,7 +1182,7 @@ pub extern "C" fn ttyslot() -> ::c_int {
 }
 
 // #[no_mangle]
-pub extern "C" fn unlockpt(fildes: ::c_int) -> ::c_int {
+pub extern "C" fn unlockpt(_fildes: ::c_int) -> ::c_int {
     unimplemented!();
 }
 

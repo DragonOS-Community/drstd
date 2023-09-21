@@ -180,18 +180,16 @@ fn main() {
     let mut c = cc::Build::new();
     //#[cfg(target_os = "dragonos")]
     c.flag("-nostdinc")
-    .flag("-nostdlib")
-    .flag("-fno-stack-protector")
-    .flag("-Wno-expansion-to-defined")
-    .file("src/unix/platform/dragonos/c/dragonos_malloc.c");
+        .flag("-nostdlib")
+        .flag("-fno-stack-protector")
+        .flag("-Wno-expansion-to-defined")
+        .file("src/unix/platform/dragonos/c/dragonos_malloc.c");
     //#[cfg(target_os = "dragonos")]
     c.define("HAVE_MMAP", "0");
     //#[cfg(target_os = "dragonos")]
     c.compile("dlibc_c");
     //#[cfg(target_os = "dragonos")]
     println!("cargo:rustc-link-lib=static=dlibc_c");
-        
-    
 }
 
 fn rustc_minor_nightly() -> (u32, bool) {

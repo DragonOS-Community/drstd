@@ -1,5 +1,5 @@
 //! sys/file.h implementation
-use crate::unix::platform;
+
 
 pub const LOCK_SH: usize = 1;
 pub const LOCK_EX: usize = 2;

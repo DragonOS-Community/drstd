@@ -2,7 +2,7 @@
 
 use core::ptr;
 
-use sigset_t;
+
 
 use crate::unix::platform;
 

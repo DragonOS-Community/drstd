@@ -30,7 +30,7 @@ impl<T> Once<T> {
         {
             UNINITIALIZED => {
                 // We now have a lock, let's initiate things!
-                let ret = unsafe { &mut *self.data.get() }.write(f());
+                let _ret = unsafe { &mut *self.data.get() }.write(f());
 
                 // Mark the data as initialized
                 if self.status.swap(INITIALIZED, SeqCst) == WAITING {

@@ -1,6 +1,6 @@
 //! termios implementation, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/termios.h.html
 
-use crate::unix::header::{errno, sys_ioctl};
+use crate::unix::header::{errno};
 
 pub type cc_t = u8;
 pub type speed_t = u32;

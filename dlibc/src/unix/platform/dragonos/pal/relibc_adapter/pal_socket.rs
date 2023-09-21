@@ -1,6 +1,6 @@
 use crate::unix::*;
 use dsc::syscall;
-use crate::unix::platform::pal::{e,errno};
+use crate::unix::platform::pal::{e};
 use sockaddr;
 #[no_mangle]
 pub unsafe extern "C" fn accept(socket: ::c_int, address: *mut sockaddr, address_len: *mut socklen_t) -> ::c_int{
@@ -131,10 +131,10 @@ pub extern "C" fn socket(domain: ::c_int, ty: ::c_int, protocol: ::c_int) -> ::c
 
 #[no_mangle]
 pub extern "C" fn socketpair(
-    domain: ::c_int,
-    type_: ::c_int,
-    protocol: ::c_int,
-    socket_vector: *mut ::c_int,
+    _domain: ::c_int,
+    _type_: ::c_int,
+    _protocol: ::c_int,
+    _socket_vector: *mut ::c_int,
 ) -> ::c_int{
 	unimplemented!()
 }

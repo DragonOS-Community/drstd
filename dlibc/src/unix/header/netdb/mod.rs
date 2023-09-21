@@ -348,7 +348,7 @@ pub unsafe extern "C" fn gethostbyname(name: *const ::c_char) -> *mut hostent {
     &mut HOST_ENTRY as *mut hostent
 }
 
-pub unsafe extern "C" fn getnetbyaddr(net: u32, net_type: ::c_int) -> *mut netent {
+pub unsafe extern "C" fn getnetbyaddr(_net: u32, _net_type: ::c_int) -> *mut netent {
     unimplemented!();
 }
 
@@ -612,7 +612,7 @@ pub unsafe extern "C" fn getservent() -> *mut servent {
     let mut rlb = RawLineBuffer::new(SERVDB);
     rlb.seek(S_POS);
 
-    let r: Box<str> = Box::default();
+    let _r: Box<str> = Box::default();
 
     loop {
         let r = match rlb.next() {
@@ -839,13 +839,13 @@ pub unsafe extern "C" fn getnameinfo(
 
     let addr = &*(addr as *const sockaddr_in);
 
-    let host_opt = if host.is_null() {
+    let _host_opt = if host.is_null() {
         None
     } else {
         Some(slice::from_raw_parts_mut(host, hostlen as usize))
     };
 
-    let serv_opt = if serv.is_null() {
+    let _serv_opt = if serv.is_null() {
         None
     } else {
         Some(slice::from_raw_parts_mut(serv, servlen as usize))

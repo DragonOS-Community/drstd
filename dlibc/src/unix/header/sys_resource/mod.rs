@@ -2,7 +2,7 @@
 //! http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysresource.h.html
 
 use crate::unix::header::sys_time::timeval;
-use crate::unix::{platform,rlimit};
+
 // Exported in bits file
 // const RUSAGE_SELF: ::c_int = 0;
 // const RUSAGE_CHILDREN: ::c_int = -1;

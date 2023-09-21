@@ -13,7 +13,7 @@ static ERROR_NOT_SUPPORTED: &'static CStr = c_str!("dlfcn not supported");
 static ERROR: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
-pub unsafe extern "C" fn dladdr(addr: *mut ::c_void, info: *mut ::Dl_info) -> ::c_int {
+pub unsafe extern "C" fn dladdr(_addr: *mut ::c_void, info: *mut ::Dl_info) -> ::c_int {
     //TODO
     (*info).dli_fname = ptr::null();
     (*info).dli_fbase = ptr::null_mut();
@@ -23,7 +23,7 @@ pub unsafe extern "C" fn dladdr(addr: *mut ::c_void, info: *mut ::Dl_info) -> ::
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn dlopen(cfilename: *const ::c_char, flags: ::c_int) -> *mut ::c_void {
+pub unsafe extern "C" fn dlopen(cfilename: *const ::c_char, _flags: ::c_int) -> *mut ::c_void {
     //TODO support all sort of flags
 
     let filename = if cfilename.is_null() {
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn dlopen(cfilename: *const ::c_char, flags: ::c_int) -> *
     let cbs = cbs_c.borrow();
 
     let id = match (cbs.load_library)(&mut linker, filename) {
-        Err(err) => {
+        Err(_err) => {
             ERROR.store(ERROR_NOT_SUPPORTED.as_ptr() as usize, Ordering::SeqCst);
             return ptr::null_mut();
         }

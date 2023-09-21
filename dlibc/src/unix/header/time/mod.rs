@@ -155,7 +155,7 @@ pub extern "C" fn clock() -> ::clock_t {
 }
 
 #[no_mangle]
-pub extern "C" fn clock_getres(clock_id: ::clockid_t, res: *mut ::timespec) -> ::c_int {
+pub extern "C" fn clock_getres(_clock_id: ::clockid_t, _res: *mut ::timespec) -> ::c_int {
     unimplemented!();
 }
 
@@ -165,7 +165,7 @@ pub extern "C" fn clock_getres(clock_id: ::clockid_t, res: *mut ::timespec) -> :
 // }
 
 // #[no_mangle]
-pub extern "C" fn clock_settime(clock_id: ::clockid_t, tp: *const ::timespec) -> ::c_int {
+pub extern "C" fn clock_settime(_clock_id: ::clockid_t, _tp: *const ::timespec) -> ::c_int {
     unimplemented!();
 }
 
@@ -200,7 +200,7 @@ pub extern "C" fn difftime(time1: ::time_t, time0: ::time_t) -> ::c_double {
 }
 
 // #[no_mangle]
-pub extern "C" fn getdate(string: *const ::c_char) -> tm {
+pub extern "C" fn getdate(_string: *const ::c_char) -> tm {
     unimplemented!();
 }
 
@@ -437,15 +437,15 @@ pub unsafe extern "C" fn timegm(tm: *mut tm) -> ::time_t {
 
 // #[no_mangle]
 pub extern "C" fn timer_create(
-    clock_id: ::clockid_t,
-    evp: *mut sigevent,
-    timerid: *mut ::timer_t,
+    _clock_id: ::clockid_t,
+    _evp: *mut sigevent,
+    _timerid: *mut ::timer_t,
 ) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn timer_delete(timerid: ::timer_t) -> ::c_int {
+pub extern "C" fn timer_delete(_timerid: ::timer_t) -> ::c_int {
     unimplemented!();
 }
 
@@ -456,21 +456,21 @@ pub extern "C" fn tzset() {
 
 // #[no_mangle]
 pub extern "C" fn timer_settime(
-    timerid: ::timer_t,
-    flags: ::c_int,
-    value: *const itimerspec,
-    ovalue: *mut itimerspec,
+    _timerid: ::timer_t,
+    _flags: ::c_int,
+    _value: *const itimerspec,
+    _ovalue: *mut itimerspec,
 ) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn timer_gettime(timerid: ::timer_t, value: *mut itimerspec) -> ::c_int {
+pub extern "C" fn timer_gettime(_timerid: ::timer_t, _value: *mut itimerspec) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn timer_getoverrun(timerid: ::timer_t) -> ::c_int {
+pub extern "C" fn timer_getoverrun(_timerid: ::timer_t) -> ::c_int {
     unimplemented!();
 }
 

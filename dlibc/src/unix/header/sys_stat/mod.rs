@@ -1,11 +1,10 @@
 //! ::stat implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstat.h.html
 
 use crate::unix::{
-    c_str::CStr,
     header::fcntl::{O_NOFOLLOW, O_PATH},
 };
 
-use timespec;
+
 
 use crate::unix::platform;
 

@@ -9,7 +9,7 @@ use crate::unix::header::errno;
 pub use self::platform::*;
 
 use crate::unix::platform;
-use crate::unix::header::signal::sys::{SA_RESTORER,NSIG};
+use crate::unix::header::signal::sys::{NSIG};
 
 #[cfg(target_os = "linux")]
 #[path = "linux.rs"]
@@ -156,17 +156,17 @@ pub extern "C" fn sigfillset(set: *mut sigset_t) -> ::c_int {
 }
 
 // #[no_mangle]
-pub extern "C" fn sighold(sig: ::c_int) -> ::c_int {
+pub extern "C" fn sighold(_sig: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn sigignore(sig: ::c_int) -> ::c_int {
+pub extern "C" fn sigignore(_sig: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
 // #[no_mangle]
-pub extern "C" fn siginterrupt(sig: ::c_int, flag: ::c_int) -> ::c_int {
+pub extern "C" fn siginterrupt(_sig: ::c_int, _flag: ::c_int) -> ::c_int {
     unimplemented!();
 }
 

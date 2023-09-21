@@ -22,8 +22,7 @@ mod dragonos;
 #[cfg(target_os = "redox")]
 mod redox;
 
-#[cfg(target_os = "dragonos")]
-use self::dragonos as sys;
+
 #[cfg(target_os = "linux")]
 use self::linux as sys;
 #[cfg(target_os = "redox")]
@@ -243,7 +242,7 @@ pub unsafe extern "C" fn getpwuid_r(
     size: ::size_t,
     result: *mut *mut passwd,
 ) -> ::c_int {
-    let slice = core::slice::from_raw_parts_mut(buf as *mut u8, size);
+    let _slice = core::slice::from_raw_parts_mut(buf as *mut u8, size);
     mux(
         pwd_lookup(
             |part| part.pw_uid == uid,

@@ -88,7 +88,7 @@ unsafe fn adjust_stack(sp: &'static mut Stack) {
         if let Ok(arg_str) = CStr::from_ptr(arg as *const ::c_char).to_str() {
             let mut parts = arg_str.splitn(2, '=');
             if let Some(key) = parts.next() {
-                if let Some(value) = parts.next() {
+                if let Some(_value) = parts.next() {
                     if let "LD_LIBRARY_PATH" = key {
                         //library_path = value
                     }
@@ -213,7 +213,7 @@ pub extern "C" fn relibc_ld_so_start(sp: &'static mut Stack, ld_entry: usize) ->
         argv[0].to_string()
     };
 
-    let (path, name) = match resolve_path_name(&name_or_path, &envs) {
+    let (path, _name) = match resolve_path_name(&name_or_path, &envs) {
         Some((p, n)) => (p, n),
         None => {
             eprintln!("ld.so: failed to locate '{}'", name_or_path);

@@ -5105,7 +5105,7 @@ pub use self::pal::relibc_adapter::{
 
 pub use self::pal::errno;
 use alloc::boxed::Box;
-pub fn init(auxvs: Box<[[usize; 2]]>) {}
+pub fn init(_auxvs: Box<[[usize; 2]]>) {}
 
 cfg_if! {
     if #[cfg(libc_align)] {

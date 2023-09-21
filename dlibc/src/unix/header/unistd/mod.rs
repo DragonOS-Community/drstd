@@ -5,7 +5,7 @@ use core::{convert::TryFrom, mem, ptr, slice};
 use crate::unix::{
     c_str::CStr,
     header::{
-        errno, fcntl, limits, stdlib::getenv, sys_ioctl, sys_time, sys_utsname, termios,
+        errno, limits, stdlib::getenv, sys_time, termios,
     },
 };
 use alloc::collections::LinkedList;
@@ -15,9 +15,9 @@ pub use self::{brk::*, getopt::*, pathconf::*, sysconf::*};
 use ioctl;
 use TIOCSPGRP;
 use TIOCGPGRP;
-use TCXONC;
 
-use O_WRONLY;
+
+
 
 mod brk;
 mod getopt;
@@ -98,7 +98,7 @@ pub extern "C" fn alarm(seconds: ::c_uint) -> ::c_uint {
 // }
 
 #[no_mangle]
-pub extern "C" fn chroot(path: *const ::c_char) -> ::c_int {
+pub extern "C" fn chroot(_path: *const ::c_char) -> ::c_int {
     // TODO: Implement
     unsafe {
         platform::errno = crate::unix::header::errno::EPERM;
@@ -230,7 +230,7 @@ pub unsafe extern "C" fn execvp(file: *const ::c_char, argv: *const *const ::c_c
 // }
 
 // #[no_mangle]
-pub extern "C" fn fdatasync(fildes: ::c_int) -> ::c_int {
+pub extern "C" fn fdatasync(_fildes: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
@@ -362,7 +362,7 @@ pub unsafe extern "C" fn getlogin() -> *mut ::c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn getlogin_r(name: *mut ::c_char, namesize: ::size_t) -> ::c_int {
+pub extern "C" fn getlogin_r(_name: *mut ::c_char, _namesize: ::size_t) -> ::c_int {
     //TODO: Determine correct getlogin result on Redox
     unsafe { platform::errno = errno::ENOENT };
     -1
@@ -458,7 +458,7 @@ pub extern "C" fn isatty(fd: ::c_int) -> ::c_int {
 // }
 
 // #[no_mangle]
-pub extern "C" fn nice(incr: ::c_int) -> ::c_int {
+pub extern "C" fn nice(_incr: ::c_int) -> ::c_int {
     unimplemented!();
 }
 
@@ -621,7 +621,7 @@ pub extern "C" fn swab(src: *const ::c_void, dest: *mut ::c_void, nbytes: ::ssiz
     }
     let number_of_swaps = nbytes / 2;
     let mut offset = 0;
-    for i in 0..number_of_swaps {
+    for _i in 0..number_of_swaps {
         unsafe {
             src.offset(offset).copy_to(dest.offset(offset + 1), 1);
             src.offset(offset + 1).copy_to(dest.offset(offset), 1);

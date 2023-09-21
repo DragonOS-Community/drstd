@@ -1,13 +1,12 @@
-use crate::println;
+
 use alloc::vec::Vec;
 use core::{arch::asm, mem, ptr, slice};
 use goblin::error::{Error, Result};
 
-use super::ExpectTlsFree;
+
 
 use crate::unix::platform;
 use crate::unix::{
-    header::sys_mman,
     ld_so::linker::Linker,
     sync::mutex::Mutex,
 };
@@ -63,7 +62,7 @@ impl Tcb {
     /// Create a new TCB
     pub unsafe fn new(size: usize) -> Result<&'static mut Self> {
         let page_size = platform::pal::getpagesize();
-        let (abi_page, tls, tcb_page) = Self::os_new(round_up(size, page_size))?;
+        let (_abi_page, tls, tcb_page) = Self::os_new(round_up(size, page_size))?;
 
         let tcb_ptr = tcb_page.as_mut_ptr() as *mut Self;
         trace!("New TCB: {:p}", tcb_ptr);
@@ -273,7 +272,7 @@ impl Tcb {
 
     /// OS and architecture specific code to activate TLS - DragonOS x86_64
     #[cfg(all(target_os = "dragonos", target_arch = "x86_64"))]
-    unsafe fn os_arch_activate(tls_end: usize, _tls_len: usize) {
+    unsafe fn os_arch_activate(_tls_end: usize, _tls_len: usize) {
         const ARCH_SET_FS: usize = 0x1002;
         // syscall!(ARCH_PRCTL, ARCH_SET_FS, tls_end);
         unimplemented!()

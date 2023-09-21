@@ -3,7 +3,6 @@ use core::{mem, ptr};
 
 use crate::unix::platform;
 use crate::unix::{
-    c_str::CString,
     header::{
         arpa_inet::inet_aton, fcntl::O_RDONLY, netinet_in::in_addr, sys_socket::constants::AF_INET,
         unistd::SEEK_SET,
