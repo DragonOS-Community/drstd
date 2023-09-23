@@ -107,18 +107,18 @@ impl Command {
         // in its own process. Thus the parent drops the lock guard immediately.
         // The child calls `mem::forget` to leak the lock, which is crucial because
         // releasing a lock is not async-signal-safe.
+
         let env_lock = sys::os::env_read_lock();
         let pid = unsafe { self.do_fork()? };
         if pid == 0 {
             crate::std::panic::always_abort();
             mem::forget(env_lock); // avoid non-async-signal-safe unlocking
-                                   //TODO:此处和标准库不一致
-                                   //drop(input);
+            drop(input);
             #[cfg(target_os = "linux")]
             if self.get_create_pidfd() {
                 self.send_pidfd(&output);
             }
-            //TODO:此处和标准库不一致
+            //此处改动
             if let Err(err) = unsafe { self.do_exec(theirs, envp.as_ref()) } {
                 let errno = err.raw_os_error().unwrap_or(dlibc::EINVAL) as u32;
                 let errno = errno.to_be_bytes();
@@ -138,55 +138,61 @@ impl Command {
                 rtassert!(output.write(&bytes).is_ok());
                 unsafe { dlibc::_exit(1) }
             }
-        }
-
-        //TODO:此处和标准库不一致
-        //drop(env_lock);
-        drop(output);
-
-        #[cfg(target_os = "linux")]
-        let pidfd = if self.get_create_pidfd() {
-            self.recv_pidfd(&input)
         } else {
-            -1
-        };
+            use crate::print;
+            use crate::println;
 
-        #[cfg(not(target_os = "linux"))]
-        let pidfd = -1;
+            drop(env_lock);
+            drop(output);
 
-        // Safety: We obtained the pidfd from calling `clone3` with
-        // `CLONE_PIDFD` so it's valid an otherwise unowned.
-        let mut p = unsafe { Process::new(pid, pidfd) };
-        let mut bytes = [0; 8];
+            #[cfg(target_os = "linux")]
+            let pidfd = if self.get_create_pidfd() {
+                self.recv_pidfd(&input)
+            } else {
+                -1
+            };
 
-        // loop to handle EINTR
-        loop {
-            match input.read(&mut bytes) {
-                Ok(0) => return Ok((p, ours)),
-                Ok(8) => {
-                    let (errno, footer) = bytes.split_at(4);
-                    assert_eq!(
-                        CLOEXEC_MSG_FOOTER, footer,
-                        "Validation on the CLOEXEC pipe failed: {:?}",
-                        bytes
-                    );
-                    let errno = i32::from_be_bytes(errno.try_into().unwrap());
-                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-                    return Err(Error::from_raw_os_error(errno));
-                }
-                Err(ref e) if e.is_interrupted() => {}
-                Err(e) => {
-                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-                    panic!("the CLOEXEC pipe failed: {e:?}")
-                }
-                Ok(..) => {
-                    // pipe I/O up to PIPE_BUF bytes should be atomic
-                    // similarly SOCK_SEQPACKET messages should arrive whole
-                    assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
-                    panic!("short read on the CLOEXEC pipe")
+            #[cfg(not(target_os = "linux"))]
+            let pidfd = -1;
+
+            // Safety: We obtained the pidfd from calling `clone3` with
+            // `CLONE_PIDFD` so it's valid an otherwise unowned.
+            let mut p = unsafe { Process::new(pid, pidfd) };
+            let mut bytes = [0; 8];
+
+            //test
+            //return Ok((p,ours));
+            // loop to handle EINTR
+            loop {
+                match input.read(&mut bytes) {
+                    Ok(0) => return Ok((p, ours)),
+                    Ok(8) => {
+                        let (errno, footer) = bytes.split_at(4);
+                        assert_eq!(
+                            CLOEXEC_MSG_FOOTER, footer,
+                            "Validation on the CLOEXEC pipe failed: {:?}",
+                            bytes
+                        );
+                        let errno = i32::from_be_bytes(errno.try_into().unwrap());
+                        assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                        return Err(Error::from_raw_os_error(errno));
+                    }
+                    Err(ref e) if e.is_interrupted() => {}
+                    Err(e) => {
+                        assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                        panic!("the CLOEXEC pipe failed: {e:?}")
+                    }
+                    Ok(..) => {
+                        // pipe I/O up to PIPE_BUF bytes should be atomic
+                        // similarly SOCK_SEQPACKET messages should arrive whole
+                        assert!(p.wait().is_ok(), "wait() should either return Ok or panic");
+                        panic!("short read on the CLOEXEC pipe")
+                    }
                 }
             }
         }
+        //TODO: 改动
+        return Err(Error::last_os_error());
     }
 
     pub fn output(&mut self) -> io::Result<(ExitStatus, Vec<u8>, Vec<u8>)> {
@@ -316,7 +322,6 @@ impl Command {
         stdio: ChildPipes,
         maybe_envp: Option<&CStringArray>,
     ) -> Result<!, io::Error> {
-        use crate::{print, println};
 
         use crate::std::sys::{self, cvt_r};
 
@@ -440,6 +445,7 @@ impl Command {
         all(target_os = "linux", target_env = "gnu"),
         all(target_os = "linux", target_env = "musl"),
         target_os = "nto",
+        targte_os = "dragonos"
     )))]
     fn posix_spawn(
         &mut self,
@@ -460,6 +466,7 @@ impl Command {
         all(target_os = "linux", target_env = "gnu"),
         all(target_os = "linux", target_env = "musl"),
         target_os = "nto",
+        targte_os = "dragonos"
     ))]
     fn posix_spawn(
         &mut self,
