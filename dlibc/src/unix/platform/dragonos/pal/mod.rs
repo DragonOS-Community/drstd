@@ -782,10 +782,10 @@ pub extern "C" fn syscall(_num: ::c_long) -> ::c_long {
 // pub extern "C" fn setsid() -> ::pid_t{
 // 	unimplemented!()
 // }
-// #[no_mangle]
-// pub extern "C" fn setuid(uid: uid_t) -> ::c_int{
-// 	unimplemented!()
-// }
+#[no_mangle]
+pub extern "C" fn setuid(uid: ::uid_t) -> ::c_int{
+	0
+}
 
 // #[cfg_attr(
 //     all(target_os = "macos", target_arch = "x86"),
@@ -921,10 +921,11 @@ pub extern "C" fn syscall(_num: ::c_long) -> ::c_long {
 // 	unimplemented!()
 // }
 
-// #[no_mangle]
-// pub extern "C" fn signal(signum: ::c_int, handler: sighandler_t) -> sighandler_t{
-// 	unimplemented!()
-// }
+#[no_mangle]
+pub extern "C" fn signal(signum: ::c_int, handler: ::sighandler_t) -> ::sighandler_t{
+	0
+    //unimplemented!()
+}
 
 // #[cfg_attr(target_os = "netbsd", link_name = "__getrusage50")]
 // #[no_mangle]
@@ -1778,10 +1779,10 @@ pub extern "C" fn pthread_setspecific(_key: ::pthread_key_t, _value: *const ::c_
 // pub extern "C" fn memalign(align: ::size_t, size: ::size_t) -> *mut ::c_void{
 // 	unimplemented!()
 // }
-// #[no_mangle]
-// pub extern "C" fn setgroups(ngroups: ::size_t, ptr: *const ::gid_t) -> ::c_int{
-// 	unimplemented!()
-// }
+#[no_mangle]
+pub extern "C" fn setgroups(ngroups: ::size_t, ptr: *const ::gid_t) -> ::c_int{
+	0
+}
 // #[no_mangle]
 // pub extern "C" fn pipe2(fds: *mut ::c_int, flags: ::c_int) -> ::c_int{
 // 	if flags == 0 {

@@ -2,6 +2,8 @@
 
 use core::{convert::TryFrom, mem, ptr, slice};
 
+pub use self::{brk::*, getopt::*, pathconf::*, sysconf::*};
+use crate::unix::platform;
 use crate::unix::{
     c_str::CStr,
     header::{
@@ -9,15 +11,8 @@ use crate::unix::{
     },
 };
 use alloc::collections::LinkedList;
-use crate::unix::platform;
-pub use self::{brk::*, getopt::*, pathconf::*, sysconf::*};
-
 use ioctl;
-use TIOCSPGRP;
 use TIOCGPGRP;
-
-
-
 
 mod brk;
 mod getopt;
@@ -478,7 +473,12 @@ pub unsafe extern "C" fn pipe(fildes: *mut ::c_int) -> ::c_int {
 // }
 
 #[no_mangle]
-pub unsafe extern "C" fn pread(fildes: ::c_int, buf: *mut ::c_void, nbyte: ::size_t, offset: ::off_t) -> ::ssize_t {
+pub unsafe extern "C" fn pread(
+    fildes: ::c_int,
+    buf: *mut ::c_void,
+    nbyte: ::size_t,
+    offset: ::off_t,
+) -> ::ssize_t {
     //TODO: better pread using system calls
 
     let previous = ::lseek(fildes, offset, SEEK_SET);
@@ -664,7 +664,7 @@ pub extern "C" fn truncate(path: *const ::c_char, length: ::off_t) -> ::c_int {
         return -1;
     }
 
-    let res = unsafe{::ftruncate(fd, length)};
+    let res = unsafe { ::ftruncate(fd, length) };
 
     platform::pal::close(fd);
 
@@ -688,9 +688,7 @@ pub extern "C" fn ttyname_r(fildes: ::c_int, name: *mut ::c_char, namesize: ::si
         return errno::ERANGE;
     }
 
-    let len = platform::pal::fpath(fildes, 
-        (&mut name[..namesize - 1]).as_ptr() as *const i8
-    );
+    let len = platform::pal::fpath(fildes, (&mut name[..namesize - 1]).as_ptr() as *const i8);
     if len < 0 {
         return unsafe { -platform::errno };
     }

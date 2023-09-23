@@ -11,7 +11,6 @@
 
 use crate::std::os::raw::c_ulong;
 
-
 pub type dev_t = u64;
 pub type mode_t = u32;
 
