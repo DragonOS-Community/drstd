@@ -6,12 +6,13 @@ pub use self::{brk::*, getopt::*, pathconf::*, sysconf::*};
 use crate::unix::platform;
 use crate::unix::{
     c_str::CStr,
-    header::{errno, limits, stdlib::getenv, sys_time, termios},
+    header::{
+        errno, limits, stdlib::getenv, sys_time, termios,
+    },
 };
 use alloc::collections::LinkedList;
 use ioctl;
 use TIOCGPGRP;
-use TIOCSPGRP;
 
 mod brk;
 mod getopt;
