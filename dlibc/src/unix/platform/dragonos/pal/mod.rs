@@ -752,10 +752,10 @@ pub extern "C" fn syscall(_num: ::c_long) -> ::c_long {
 // pub extern "C" fn pathconf(path: *const ::c_char, name: ::c_int) -> c_long{
 // 	unimplemented!()
 // }
-// #[no_mangle]
-// pub extern "C" fn pipe(fds: *mut ::c_int) -> ::c_int{
-// 	unimplemented!()
-// }
+#[no_mangle]
+pub extern "C" fn pipe(fds: *mut ::c_int) -> ::c_int{
+	e(unsafe { syscall!(SYS_PIPE, fds) }) as ::c_int
+}
 // #[no_mangle]
 // pub extern "C" fn posix_memalign(memptr: *mut *mut ::c_void, align: ::size_t, size: ::size_t) -> ::c_int{
 // 	unimplemented!()

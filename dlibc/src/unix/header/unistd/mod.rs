@@ -461,7 +461,7 @@ pub extern "C" fn pause() -> ::c_int {
     unimplemented!();
 }
 
-#[no_mangle]
+//#[no_mangle]
 pub unsafe extern "C" fn pipe(fildes: *mut ::c_int) -> ::c_int {
     ::pipe2(fildes, 0)
 }

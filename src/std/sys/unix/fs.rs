@@ -60,7 +60,7 @@ use dlibc::fstatat64;
     target_os = "vita",
 ))]
 use dlibc::readdir as readdir64;
-#[cfg(any(target_os = "linux",target_os = "dragonos",))]
+#[cfg(any(target_os = "linux", target_os = "dragonos",))]
 use dlibc::readdir64;
 #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
 use dlibc::readdir64_r;

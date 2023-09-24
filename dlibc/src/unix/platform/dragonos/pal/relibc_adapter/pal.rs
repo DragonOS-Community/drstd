@@ -316,11 +316,7 @@ pub extern "C" fn open(path: *const ::c_char, oflag: ::c_int, mode: mode_t) -> :
 
 #[no_mangle]
 pub extern "C" fn pipe2(fds: *mut ::c_int, flags: ::c_int) -> ::c_int {
-    if flags == 0 {
-        e(unsafe { syscall!(SYS_PIPE, fds) }) as ::c_int
-    } else {
-        unimplemented!()
-    }
+    e(unsafe { syscall!(SYS_PIPE, fds, flags )}) as ::c_int
 }
 
 #[no_mangle]
