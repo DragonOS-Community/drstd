@@ -2,7 +2,6 @@
 
 use crate::std::sync::{Mutex, PoisonError};
 
-
 /// Max number of frames to print.
 const MAX_NB_FRAMES: usize = 100;
 

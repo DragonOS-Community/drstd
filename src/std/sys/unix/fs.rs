@@ -58,10 +58,9 @@ use dlibc::fstatat64;
     target_os = "illumos",
     target_os = "nto",
     target_os = "vita",
-    target_os = "dragonos",
 ))]
 use dlibc::readdir as readdir64;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux",target_os = "dragonos",))]
 use dlibc::readdir64;
 #[cfg(any(target_os = "emscripten", target_os = "l4re"))]
 use dlibc::readdir64_r;
@@ -88,7 +87,8 @@ use dlibc::{
     target_os = "linux",
     target_os = "emscripten",
     target_os = "l4re",
-    target_os = "android"
+    target_os = "android",
+    target_os = "dragonos"
 )))]
 use dlibc::{
     dirent as dirent64, fstat as fstat64, ftruncate as ftruncate64, lseek as lseek64,
@@ -96,6 +96,9 @@ use dlibc::{
 };
 #[cfg(any(target_os = "linux", target_os = "emscripten", target_os = "l4re"))]
 use dlibc::{dirent64, fstat64, ftruncate64, lseek64, lstat64, off64_t, open64, stat64};
+
+#[cfg(any(target_os = "dragonos"))]
+use dlibc::{dirent64, fstat64, ftruncate64, lseek64, lstat64, off64_t, open as open64, stat64};
 
 pub use crate::std::sys_common::fs::try_exists;
 
