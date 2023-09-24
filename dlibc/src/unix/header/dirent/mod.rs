@@ -88,7 +88,7 @@ pub unsafe extern "C" fn readdir(dir: *mut DIR) -> *mut ::dirent {
     (*dir).index += (*ptr).d_reclen as usize;
     ptr
 }
-// #[no_mangle]
+#[no_mangle]
 pub extern "C" fn readdir_r(
     _dir: *mut DIR,
     _entry: *mut ::dirent,
@@ -114,7 +114,10 @@ pub unsafe extern "C" fn rewinddir(dir: *mut DIR) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn alphasort(first: *mut *const ::dirent, second: *mut *const ::dirent) -> ::c_int {
+pub unsafe extern "C" fn alphasort(
+    first: *mut *const ::dirent,
+    second: *mut *const ::dirent,
+) -> ::c_int {
     string::strcoll((**first).d_name.as_ptr(), (**second).d_name.as_ptr())
 }
 

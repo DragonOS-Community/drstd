@@ -169,7 +169,7 @@ pub extern "C" fn getcwd(buf: *mut ::c_char, size: ::size_t) -> *mut ::c_char {
 
 #[no_mangle]
 pub extern "C" fn getdents(fd: ::c_int, dirents: *mut dirent, bytes: usize) -> ::c_int {
-    unsafe { syscall!(SYS_GET_DENTS, dirents, bytes) as ::c_int }
+    unsafe { syscall!(SYS_GET_DENTS, fd, dirents, bytes) as ::c_int }
 }
 
 #[no_mangle]

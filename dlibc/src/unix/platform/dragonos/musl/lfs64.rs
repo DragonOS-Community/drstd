@@ -88,11 +88,13 @@ pub unsafe extern "C" fn getrlimit64(resource: ::c_int, rlim: *mut ::rlimit64) -
 }
 
 #[inline]
+#[no_mangle]
 pub unsafe extern "C" fn lseek64(fd: ::c_int, offset: ::off64_t, whence: ::c_int) -> ::off64_t {
     ::lseek(fd, offset, whence)
 }
 
 #[inline]
+#[no_mangle]
 pub unsafe extern "C" fn lstat64(path: *const ::c_char, buf: *mut ::stat64) -> ::c_int {
     ::lstat(path, buf as *mut _)
 }
@@ -188,6 +190,7 @@ pub unsafe extern "C" fn pwritev64(
 }
 
 #[inline]
+#[no_mangle]
 pub unsafe extern "C" fn readdir64(dirp: *mut ::DIR) -> *mut ::dirent64 {
     ::readdir(dirp) as *mut _
 }
@@ -217,6 +220,7 @@ pub unsafe extern "C" fn setrlimit64(resource: ::c_int, rlim: *const ::rlimit64)
 }
 
 #[inline]
+#[no_mangle]
 pub unsafe extern "C" fn stat64(pathname: *const ::c_char, statbuf: *mut ::stat64) -> ::c_int {
     ::stat(pathname, statbuf as *mut _)
 }
