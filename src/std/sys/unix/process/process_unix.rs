@@ -72,8 +72,8 @@ cfg_if::cfg_if! {
 impl Command {
     pub fn spawn(
         &mut self,
-        default: Stdio,
-        needs_stdin: bool,
+        _default: Stdio,
+        _needs_stdin: bool,
     ) -> io::Result<(Process, StdioPipes)> {
         const CLOEXEC_MSG_FOOTER: [u8; 4] = *b"NOEX";
         let envp = self.capture_env();
@@ -319,6 +319,7 @@ impl Command {
         stdio: ChildPipes,
         maybe_envp: Option<&CStringArray>,
     ) -> Result<!, io::Error> {
+
         use crate::std::sys::{self, cvt_r};
 
         if let Some(fd) = stdio.stdin.fd() {
