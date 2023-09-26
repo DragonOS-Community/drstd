@@ -157,6 +157,9 @@ impl Command {
             let mut p = unsafe { Process::new(pid, pidfd) };
             let mut bytes = [0; 8];
 
+            // TODO: 在DragonOS管道读取数据时拿不到锁
+            return Ok((p, ours));
+
             // loop to handle EINTR
             loop {
                 match input.read(&mut bytes) {
