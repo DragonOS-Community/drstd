@@ -158,7 +158,7 @@ impl Command {
             let mut bytes = [0; 8];
 
             //TODO: 这里直接返回，没有从管道读取子进程状态，后续需更改
-            return Ok((p, ours));
+            // return Ok((p, ours));
             // loop to handle EINTR
             loop {
                 match input.read(&mut bytes) {
