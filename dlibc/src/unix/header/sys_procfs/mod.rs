@@ -3,7 +3,6 @@ use crate::header::arch_aarch64_user::*;
 #[cfg(target_arch = "x86_64")]
 use crate::header::arch_x64_user::*;
 
-
 pub const ELF_PRARGSZ: ::size_t = 80;
 
 #[repr(C)]

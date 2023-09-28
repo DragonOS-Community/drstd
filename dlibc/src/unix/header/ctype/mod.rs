@@ -74,7 +74,9 @@ pub extern "C" fn isupper(c: ::c_int) -> ::c_int {
 
 #[no_mangle]
 pub extern "C" fn isxdigit(c: ::c_int) -> ::c_int {
-    ::c_int::from(isdigit(c) != 0 || (c | 32 >= ::c_int::from(b'a') && c | 32 <= ::c_int::from(b'f')))
+    ::c_int::from(
+        isdigit(c) != 0 || (c | 32 >= ::c_int::from(b'a') && c | 32 <= ::c_int::from(b'f')),
+    )
 }
 
 #[no_mangle]

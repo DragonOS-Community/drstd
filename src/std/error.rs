@@ -3,8 +3,7 @@
 use crate::std::backtrace::Backtrace;
 use crate::std::fmt::{self, Write};
 
-pub use core::any::{request_ref, request_value};
-pub use core::error::Error;
+pub use core::error::{request_ref, request_value, Error};
 
 mod private {
     // This is a hack to prevent `type_id` from being overridden by `Error`

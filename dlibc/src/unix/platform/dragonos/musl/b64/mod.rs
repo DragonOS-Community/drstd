@@ -2,9 +2,8 @@ pub type c_long = i64;
 pub type c_ulong = u64;
 pub type regoff_t = ::c_long;
 
-
 #[cfg(not(target_os = "dragonos"))]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct sigset_t {
     __val: [::c_ulong; 16],
 }

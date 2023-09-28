@@ -702,6 +702,7 @@ cfg_if! {
     }
 }
 
+#[allow(dead_code)]
 extern "C" {
     pub fn sendmmsg(
         sockfd: ::c_int,

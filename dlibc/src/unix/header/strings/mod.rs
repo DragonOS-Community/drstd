@@ -5,7 +5,11 @@ use core::{arch, ptr};
 use crate::unix::header::{ctype, string};
 
 #[no_mangle]
-pub unsafe extern "C" fn bcmp(first: *const ::c_void, second: *const ::c_void, n: ::size_t) -> ::c_int {
+pub unsafe extern "C" fn bcmp(
+    first: *const ::c_void,
+    second: *const ::c_void,
+    n: ::size_t,
+) -> ::c_int {
     string::memcmp(first, second, n)
 }
 

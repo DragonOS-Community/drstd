@@ -2,7 +2,6 @@
 /* Ported from musl's implementation (src/prng/random.c). Does not
  * currently implement locking, though. */
 
-
 use core::{convert::TryFrom, ptr};
 
 #[rustfmt::skip]

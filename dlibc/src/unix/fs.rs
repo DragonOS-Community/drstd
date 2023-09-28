@@ -1,13 +1,13 @@
+use crate::unix::platform;
 use crate::unix::{
+    c_str::CStr,
     header::{
         fcntl::O_CREAT,
         unistd::{SEEK_CUR, SEEK_END, SEEK_SET},
     },
     io,
-    c_str::CStr
 };
 use core::ops::Deref;
-use crate::unix::platform;
 pub struct File {
     pub fd: ::c_int,
     /// To avoid self referential FILE struct that needs both a reader and a writer,
@@ -71,7 +71,7 @@ impl File {
 
 impl io::Read for &File {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        match platform::pal::read(self.fd, buf.as_ptr() as *mut ::c_void,buf.len()) {
+        match platform::pal::read(self.fd, buf.as_ptr() as *mut ::c_void, buf.len()) {
             -1 => Err(io::last_os_error()),
             ok => Ok(ok as usize),
         }
@@ -80,7 +80,7 @@ impl io::Read for &File {
 
 impl io::Write for &File {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        match platform::pal::write(self.fd, buf.as_ptr() as*const ::c_void,buf.len()) {
+        match platform::pal::write(self.fd, buf.as_ptr() as *const ::c_void, buf.len()) {
             -1 => Err(io::last_os_error()),
             ok => Ok(ok as usize),
         }

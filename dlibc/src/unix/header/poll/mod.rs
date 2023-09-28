@@ -5,8 +5,7 @@ use core::{mem, slice};
 use crate::unix::{
     fs::File,
     header::sys_epoll::{
-        epoll_ctl, epoll_data, epoll_event, epoll_wait,
-        EPOLL_CLOEXEC, EPOLL_CTL_ADD,
+        epoll_ctl, epoll_data, epoll_event, epoll_wait, EPOLL_CLOEXEC, EPOLL_CTL_ADD,
     },
 };
 
@@ -45,7 +44,7 @@ pub fn poll_epoll(fds: &mut [pollfd], timeout: ::c_int) -> ::c_int {
     ];
 
     let ep = {
-        let epfd = unsafe{::epoll_create1(EPOLL_CLOEXEC)};
+        let epfd = unsafe { ::epoll_create1(EPOLL_CLOEXEC) };
         if epfd < 0 {
             return -1;
         }
@@ -69,7 +68,7 @@ pub fn poll_epoll(fds: &mut [pollfd], timeout: ::c_int) -> ::c_int {
 
         pfd.revents = 0;
 
-        if unsafe{epoll_ctl(*ep, EPOLL_CTL_ADD, pfd.fd, &mut event)} < 0 {
+        if unsafe { epoll_ctl(*ep, EPOLL_CTL_ADD, pfd.fd, &mut event) } < 0 {
             return -1;
         }
     }

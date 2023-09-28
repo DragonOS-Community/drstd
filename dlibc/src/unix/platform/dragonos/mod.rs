@@ -140,7 +140,6 @@ pub static STR_ERROR: [&'static str; 132] = [
     "Unknown",
 ];
 
-
 pub type useconds_t = u32;
 pub type dev_t = u64;
 pub type socklen_t = u32;
@@ -1814,7 +1813,7 @@ pub const PF_MASKOS: u32 = 0x0ff00000;
 pub const PF_MASKPROC: u32 = 0xf0000000;
 
 // elf.h - Legal values for a_type (entry type).
-cfg_if!{
+cfg_if! {
     if #[cfg(target_os = "dragonos")]{
         pub const AT_NULL: usize = 0;
         pub const AT_IGNORE: usize = 1;
@@ -1876,13 +1875,12 @@ cfg_if!{
         pub const AT_HWCAP2: ::c_ulong = 26;
 
         pub const AT_EXECFN: ::c_ulong = 31;
-        
+
         // defined in arch/<arch>/include/uapi/asm/auxvec.h but has the same value
         // wherever it is defined.
         pub const AT_SYSINFO_EHDR: ::c_ulong = 33;
     }
 }
-
 
 pub const GLOB_ERR: ::c_int = 1 << 0;
 pub const GLOB_MARK: ::c_int = 1 << 1;
@@ -5077,19 +5075,18 @@ cfg_if! {
 
 cfg_if! {
     if #[cfg(target_env = "uclibc")] {
-        mod uclibc;
-        pub use self::ucdlibc::*;
+        // mod uclibc;
+        // pub use self::ucdlibc::*;
+        unimplemented!();
     } else if #[cfg(any(target_env = "musl", target_env = "ohos"))] {
         mod musl;
         pub use self::musl::*;
     } else if #[cfg(target_env = "gnu")] {
-        mod gnu;
-        pub use self::gnu::*;
+        // mod gnu;
+        // pub use self::gnu::*;
+        unimplemented!();
     }
 }
-
-pub mod musl;
-pub use self::musl::*;
 
 pub mod arch;
 pub use self::arch::*;

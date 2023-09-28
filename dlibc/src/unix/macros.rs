@@ -143,7 +143,7 @@ macro_rules! strto_impl {
                 *$endptr = $s.offset(idx) as *mut _;
             }
         };
-        
+
         #[allow(unused_mut)]
         let mut invalid_input = || {
             ::errno = EINVAL;

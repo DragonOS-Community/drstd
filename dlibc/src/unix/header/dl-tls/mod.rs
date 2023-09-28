@@ -3,7 +3,7 @@
 use crate::ld_so::tcb::Tcb;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct dl_tls_index {
     pub ti_module: u64,
     pub ti_offset: u64,

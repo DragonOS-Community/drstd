@@ -51,7 +51,11 @@ pub const REG_BADRPT: ::c_int = 14;
 
 #[no_mangle]
 #[linkage = "weak"] // redefined in GIT
-pub unsafe extern "C" fn regcomp(out: *mut regex_t, pat: *const ::c_char, cflags: ::c_int) -> ::c_int {
+pub unsafe extern "C" fn regcomp(
+    out: *mut regex_t,
+    pat: *const ::c_char,
+    cflags: ::c_int,
+) -> ::c_int {
     if cflags & REG_EXTENDED == REG_EXTENDED {
         return REG_ENOSYS;
     }

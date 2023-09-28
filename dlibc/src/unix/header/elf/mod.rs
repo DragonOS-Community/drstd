@@ -1,4 +1,3 @@
-
 pub type Elf32_Half = ::uint16_t;
 pub type Elf64_Half = ::uint16_t;
 
@@ -27,7 +26,7 @@ pub type Elf64_Versym = Elf64_Half;
 pub const EI_NIDENT: usize = 16;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Ehdr {
     pub e_ident: [::c_uchar; EI_NIDENT],
     pub e_type: Elf32_Half,
@@ -46,7 +45,7 @@ pub struct Elf32_Ehdr {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Ehdr {
     pub e_ident: [::c_uchar; EI_NIDENT],
     pub e_type: Elf64_Half,
@@ -198,7 +197,7 @@ pub const EV_CURRENT: usize = 1;
 pub const EV_NUM: usize = 2;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Shdr {
     pub sh_name: Elf32_Word,
     pub sh_type: Elf32_Word,
@@ -213,7 +212,7 @@ pub struct Elf32_Shdr {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Shdr {
     pub sh_name: Elf64_Word,
     pub sh_type: Elf64_Word,
@@ -293,7 +292,7 @@ pub const SHF_EXCLUDE: usize = 1 << 31;
 pub const GRP_COMDAT: usize = 0x1;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Sym {
     pub st_name: Elf32_Word,
     pub st_value: Elf32_Addr,
@@ -304,7 +303,7 @@ pub struct Elf32_Sym {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Sym {
     pub st_name: Elf64_Word,
     pub st_info: ::c_uchar,
@@ -315,14 +314,14 @@ pub struct Elf64_Sym {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Syminfo {
     pub si_boundto: Elf32_Half,
     pub si_flags: Elf32_Half,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Syminfo {
     pub si_boundto: Elf64_Half,
     pub si_flags: Elf64_Half,
@@ -369,21 +368,21 @@ pub const STV_HIDDEN: usize = 2;
 pub const STV_PROTECTED: usize = 3;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Rel {
     pub r_offset: Elf32_Addr,
     pub r_info: Elf32_Word,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Rel {
     pub r_offset: Elf64_Addr,
     pub r_info: Elf64_Xword,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Rela {
     pub r_offset: Elf32_Addr,
     pub r_info: Elf32_Word,
@@ -391,7 +390,7 @@ pub struct Elf32_Rela {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Rela {
     pub r_offset: Elf64_Addr,
     pub r_info: Elf64_Xword,
@@ -399,7 +398,7 @@ pub struct Elf64_Rela {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Phdr {
     pub p_type: Elf32_Word,
     pub p_offset: Elf32_Off,
@@ -412,7 +411,7 @@ pub struct Elf32_Phdr {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Phdr {
     pub p_type: Elf64_Word,
     pub p_flags: Elf64_Word,
@@ -495,28 +494,28 @@ pub const NT_METAG_TLS: usize = 0x502;
 pub const NT_VERSION: usize = 1;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub union Elf32_Dyn_Union {
     d_val: Elf32_Word,
     d_ptr: Elf32_Addr,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Dyn {
     pub d_tag: Elf32_Sword,
     pub d_un: Elf32_Dyn_Union,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub union Elf64_Dyn_Union {
     d_val: Elf64_Xword,
     d_ptr: Elf64_Addr,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Dyn {
     pub d_tag: Elf64_Sxword,
     pub d_un: Elf64_Dyn_Union,
@@ -636,7 +635,7 @@ pub const DF_P1_LAZYLOAD: usize = 0x00000001;
 pub const DF_P1_GROUPPERM: usize = 0x00000002;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Verdef {
     pub vd_version: Elf32_Half,
     pub vd_flags: Elf32_Half,
@@ -648,7 +647,7 @@ pub struct Elf32_Verdef {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Verdef {
     pub vd_version: Elf64_Half,
     pub vd_flags: Elf64_Half,
@@ -671,21 +670,21 @@ pub const VER_NDX_LORESERVE: usize = 0xff00;
 pub const VER_NDX_ELIMINATE: usize = 0xff01;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Verdaux {
     pub vda_name: Elf32_Word,
     pub vda_next: Elf32_Word,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Verdaux {
     pub vda_name: Elf64_Word,
     pub vda_next: Elf64_Word,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Verneed {
     pub vn_version: Elf32_Half,
     pub vn_cnt: Elf32_Half,
@@ -695,7 +694,7 @@ pub struct Elf32_Verneed {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Verneed {
     pub vn_version: Elf64_Half,
     pub vn_cnt: Elf64_Half,
@@ -709,7 +708,7 @@ pub const VER_NEED_CURRENT: usize = 1;
 pub const VER_NEED_NUM: usize = 2;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Vernaux {
     pub vna_hash: Elf64_Word,
     pub vna_flags: Elf64_Half,
@@ -719,13 +718,13 @@ pub struct Elf64_Vernaux {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub union A_UN {
     a_val: ::uint64_t,
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_auxv_t {
     pub a_type: ::uint64_t,
     pub a_un: A_UN,
@@ -767,7 +766,7 @@ pub const AT_L2_CACHESHAPE: usize = 36;
 pub const AT_L3_CACHESHAPE: usize = 37;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf32_Nhdr {
     pub n_namesz: Elf32_Word,
     pub n_descsz: Elf32_Word,
@@ -775,7 +774,7 @@ pub struct Elf32_Nhdr {
 }
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Nhdr {
     pub n_namesz: Elf64_Word,
     pub n_descsz: Elf64_Word,
@@ -799,7 +798,7 @@ pub const NT_GNU_BUILD_ID: usize = 3;
 pub const NT_GNU_GOLD_VERSION: usize = 4;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Elf64_Move {
     pub m_value: Elf64_Xword,
     pub m_info: Elf64_Xword,

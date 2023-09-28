@@ -1,7 +1,7 @@
 //! ptrace compatibility layer for Redox OS
 
-use core::ffi::VaList;
 use crate::unix::platform;
+use core::ffi::VaList;
 
 pub const PTRACE_TRACEME: ::c_int = 0;
 pub const PTRACE_PEEKTEXT: ::c_int = 1;

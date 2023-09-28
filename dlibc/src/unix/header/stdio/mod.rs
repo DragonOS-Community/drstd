@@ -1,11 +1,15 @@
 //! stdio implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/stdio.h.html
-use WriteByte;
+use crate::unix::header::{
+    errno::{self, STR_ERROR},
+    fcntl, stdlib,
+    string::{self, strlen},
+};
+use crate::unix::platform;
 use alloc::{
     borrow::{Borrow, BorrowMut},
     boxed::Box,
     vec::Vec,
 };
-use crate::unix::platform;
 use core::{
     cmp,
     ffi::VaList as va_list,
@@ -14,11 +18,6 @@ use core::{
     ops::{Deref, DerefMut},
     ptr, slice, str,
 };
-use crate::unix::header::{
-    errno::{self, STR_ERROR},
-    fcntl, stdlib,
-    string::{self, strlen},
-};
 use unix::{
     c_str::CStr,
     c_vec::CVec,
@@ -26,6 +25,7 @@ use unix::{
     io::{self, BufRead, BufWriter, LineWriter, Read, Write},
     sync::Mutex,
 };
+use WriteByte;
 
 pub use self::constants::*;
 mod constants;
@@ -870,7 +870,10 @@ pub unsafe extern "C" fn popen(command: *const ::c_char, mode: *const ::c_char) 
             ::close(pipes[1]);
         }
 
-        ::execv(shell as *const ::c_char, args.as_ptr() as *const *const ::c_char);
+        ::execv(
+            shell as *const ::c_char,
+            args.as_ptr() as *const *const ::c_char,
+        );
 
         stdlib::exit(127);
 
@@ -1119,7 +1122,11 @@ pub unsafe extern "C" fn ungetc(c: ::c_int, stream: *mut FILE) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vfprintf(file: *mut FILE, format: *const ::c_char, ap: va_list) -> ::c_int {
+pub unsafe extern "C" fn vfprintf(
+    file: *mut FILE,
+    format: *const ::c_char,
+    ap: va_list,
+) -> ::c_int {
     let mut file = (*file).lock();
     if let Err(_) = file.try_set_byte_orientation_unlocked() {
         return -1;
@@ -1162,7 +1169,11 @@ pub unsafe extern "C" fn vsnprintf(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vsprintf(s: *mut ::c_char, format: *const ::c_char, ap: va_list) -> ::c_int {
+pub unsafe extern "C" fn vsprintf(
+    s: *mut ::c_char,
+    format: *const ::c_char,
+    ap: va_list,
+) -> ::c_int {
     printf::printf(&mut platform::UnsafeStringWriter(s as *mut u8), format, ap)
 }
 
@@ -1187,7 +1198,11 @@ pub unsafe extern "C" fn vscanf(format: *const ::c_char, ap: va_list) -> ::c_int
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn vsscanf(s: *const ::c_char, format: *const ::c_char, ap: va_list) -> ::c_int {
+pub unsafe extern "C" fn vsscanf(
+    s: *const ::c_char,
+    format: *const ::c_char,
+    ap: va_list,
+) -> ::c_int {
     let reader = (s as *const u8).into();
     scanf::scanf(reader, format, ap)
 }

@@ -1,4 +1,3 @@
-
 #[repr(C)]
 pub struct user_regs_struct {
     pub regs: [::c_ulonglong; 31],

@@ -82,7 +82,7 @@ clean:
 	$(CARGO) clean
 
 check:
-	$(CARGO) check
+	$(CARGO) -Z build-std=core,alloc,compiler_builtins check --workspace --message-format=json --target target.json
 
 fmt:
 	$(CARGO) fmt

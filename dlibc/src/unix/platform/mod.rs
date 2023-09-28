@@ -200,23 +200,23 @@ s! {
         pub msg_hdr: ::msghdr,
         pub msg_len: ::c_uint,
     }
-    
+
 }
 
-#[derive(Copy,Clone,Default)]
+#[derive(Copy, Clone, Default)]
 pub struct timeval {
     pub tv_sec: time_t,
     pub tv_usec: suseconds_t,
 }
 
 // <sys/time.h>
-#[derive(Copy,Clone,Default)]
+#[derive(Copy, Clone, Default)]
 pub struct itimerval {
     pub it_interval: ::timeval,
     pub it_value: ::timeval,
 }
 
-cfg_if!{
+cfg_if! {
     if #[cfg(target_os = "dragonos")]{
         #[derive(Copy,Clone)]
         pub union epoll_data {
@@ -247,9 +247,12 @@ cfg_if!{
             target_arch = "x86",
             not(target_env = "musl"),
             not(target_os = "android"),
-            not(target_os = "dragonos")),
-        target_arch = "x86_64"),
-    repr(packed))]
+            not(target_os = "dragonos")
+        ),
+        target_arch = "x86_64"
+    ),
+    repr(packed)
+)]
 pub struct epoll_event {
     pub events: u32,
     pub u64: u64,
@@ -1102,7 +1105,7 @@ pub const PATH_MAX: ::c_int = 4096;
 pub const UIO_MAXIOV: ::c_int = 1024;
 
 pub const FD_SETSIZE: usize = 1024;
-cfg_if!{
+cfg_if! {
     if #[cfg(not(target_os = "dragonos"))]{
         pub const EPOLLIN: ::c_int = 0x1;
         pub const EPOLLPRI: ::c_int = 0x2;
@@ -1945,11 +1948,11 @@ pub mod dragonos;
 #[cfg(target_os = "dragonos")]
 pub use self::dragonos::*;
 
-use unix::io::{self, Read, Write};
 use alloc::{boxed::Box, vec::Vec};
 use core::{fmt, ptr};
+use unix::io::{self, Read, Write};
 
-pub use self::allocator::{alloc,free,realloc,alloc_align};
+pub use self::allocator::{alloc, alloc_align, free, realloc};
 
 //#[cfg(all(not(feature = "ralloc"), target_os = "dragonos"))]
 #[path = "dragonos/allocator/dragonos_malloc.rs"]
@@ -2017,12 +2020,12 @@ impl<'a, W: WriteByte> WriteByte for &'a mut W {
     }
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct FileWriter(pub ::c_int);
 
 impl FileWriter {
     pub fn write(&mut self, buf: &[u8]) -> isize {
-        self::write(self.0, buf.as_ptr() as *const ::c_void,buf.len())
+        self::write(self.0, buf.as_ptr() as *const ::c_void, buf.len())
     }
 }
 
@@ -2040,18 +2043,18 @@ impl WriteByte for FileWriter {
     }
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct FileReader(pub ::c_int);
 
 impl FileReader {
     pub fn read(&mut self, buf: &mut [u8]) -> isize {
-        self::read(self.0, buf.as_mut_ptr() as *mut ::c_void,buf.len())
+        self::read(self.0, buf.as_mut_ptr() as *mut ::c_void, buf.len())
     }
 }
 
 impl Read for FileReader {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        let i = self::read(self.0, buf.as_mut_ptr() as *mut ::c_void,buf.len());
+        let i = self::read(self.0, buf.as_mut_ptr() as *mut ::c_void, buf.len());
         if i >= 0 {
             Ok(i as usize)
         } else {
@@ -2236,4 +2239,3 @@ pub fn init(auxvs: Box<[[usize; 2]]>) {
 }
 #[cfg(not(target_os = "redox"))]
 pub fn init(_auxvs: Box<[[usize; 2]]>) {}
-

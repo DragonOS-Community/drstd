@@ -16,10 +16,6 @@ use core::{slice, u16};
 mod answer;
 mod query;
 
-
-
-
-
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, Default)]
 #[repr(packed)]

@@ -1,9 +1,6 @@
 //! ::statvfs implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstatvfs.h.html
 
-use crate::unix::{
-    header::fcntl::O_PATH,
-    platform,
-};
+use crate::unix::{header::fcntl::O_PATH, platform};
 
 //pub const ST_RDONLY
 //pub const ST_NOSUID

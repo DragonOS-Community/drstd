@@ -3,7 +3,7 @@
 //! [Documentation for other platforms][pd].
 //!
 //! [pd]: https://rust-lang.github.io/libc/#platform-specific-documentation
-//! 
+//!
 
 #![feature(core_intrinsics)]
 #![feature(linkage)]
@@ -14,8 +14,6 @@
 #![feature(c_variadic)]
 #![feature(stmt_expr_attributes)]
 #![feature(lang_items)]
-
-
 #![crate_name = "dlibc"]
 #![crate_type = "staticlib"]
 #![allow(
@@ -49,13 +47,12 @@ extern crate alloc;
 extern crate core_io;
 #[macro_use]
 extern crate lazy_static;
-extern crate memchr;
-extern crate goblin;
-extern crate rand;
-extern crate posix_regex;
 extern crate cbitset;
+extern crate goblin;
+extern crate memchr;
 extern crate num_traits;
-
+extern crate posix_regex;
+extern crate rand;
 
 #[macro_use]
 mod macros;
@@ -127,11 +124,10 @@ pub use unix::*;
 extern crate dsc;
 #[cfg(target_os = "dragonos")]
 #[global_allocator]
-static ALLOCATOR: crate::unix::platform::allocator::Allocator = crate::unix::platform::allocator::ALLOCATOR;
+static ALLOCATOR: crate::unix::platform::allocator::Allocator =
+    crate::unix::platform::allocator::ALLOCATOR;
 #[cfg(target_os = "dragonos")]
 pub use crate::unix::macros::*;
-
-
 
 #[lang = "eh_personality"]
 extern "C" fn eh_personality() {}
@@ -146,4 +142,4 @@ fn panic_handler(info: &core::panic::PanicInfo) -> ! {
 
     // 结束程序，例如通过调用 `std::process::exit`
     crate::unix::platform::pal::exit(0);
-}                        
+}

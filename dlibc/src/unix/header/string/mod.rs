@@ -1,10 +1,10 @@
 //! string implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/string.h.html
 
-use core::{mem, ptr, slice, usize};
+use crate::unix::header::string::slice::memchr;
+use crate::unix::header::{errno::*, signal};
 use crate::unix::platform;
 use cbitset::BitSet256;
-use crate::unix::header::{errno::*, signal};
-use crate::unix::header::string::slice::memchr;
+use core::{mem, ptr, slice, usize};
 
 #[no_mangle]
 pub unsafe extern "C" fn memccpy(
@@ -71,7 +71,11 @@ pub unsafe extern "C" fn memcmp(s1: *const ::c_void, s2: *const ::c_void, n: ::s
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn memcpy(s1: *mut ::c_void, s2: *const ::c_void, n: ::size_t) -> *mut ::c_void {
+pub unsafe extern "C" fn memcpy(
+    s1: *mut ::c_void,
+    s2: *const ::c_void,
+    n: ::size_t,
+) -> *mut ::c_void {
     let mut i = 0;
     while i + 7 < n {
         *(s1.add(i) as *mut u64) = *(s2.add(i) as *const u64);
@@ -85,7 +89,11 @@ pub unsafe extern "C" fn memcpy(s1: *mut ::c_void, s2: *const ::c_void, n: ::siz
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn memmove(s1: *mut ::c_void, s2: *const ::c_void, n: ::size_t) -> *mut ::c_void {
+pub unsafe extern "C" fn memmove(
+    s1: *mut ::c_void,
+    s2: *const ::c_void,
+    n: ::size_t,
+) -> *mut ::c_void {
     if s2 < s1 as *const ::c_void {
         // copy from end
         let mut i = n;
@@ -241,7 +249,11 @@ pub unsafe extern "C" fn strerror(errnum: ::c_int) -> *mut ::c_char {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strerror_r(errnum: ::c_int, buf: *mut ::c_char, buflen: ::size_t) -> ::c_int {
+pub unsafe extern "C" fn strerror_r(
+    errnum: ::c_int,
+    buf: *mut ::c_char,
+    buflen: ::size_t,
+) -> ::c_int {
     let msg = strerror(errnum);
     let len = strlen(msg);
 
@@ -289,7 +301,11 @@ pub unsafe extern "C" fn strcat(s1: *mut ::c_char, s2: *const ::c_char) -> *mut 
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strncat(s1: *mut ::c_char, s2: *const ::c_char, n: ::size_t) -> *mut ::c_char {
+pub unsafe extern "C" fn strncat(
+    s1: *mut ::c_char,
+    s2: *const ::c_char,
+    n: ::size_t,
+) -> *mut ::c_char {
     let len = strlen(s1 as *const ::c_char);
     let mut i = 0;
     while i < n {
@@ -322,7 +338,11 @@ pub unsafe extern "C" fn strncmp(s1: *const ::c_char, s2: *const ::c_char, n: ::
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strncpy(dst: *mut ::c_char, src: *const ::c_char, n: ::size_t) -> *mut ::c_char {
+pub unsafe extern "C" fn strncpy(
+    dst: *mut ::c_char,
+    src: *const ::c_char,
+    n: ::size_t,
+) -> *mut ::c_char {
     let mut i = 0;
 
     while *src.add(i) != 0 && i < n {
@@ -399,11 +419,17 @@ unsafe fn inner_strstr(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strstr(haystack: *const ::c_char, needle: *const ::c_char) -> *mut ::c_char {
+pub unsafe extern "C" fn strstr(
+    haystack: *const ::c_char,
+    needle: *const ::c_char,
+) -> *mut ::c_char {
     inner_strstr(haystack, needle, !0)
 }
 #[no_mangle]
-pub unsafe extern "C" fn strcasestr(haystack: *const ::c_char, needle: *const ::c_char) -> *mut ::c_char {
+pub unsafe extern "C" fn strcasestr(
+    haystack: *const ::c_char,
+    needle: *const ::c_char,
+) -> *mut ::c_char {
     inner_strstr(haystack, needle, !32)
 }
 
@@ -460,7 +486,11 @@ pub unsafe extern "C" fn strxfrm(s1: *mut ::c_char, s2: *const ::c_char, n: ::si
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strlcpy(dst: *mut ::c_char, src: *const ::c_char, n: ::size_t) -> ::size_t {
+pub unsafe extern "C" fn strlcpy(
+    dst: *mut ::c_char,
+    src: *const ::c_char,
+    n: ::size_t,
+) -> ::size_t {
     let mut i = 0;
 
     while *src.add(i) != 0 && i < n {
@@ -474,7 +504,11 @@ pub unsafe extern "C" fn strlcpy(dst: *mut ::c_char, src: *const ::c_char, n: ::
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strlcat(dst: *mut ::c_char, src: *const ::c_char, n: ::size_t) -> ::size_t {
+pub unsafe extern "C" fn strlcat(
+    dst: *mut ::c_char,
+    src: *const ::c_char,
+    n: ::size_t,
+) -> ::size_t {
     let len = strlen(dst) as isize;
     let d = dst.offset(len);
 

@@ -1,9 +1,9 @@
 //! getopt implementation for relibc
 
 use crate::unix::header::{
-        stdio, string,
-        unistd::{optarg, opterr, optind, optopt},
-    };
+    stdio, string,
+    unistd::{optarg, opterr, optind, optopt},
+};
 use core::ptr;
 
 static mut CURRENT_OPT: *mut ::c_char = ptr::null_mut();

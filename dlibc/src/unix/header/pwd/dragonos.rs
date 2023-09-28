@@ -1,6 +1,5 @@
 use super::{parsed, passwd};
 
-
 pub fn split(line: &mut [u8]) -> Option<passwd> {
     let mut parts = line.split_mut(|&c| c == b'\0');
     Some(passwd {

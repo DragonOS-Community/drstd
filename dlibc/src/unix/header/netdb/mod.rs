@@ -7,7 +7,6 @@ use core::{
     str::{self, FromStr},
 };
 
-use alloc::{borrow::ToOwned, boxed::Box, str::SplitWhitespace, vec::Vec};
 use crate::unix::header::{
     arpa_inet::{htons, inet_aton, ntohl},
     errno::*,
@@ -18,6 +17,7 @@ use crate::unix::header::{
     sys_socket::{constants::AF_INET, sa_family_t, socklen_t},
     unistd::SEEK_SET,
 };
+use alloc::{borrow::ToOwned, boxed::Box, str::SplitWhitespace, vec::Vec};
 
 use sockaddr;
 
@@ -88,8 +88,8 @@ pub struct addrinfo {
     ai_protocol: ::c_int,        /* 0 or IPPROTO_xxx for IPv4 and IPv6 */
     ai_addrlen: ::size_t,        /* length of ai_addr */
     ai_canonname: *mut ::c_char, /* canonical name for hostname */
-    ai_addr: *mut sockaddr,    /* binary address */
-    ai_next: *mut addrinfo,    /* next structure in linked list */
+    ai_addr: *mut sockaddr,      /* binary address */
+    ai_next: *mut addrinfo,      /* next structure in linked list */
 }
 
 pub const AI_PASSIVE: ::c_int = 0x0001;
@@ -235,7 +235,10 @@ pub unsafe extern "C" fn gethostbyaddr(
     match lookup_addr(addr) {
         Ok(s) => {
             _HOST_ADDR_LIST = mem::transmute::<u32, [u8; 4]>(addr.s_addr);
-            HOST_ADDR_LIST = [_HOST_ADDR_LIST.as_mut_ptr() as *mut ::c_char, ptr::null_mut()];
+            HOST_ADDR_LIST = [
+                _HOST_ADDR_LIST.as_mut_ptr() as *mut ::c_char,
+                ptr::null_mut(),
+            ];
             let host_name = s[0].to_vec();
             HOST_NAME = Some(host_name);
             HOST_ENTRY = hostent {
@@ -326,7 +329,10 @@ pub unsafe extern "C" fn gethostbyname(name: *const ::c_char) -> *mut hostent {
     let host_name: Vec<u8> = name_cstr.to_bytes().to_vec();
     HOST_NAME = Some(host_name);
     _HOST_ADDR_LIST = mem::transmute::<u32, [u8; 4]>(host_addr.s_addr);
-    HOST_ADDR_LIST = [_HOST_ADDR_LIST.as_mut_ptr() as *mut ::c_char, ptr::null_mut()];
+    HOST_ADDR_LIST = [
+        _HOST_ADDR_LIST.as_mut_ptr() as *mut ::c_char,
+        ptr::null_mut(),
+    ];
     HOST_ADDR = Some(host_addr);
 
     //TODO actually get aliases
@@ -545,7 +551,10 @@ pub unsafe extern "C" fn getprotoent() -> *mut protoent {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn getservbyname(name: *const ::c_char, proto: *const ::c_char) -> *mut servent {
+pub unsafe extern "C" fn getservbyname(
+    name: *const ::c_char,
+    proto: *const ::c_char,
+) -> *mut servent {
     setservent(SERV_STAYOPEN);
     let mut p: *mut servent;
     if proto.is_null() {

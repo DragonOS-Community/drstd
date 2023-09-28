@@ -126,7 +126,9 @@ pub unsafe extern "C" fn scandir(
     dirp: *const ::c_char,
     namelist: *mut *mut *mut platform::dirent,
     filter: Option<extern "C" fn(_: *const platform::dirent) -> ::c_int>,
-    compare: Option<extern "C" fn(_: *mut *const platform::dirent, _: *mut *const platform::dirent) -> ::c_int>,
+    compare: Option<
+        extern "C" fn(_: *mut *const platform::dirent, _: *mut *const platform::dirent) -> ::c_int,
+    >,
 ) -> ::c_int {
     let dir = opendir(dirp);
     if dir.is_null() {

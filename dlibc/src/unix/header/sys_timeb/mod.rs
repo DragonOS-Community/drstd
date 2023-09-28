@@ -1,6 +1,6 @@
 //! sys/time implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/systime.h.html
 
-use crate::unix::header::sys_time::{gettimeofday ,timeval, timezone};
+use crate::unix::header::sys_time::{gettimeofday, timeval, timezone};
 
 #[repr(C)]
 #[derive(Default)]

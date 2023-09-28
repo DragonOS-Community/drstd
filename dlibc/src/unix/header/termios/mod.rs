@@ -1,6 +1,6 @@
 //! termios implementation, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/termios.h.html
 
-use crate::unix::header::{errno};
+use crate::unix::header::errno;
 
 pub type cc_t = u8;
 pub type speed_t = u32;
@@ -46,8 +46,8 @@ pub struct termios {
     c_cc: [cc_t; NCCS],
 }
 
-use {TCGETS,TCSETS,TCFLSH,TCSBRK};
 use unix::platform::ioctl;
+use {TCFLSH, TCGETS, TCSBRK, TCSETS};
 
 #[no_mangle]
 pub unsafe extern "C" fn tcgetattr(fd: ::c_int, out: *mut termios) -> ::c_int {

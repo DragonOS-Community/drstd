@@ -1,10 +1,6 @@
 //! ::stat implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/sysstat.h.html
 
-use crate::unix::{
-    header::fcntl::{O_NOFOLLOW, O_PATH},
-};
-
-
+use crate::unix::header::fcntl::{O_NOFOLLOW, O_PATH};
 
 use crate::unix::platform;
 

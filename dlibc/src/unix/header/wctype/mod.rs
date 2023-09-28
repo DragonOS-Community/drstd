@@ -1,7 +1,7 @@
 //! wchar implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/wctype.h.html
 
 use self::casecmp::casemap;
-use crate::unix::{c_str::CStr, header::ctype,};
+use crate::unix::{c_str::CStr, header::ctype};
 
 mod alpha;
 mod casecmp;
@@ -165,7 +165,9 @@ pub extern "C" fn iswupper(wc: ::wint_t) -> ::c_int {
 
 #[no_mangle]
 pub extern "C" fn iswxdigit(wc: ::wint_t) -> ::c_int {
-    ::c_int::from(wc.wrapping_sub('0' as ::wint_t) < 10 || (wc | 32).wrapping_sub('a' as ::wint_t) < 6)
+    ::c_int::from(
+        wc.wrapping_sub('0' as ::wint_t) < 10 || (wc | 32).wrapping_sub('a' as ::wint_t) < 6,
+    )
 }
 
 #[no_mangle]

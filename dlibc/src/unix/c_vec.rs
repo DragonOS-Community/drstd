@@ -232,4 +232,3 @@ impl WriteByte for CVec<u8> {
         Ok(())
     }
 }
-

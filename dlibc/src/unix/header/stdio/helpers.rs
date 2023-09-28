@@ -2,14 +2,10 @@ use alloc::boxed::Box;
 
 use super::{Buffer, FILE};
 use crate::unix::header::{errno, fcntl::*, string::strchr};
-use crate::unix::{
-    fs::File,
-    io::BufWriter,
-    sync::Mutex,
-};
+use crate::unix::{fs::File, io::BufWriter, sync::Mutex};
 use alloc::vec::Vec;
 
-use crate::unix::header::stdio::{F_APP,F_NORD,F_NOWR};
+use crate::unix::header::stdio::{F_APP, F_NORD, F_NOWR};
 use crate::unix::platform;
 
 /// Parse mode flags as a string and output a mode flags integer

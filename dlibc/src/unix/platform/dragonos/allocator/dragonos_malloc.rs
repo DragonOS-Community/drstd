@@ -1,4 +1,8 @@
-use core::{alloc::GlobalAlloc, ptr::null_mut, sync::atomic::{AtomicUsize, Ordering}};
+use core::{
+    alloc::GlobalAlloc,
+    ptr::null_mut,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
 extern "C" {
     fn _dragonos_free(ptr: *mut ::c_void) -> *mut ::c_void;
@@ -6,7 +10,7 @@ extern "C" {
     fn _dragonos_chunk_length(ptr: *mut ::c_void) -> usize;
 }
 
-pub struct Allocator{
+pub struct Allocator {
     mstate: AtomicUsize,
 }
 
@@ -19,7 +23,7 @@ impl Allocator {
     }
 }
 
-pub const ALLOCATOR: Allocator = Allocator{
+pub const ALLOCATOR: Allocator = Allocator {
     mstate: AtomicUsize::new(0),
 };
 

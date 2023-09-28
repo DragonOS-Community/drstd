@@ -1,5 +1,3 @@
-
-
 #[repr(C)]
 #[derive(Copy)]
 pub union sem_t {

@@ -1,4 +1,4 @@
-use crate::unix::header::time::{sigevent};
+use crate::unix::header::time::sigevent;
 
 pub struct aiocb {
     pub aio_fildes: ::c_int,

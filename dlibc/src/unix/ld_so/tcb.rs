@@ -1,19 +1,13 @@
-
 use alloc::vec::Vec;
 use core::{arch::asm, mem, ptr, slice};
 use goblin::error::{Error, Result};
 
-
-
 use crate::unix::platform;
-use crate::unix::{
-    ld_so::linker::Linker,
-    sync::mutex::Mutex,
-};
-use PROT_READ;
-use PROT_WRITE;
+use crate::unix::{ld_so::linker::Linker, sync::mutex::Mutex};
 use MAP_ANONYMOUS;
 use MAP_PRIVATE;
+use PROT_READ;
+use PROT_WRITE;
 
 use crate::trace;
 

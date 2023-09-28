@@ -3,8 +3,6 @@ use crate::unix::{
     header::fcntl,
 };
 
-
-
 pub const MADV_NORMAL: ::c_int = 0;
 pub const MADV_RANDOM: ::c_int = 1;
 pub const MADV_SEQUENTIAL: ::c_int = 2;
@@ -107,7 +105,11 @@ unsafe fn shm_path(name: *const ::c_char) -> CString {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn shm_open(name: *const ::c_char, oflag: ::c_int, mode: ::mode_t) -> ::c_int {
+pub unsafe extern "C" fn shm_open(
+    name: *const ::c_char,
+    oflag: ::c_int,
+    mode: ::mode_t,
+) -> ::c_int {
     let path = shm_path(name);
     fcntl::sys_open(path.as_ptr(), oflag, mode)
 }

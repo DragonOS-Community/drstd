@@ -1,10 +1,14 @@
+use crate::unix::platform::pal::e;
 use crate::unix::*;
 use dsc::syscall;
-use crate::unix::platform::pal::{e};
 use sockaddr;
 #[no_mangle]
-pub unsafe extern "C" fn accept(socket: ::c_int, address: *mut sockaddr, address_len: *mut socklen_t) -> ::c_int{
-	e(syscall!(
+pub unsafe extern "C" fn accept(
+    socket: ::c_int,
+    address: *mut sockaddr,
+    address_len: *mut socklen_t,
+) -> ::c_int {
+    e(syscall!(
         SYS_ACCEPT,
         socket as usize,
         address as usize,
@@ -13,12 +17,20 @@ pub unsafe extern "C" fn accept(socket: ::c_int, address: *mut sockaddr, address
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn bind(socket: ::c_int, address: *const ::sockaddr, address_len: ::socklen_t) -> ::c_int{
-	e(syscall!(SYS_BIND, socket, address, address_len)) as ::c_int
+pub unsafe extern "C" fn bind(
+    socket: ::c_int,
+    address: *const ::sockaddr,
+    address_len: ::socklen_t,
+) -> ::c_int {
+    e(syscall!(SYS_BIND, socket, address, address_len)) as ::c_int
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn connect(socket: ::c_int, address: *const sockaddr, address_len: socklen_t) -> ::c_int {
+pub unsafe extern "C" fn connect(
+    socket: ::c_int,
+    address: *const sockaddr,
+    address_len: socklen_t,
+) -> ::c_int {
     e(syscall!(SYS_CONNECT, socket, address, address_len)) as ::c_int
 }
 
@@ -67,22 +79,14 @@ pub extern "C" fn listen(socket: ::c_int, backlog: ::c_int) -> ::c_int {
 
 #[no_mangle]
 pub extern "C" fn recvfrom(
-	socket: ::c_int,
-	buf: *mut ::c_void,
-	len: ::size_t,
-	flags: ::c_int,
-	addr: *mut ::sockaddr,
-	addrlen: *mut ::socklen_t,
-) -> ::ssize_t{
-	e(unsafe{syscall!(
-        SYS_RECVFROM,
-        socket,
-        buf,
-        len,
-        flags,
-        addr,
-        addrlen
-    )}) as ssize_t
+    socket: ::c_int,
+    buf: *mut ::c_void,
+    len: ::size_t,
+    flags: ::c_int,
+    addr: *mut ::sockaddr,
+    addrlen: *mut ::socklen_t,
+) -> ::ssize_t {
+    e(unsafe { syscall!(SYS_RECVFROM, socket, buf, len, flags, addr, addrlen) }) as ssize_t
 }
 
 #[no_mangle]
@@ -93,10 +97,8 @@ pub extern "C" fn sendto(
     flags: ::c_int,
     addr: *const sockaddr,
     addrlen: socklen_t,
-) -> ::ssize_t{
-	e(unsafe{syscall!(
-        SYS_SENDTO, socket, buf, len, flags, addr, addrlen
-    )}) as ssize_t
+) -> ::ssize_t {
+    e(unsafe { syscall!(SYS_SENDTO, socket, buf, len, flags, addr, addrlen) }) as ssize_t
 }
 
 #[no_mangle]
@@ -106,27 +108,18 @@ pub extern "C" fn setsockopt(
     name: ::c_int,
     value: *const ::c_void,
     option_len: socklen_t,
-) -> ::c_int{
-	e(unsafe {
-        syscall!(
-            SYS_SETSOCKOPT,
-            socket,
-            level,
-            name,
-            value,
-            option_len
-        )
-    }) as ::c_int
+) -> ::c_int {
+    e(unsafe { syscall!(SYS_SETSOCKOPT, socket, level, name, value, option_len) }) as ::c_int
 }
 
 #[no_mangle]
-pub extern "C" fn shutdown(socket: ::c_int, how: ::c_int) -> ::c_int{
-	e(unsafe { syscall!(SYS_SHUTDOWN, socket, how) }) as ::c_int
+pub extern "C" fn shutdown(socket: ::c_int, how: ::c_int) -> ::c_int {
+    e(unsafe { syscall!(SYS_SHUTDOWN, socket, how) }) as ::c_int
 }
 
 #[no_mangle]
-pub extern "C" fn socket(domain: ::c_int, ty: ::c_int, protocol: ::c_int) -> ::c_int{
-	e(unsafe{syscall!(SYS_SOCKET, domain, ty, protocol)}) as ::c_int
+pub extern "C" fn socket(domain: ::c_int, ty: ::c_int, protocol: ::c_int) -> ::c_int {
+    e(unsafe { syscall!(SYS_SOCKET, domain, ty, protocol) }) as ::c_int
 }
 
 #[no_mangle]
@@ -135,6 +128,6 @@ pub extern "C" fn socketpair(
     _type_: ::c_int,
     _protocol: ::c_int,
     _socket_vector: *mut ::c_int,
-) -> ::c_int{
-	unimplemented!()
+) -> ::c_int {
+    unimplemented!()
 }

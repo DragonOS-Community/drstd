@@ -1,7 +1,5 @@
 //! grp implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/grp.h.html
 
-
-
 #[repr(C)]
 pub struct group {
     pub gr_name: *mut ::c_char,

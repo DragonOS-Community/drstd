@@ -1,4 +1,3 @@
-
 use crate::unix::c_str::CStr;
 use crate::unix::platform::pal::e;
 use crate::unix::*;
@@ -318,7 +317,7 @@ pub extern "C" fn open(path: *const ::c_char, oflag: ::c_int, mode: mode_t) -> :
 
 #[no_mangle]
 pub extern "C" fn pipe2(fds: *mut ::c_int, flags: ::c_int) -> ::c_int {
-    e(unsafe { syscall!(SYS_PIPE, fds, flags )}) as ::c_int
+    e(unsafe { syscall!(SYS_PIPE, fds, flags) }) as ::c_int
 }
 
 #[no_mangle]
