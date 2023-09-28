@@ -1,5 +1,3 @@
-
-
 pub fn introsort(
     base: *mut ::c_char,
     nel: ::size_t,
@@ -133,11 +131,20 @@ fn heap_sift_down(
         let first_child_ptr = unsafe { base.add(child * width) };
         let second_child_ptr = unsafe { base.add((child + 1) * width) };
 
-        if comp(swap_ptr as *const ::c_void, first_child_ptr as *const ::c_void) < 0 {
+        if comp(
+            swap_ptr as *const ::c_void,
+            first_child_ptr as *const ::c_void,
+        ) < 0
+        {
             swap_idx = child;
             swap_ptr = first_child_ptr;
         }
-        if child < end && comp(swap_ptr as *const ::c_void, second_child_ptr as *const ::c_void) < 0 {
+        if child < end
+            && comp(
+                swap_ptr as *const ::c_void,
+                second_child_ptr as *const ::c_void,
+            ) < 0
+        {
             swap_idx = child + 1;
             swap_ptr = second_child_ptr;
         }

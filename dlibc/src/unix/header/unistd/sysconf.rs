@@ -1,6 +1,6 @@
+use crate::unix::header::errno;
 use core::convert::TryInto;
 use unix::platform;
-use crate::unix::header::errno;
 
 // POSIX.1 {
 pub const _SC_ARG_MAX: ::c_int = 0;

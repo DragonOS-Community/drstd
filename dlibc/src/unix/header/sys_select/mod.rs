@@ -8,9 +8,7 @@ use crate::unix::{
     fs::File,
     header::{
         errno,
-        sys_epoll::{
-            epoll_create1, epoll_ctl, epoll_data, epoll_event, epoll_wait
-        },
+        sys_epoll::{epoll_create1, epoll_ctl, epoll_data, epoll_event, epoll_wait},
         sys_time::timeval,
     },
     platform,
@@ -39,7 +37,7 @@ pub fn select_epoll(
     };
 
     let ep = {
-        let epfd = unsafe{epoll_create1(::EPOLL_CLOEXEC)};
+        let epfd = unsafe { epoll_create1(::EPOLL_CLOEXEC) };
         if epfd < 0 {
             return -1;
         }
@@ -75,11 +73,11 @@ pub fn select_epoll(
 
         if events > 0 {
             let mut event = epoll_event {
-                events:events as u32,
+                events: events as u32,
                 data: epoll_data { fd },
                 ..Default::default()
             };
-            if unsafe{epoll_ctl(*ep, ::EPOLL_CTL_ADD, fd, &mut event)} < 0 {
+            if unsafe { epoll_ctl(*ep, ::EPOLL_CTL_ADD, fd, &mut event) } < 0 {
                 if unsafe { platform::errno == errno::EPERM } {
                     not_epoll += 1;
                 } else {

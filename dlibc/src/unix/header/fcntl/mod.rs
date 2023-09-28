@@ -1,7 +1,5 @@
 //! fcntl implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/fcntl.h.html
 
-
-
 pub use self::platform::*;
 use crate::unix::platform;
 
@@ -10,7 +8,7 @@ pub unsafe extern "C" fn creat(path: *const ::c_char, mode: ::mode_t) -> ::c_int
     sys_open(path, O_WRONLY | O_CREAT | O_TRUNC, mode)
 }
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct flock {
     pub l_type: ::c_short,
     pub l_whence: ::c_short,
@@ -24,7 +22,11 @@ pub extern "C" fn sys_fcntl(fildes: ::c_int, cmd: ::c_int, arg: ::c_int) -> ::c_
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn sys_open(path: *const ::c_char, oflag: ::c_int, mode: ::mode_t) -> ::c_int {
+pub unsafe extern "C" fn sys_open(
+    path: *const ::c_char,
+    oflag: ::c_int,
+    mode: ::mode_t,
+) -> ::c_int {
     platform::pal::open(path, oflag, mode)
 }
 

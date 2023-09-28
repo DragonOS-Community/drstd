@@ -10,17 +10,17 @@ use alloc::{
 
 use unix::platform::allocator::new_mspace;
 
+use super::platform;
 use crate::eprintln;
 use crate::println;
-use super::platform;
 
 use unix::{
+    allocator::ALLOCATOR,
     c_str::CStr,
     header::unistd,
     platform::{get_auxv, get_auxvs},
     start::Stack,
     sync::mutex::Mutex,
-    allocator::ALLOCATOR,
 };
 
 use super::{access::accessible, debug::_r_debug, linker::Linker, tcb::Tcb, PATH_SEP};

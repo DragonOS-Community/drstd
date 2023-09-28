@@ -1,10 +1,10 @@
+use alloc::string::String;
 use unix::{
     c_str::CString,
     fs::File,
     header::fcntl,
     io::{BufRead, BufReader},
 };
-use alloc::string::String;
 
 pub fn get_dns_server() -> String {
     let file = match File::open(&CString::new("/etc/resolv.conf").unwrap(), fcntl::O_RDONLY) {

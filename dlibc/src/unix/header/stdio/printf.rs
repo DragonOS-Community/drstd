@@ -6,10 +6,7 @@ use alloc::{
 };
 use core::{char, cmp, f64, ffi::VaList, fmt, num::FpCategory, ops::Range, slice};
 
-use crate::unix::{
-    header::errno::EILSEQ,
-    platform,
-};
+use crate::unix::{header::errno::EILSEQ, platform};
 
 //  ____        _ _                 _       _
 // | __ )  ___ (_) | ___ _ __ _ __ | | __ _| |_ ___ _
@@ -608,7 +605,11 @@ impl Iterator for PrintfIter {
     }
 }
 
-unsafe fn inner_printf<W: Write>(w: W, format: *const ::c_char, mut ap: VaList) -> io::Result<::c_int> {
+unsafe fn inner_printf<W: Write>(
+    w: W,
+    format: *const ::c_char,
+    mut ap: VaList,
+) -> io::Result<::c_int> {
     let w = &mut platform::CountingWriter::new(w);
 
     let iterator = PrintfIter {

@@ -1,2 +1,6 @@
-[alias]
-check = "check -Z build-std=core,alloc,compiler_builtins --target x86_64-unknown-dragonos"
+[build]
+target = "./target.json"
+
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
+build-std-features = ["compiler-builtins-mem"]

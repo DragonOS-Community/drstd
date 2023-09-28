@@ -1391,7 +1391,11 @@ extern "C" {
     pub fn cfsetispeed(termios: *mut platform::termios, speed: ::speed_t) -> ::c_int;
     pub fn cfsetospeed(termios: *mut platform::termios, speed: ::speed_t) -> ::c_int;
     pub fn tcgetattr(fd: ::c_int, termios: *mut platform::termios) -> ::c_int;
-    pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const platform::termios) -> ::c_int;
+    pub fn tcsetattr(
+        fd: ::c_int,
+        optional_actions: ::c_int,
+        termios: *const platform::termios,
+    ) -> ::c_int;
     pub fn tcflow(fd: ::c_int, action: ::c_int) -> ::c_int;
     pub fn tcflush(fd: ::c_int, action: ::c_int) -> ::c_int;
     pub fn tcgetsid(fd: ::c_int) -> ::pid_t;

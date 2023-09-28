@@ -1,11 +1,11 @@
 //! arpa/inet implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xns/arpainet.h.html
 
+use crate::unix::c_str::*;
+use crate::unix::platform;
 use core::{
     ptr, slice,
     str::{self, FromStr},
 };
-use crate::unix::c_str::*;
-use crate::unix::platform;
 
 use crate::unix::header::{
     errno::*,
@@ -52,7 +52,11 @@ pub unsafe extern "C" fn inet_ntoa(addr: in_addr) -> *const ::c_char {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn inet_pton(domain: ::c_int, src: *const ::c_char, dest: *mut ::c_void) -> ::c_int {
+pub unsafe extern "C" fn inet_pton(
+    domain: ::c_int,
+    src: *const ::c_char,
+    dest: *mut ::c_void,
+) -> ::c_int {
     if domain != AF_INET {
         platform::errno = EAFNOSUPPORT;
         -1

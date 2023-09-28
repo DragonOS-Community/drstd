@@ -3,7 +3,6 @@
 
 //use header::sys_resource::rusage;
 
-
 pub const WNOHANG: ::c_int = 1;
 pub const WUNTRACED: ::c_int = 2;
 

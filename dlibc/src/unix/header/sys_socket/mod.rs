@@ -1,7 +1,7 @@
 //! socket implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xns/syssocket.h.html
 
-use core::ptr;
 use crate::unix::platform;
+use core::ptr;
 pub mod constants;
 
 use unix::platform::sockaddr;
@@ -23,11 +23,7 @@ pub unsafe extern "C" fn accept(
     )
 }
 
-pub unsafe fn bind(
-    socket: ::c_int,
-    address: *const sockaddr,
-    address_len: socklen_t,
-) -> ::c_int {
+pub unsafe fn bind(socket: ::c_int, address: *const sockaddr, address_len: socklen_t) -> ::c_int {
     trace_expr!(
         platform::pal::bind(socket, address, address_len),
         "bind({}, {:p}, {})",

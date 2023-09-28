@@ -1,6 +1,5 @@
 //! sys/file.h implementation
 
-
 pub const LOCK_SH: usize = 1;
 pub const LOCK_EX: usize = 2;
 pub const LOCK_NB: usize = 4;

@@ -1,6 +1,6 @@
-use alloc::vec::Vec;
-use crate::unix::platform;
 use crate::unix::header::unistd::SEEK_SET;
+use crate::unix::platform;
+use alloc::vec::Vec;
 /// Implements an `Iterator` which returns on either newline or EOF.
 #[derive(Clone)]
 pub struct RawLineBuffer {
@@ -56,7 +56,11 @@ impl RawLineBuffer {
                 self.buf.set_len(capacity);
             }
 
-            let read = platform::pal::read(self.fd, (&mut self.buf[len..]).as_ptr() as *mut ::c_void,(&mut self.buf[len..]).len());
+            let read = platform::pal::read(
+                self.fd,
+                (&mut self.buf[len..]).as_ptr() as *mut ::c_void,
+                (&mut self.buf[len..]).len(),
+            );
 
             let read_usize = read.max(0) as usize;
 
@@ -90,7 +94,7 @@ impl RawLineBuffer {
 
     /// Seek to a byte position in the file
     pub fn seek(&mut self, pos: usize) -> ::off_t {
-        let ret = unsafe{::lseek(self.fd, pos as ::off_t, SEEK_SET)};
+        let ret = unsafe { ::lseek(self.fd, pos as ::off_t, SEEK_SET) };
         if ret != !0 {
             self.read = pos;
         }

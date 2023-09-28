@@ -44,7 +44,7 @@ impl Semaphore {
             }
             if let Some(timeout) = timeout_opt {
                 let mut time = ::timespec::default();
-                unsafe{clock_gettime(::CLOCK_MONOTONIC, &mut time)};
+                unsafe { clock_gettime(::CLOCK_MONOTONIC, &mut time) };
                 if (time.tv_sec > timeout.tv_sec)
                     || (time.tv_sec == timeout.tv_sec && time.tv_nsec >= timeout.tv_nsec)
                 {

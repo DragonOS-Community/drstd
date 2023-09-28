@@ -1,9 +1,9 @@
 // Wrapper over the access syscall that doesn't touch errno variable,
 // Do not use outside of ld_so
 
+use crate::unix::c_str::CString;
 #[cfg(target_os = "redox")]
 use crate::unix::header::unistd::{F_OK, R_OK, W_OK, X_OK};
-use crate::unix::c_str::{CString};
 
 pub fn accessible(path: &str, mode: ::c_int) -> ::c_int {
     let path_c = CString::new(path.as_bytes()).unwrap(); /*.map_err(|err| {

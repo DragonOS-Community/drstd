@@ -1,12 +1,9 @@
 //! sys/time implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/systime.h.html
 
-use crate::unix::{
-    c_str::CStr,
-    platform,
-};
+use crate::unix::{c_str::CStr, platform};
 
-pub use timeval;
 pub use itimerval;
+pub use timeval;
 
 pub const ITIMER_REAL: ::c_int = 0;
 pub const ITIMER_VIRTUAL: ::c_int = 1;
@@ -41,7 +38,10 @@ pub struct fd_set {
 #[no_mangle]
 pub extern "C" fn gettimeofday(tp: *mut timeval, tzp: *mut timezone) -> ::c_int {
     #[cfg(target_os = "dragonos")]
-    crate::unix::platform::dragonos::pal::relibc_adapter::pal::gettimeofday(tp, tzp as *mut ::c_void)
+    crate::unix::platform::dragonos::pal::relibc_adapter::pal::gettimeofday(
+        tp,
+        tzp as *mut ::c_void,
+    )
 }
 
 #[no_mangle]

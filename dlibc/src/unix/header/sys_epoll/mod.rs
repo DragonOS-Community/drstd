@@ -2,8 +2,6 @@
 
 use core::ptr;
 
-
-
 use crate::unix::platform;
 
 pub use self::platform::*;
@@ -20,5 +18,5 @@ pub extern "C" fn epoll_wait(
     maxevents: ::c_int,
     timeout: ::c_int,
 ) -> ::c_int {
-    unsafe{epoll_pwait(epfd, events, maxevents, timeout, ptr::null())}
+    unsafe { epoll_pwait(epfd, events, maxevents, timeout, ptr::null()) }
 }

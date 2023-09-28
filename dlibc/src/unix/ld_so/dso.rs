@@ -1,11 +1,12 @@
-use errno;
 use super::{
     debug::{RTLDDebug, _r_debug},
     linker::Symbol,
     tcb::{round_up, Master},
 };
-use unix::header::{errno::STR_ERROR};
+use errno;
+use unix::header::errno::STR_ERROR;
 
+use crate::trace;
 use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
@@ -35,14 +36,13 @@ use goblin::{
     elf::Elf,
     error::{Error, Result},
 };
-use PROT_READ;
-use PROT_WRITE;
-use MAP_FIXED_NOREPLACE;
-use MAP_ANONYMOUS;
-use MAP_PRIVATE;
 use mmap;
 use munmap;
-use crate::trace;
+use MAP_ANONYMOUS;
+use MAP_FIXED_NOREPLACE;
+use MAP_PRIVATE;
+use PROT_READ;
+use PROT_WRITE;
 
 /// Use to represent a library as well as all the symbols that is loaded withen it.
 #[derive(Default)]

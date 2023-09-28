@@ -1,7 +1,5 @@
 //! ioctl implementation for linux
 
-
-
 // This is used from sgtty
 #[repr(C)]
 pub struct sgttyb {

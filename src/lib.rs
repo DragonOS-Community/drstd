@@ -12,7 +12,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 #![feature(lang_items)]
-#![feature(provide_any)]
 #![feature(std_internals)]
 #![feature(extend_one)]
 #![feature(exact_size_is_empty)]

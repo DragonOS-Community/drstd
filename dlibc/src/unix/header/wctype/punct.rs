@@ -2,8 +2,6 @@
 // Licensed under the MIT license
 // Copyright 2005-2020 Rich Felker, et al.
 
-
-
 pub fn is(wc: usize) -> ::c_uchar {
     if wc < 0x20000 {
         return (table[(table[wc >> 8] as usize) * 32 + ((wc & 255) >> 3)] >> (wc & 7)) & 1;

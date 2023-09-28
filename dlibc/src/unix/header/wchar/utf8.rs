@@ -3,9 +3,9 @@
 
 use core::{char, slice, str, usize};
 
+use super::mbstate_t;
 use crate::unix::header::errno;
 use crate::unix::platform;
-use super::mbstate_t;
 
 // Based on
 // https://github.com/rust-lang/rust/blob/f24ce9b/library/core/src/str/validations.rs#L232-L257,
@@ -38,7 +38,12 @@ fn utf8_char_width(b: u8) -> usize {
 }
 
 //It's guaranteed that we don't have any nullpointers here
-pub unsafe fn mbrtowc(pwc: *mut ::wchar_t, s: *const ::c_char, n: usize, _ps: *mut mbstate_t) -> usize {
+pub unsafe fn mbrtowc(
+    pwc: *mut ::wchar_t,
+    s: *const ::c_char,
+    n: usize,
+    _ps: *mut mbstate_t,
+) -> usize {
     let size = utf8_char_width(*s as u8);
     if size > n {
         platform::errno = errno::EILSEQ;

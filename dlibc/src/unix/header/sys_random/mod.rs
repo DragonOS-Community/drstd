@@ -1,6 +1,3 @@
-
-
-
 pub const GRND_NONBLOCK: ::c_uint = 1;
 pub const GRND_RANDOM: ::c_uint = 2;
 

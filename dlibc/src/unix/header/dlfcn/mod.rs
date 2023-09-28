@@ -1,11 +1,11 @@
 //! dlfcn implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/dlfcn.h.html
 
+use crate::ld_so::tcb::Tcb;
+use crate::unix::c_str::*;
 use core::{
     ptr, str,
     sync::atomic::{AtomicUsize, Ordering},
 };
-use crate::unix::c_str::*;
-use crate::ld_so::tcb::Tcb;
 
 static ERROR_NOT_SUPPORTED: &'static CStr = c_str!("dlfcn not supported");
 

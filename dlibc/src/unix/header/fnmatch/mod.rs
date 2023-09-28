@@ -3,7 +3,6 @@
 use alloc::{borrow::Cow, vec::Vec};
 use core::slice;
 
-
 use posix_regex::{
     compile::{Collation, Range, Token},
     PosixRegex,

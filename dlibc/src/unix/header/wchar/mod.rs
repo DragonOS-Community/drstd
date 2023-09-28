@@ -1,10 +1,10 @@
 //! wchar implementation for Redox, following http://pubs.opengroup.org/onlinepubs/7908799/xsh/wchar.h.html
 
-use core::{char, ffi::VaList as va_list, mem, ptr, slice, usize};
-use crate::unix::platform;
 use crate::unix::header::{
     ctype::isspace, errno::ERANGE, stdio::*, stdlib::MB_CUR_MAX, string, time::*, wctype::*,
 };
+use crate::unix::platform;
+use core::{char, ffi::VaList as va_list, mem, ptr, slice, usize};
 
 mod utf8;
 #[repr(C)]
@@ -38,7 +38,11 @@ pub unsafe extern "C" fn fgetwc(stream: *mut FILE) -> ::wint_t {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn fgetws(ws: *mut ::wchar_t, n: ::c_int, stream: *mut FILE) -> *mut ::wchar_t {
+pub unsafe extern "C" fn fgetws(
+    ws: *mut ::wchar_t,
+    n: ::c_int,
+    stream: *mut FILE,
+) -> *mut ::wchar_t {
     //TODO: lock
     let mut i = 0;
     while ((i + 1) as ::c_int) < n {
@@ -230,7 +234,11 @@ pub extern "C" fn swprintf(
 }
 
 // #[no_mangle]
-pub extern "C" fn swscanf(_s: *const ::wchar_t, _format: *const ::wchar_t, _ap: va_list) -> ::c_int {
+pub extern "C" fn swscanf(
+    _s: *const ::wchar_t,
+    _format: *const ::wchar_t,
+    _ap: va_list,
+) -> ::c_int {
     unimplemented!();
 }
 
@@ -240,7 +248,11 @@ pub extern "C" fn ungetwc(_wc: ::wint_t, _stream: *mut FILE) -> ::wint_t {
 }
 
 // #[no_mangle]
-pub extern "C" fn vfwprintf(_stream: *mut FILE, _format: *const ::wchar_t, _arg: va_list) -> ::c_int {
+pub extern "C" fn vfwprintf(
+    _stream: *mut FILE,
+    _format: *const ::wchar_t,
+    _arg: va_list,
+) -> ::c_int {
     unimplemented!();
 }
 
@@ -371,7 +383,11 @@ pub unsafe extern "C" fn wcsncat(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn wcsncmp(ws1: *const ::wchar_t, ws2: *const ::wchar_t, n: ::size_t) -> ::c_int {
+pub unsafe extern "C" fn wcsncmp(
+    ws1: *const ::wchar_t,
+    ws2: *const ::wchar_t,
+    n: ::size_t,
+) -> ::c_int {
     for i in 0..n {
         let wc1 = *ws1.add(i);
         let wc2 = *ws2.add(i);
@@ -407,7 +423,10 @@ pub unsafe extern "C" fn wcsncpy(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn wcspbrk(mut wcs: *const ::wchar_t, set: *const ::wchar_t) -> *mut ::wchar_t {
+pub unsafe extern "C" fn wcspbrk(
+    mut wcs: *const ::wchar_t,
+    set: *const ::wchar_t,
+) -> *mut ::wchar_t {
     wcs = wcs.add(wcscspn(wcs, set));
     if *wcs == 0 {
         ptr::null_mut()
@@ -673,7 +692,11 @@ pub extern "C" fn wcwidth(wc: ::wchar_t) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn wmemchr(ws: *const ::wchar_t, wc: ::wchar_t, n: ::size_t) -> *mut ::wchar_t {
+pub unsafe extern "C" fn wmemchr(
+    ws: *const ::wchar_t,
+    wc: ::wchar_t,
+    n: ::size_t,
+) -> *mut ::wchar_t {
     for i in 0..n {
         if *ws.add(i) == wc {
             return ws.add(i) as *mut ::wchar_t;
@@ -683,7 +706,11 @@ pub unsafe extern "C" fn wmemchr(ws: *const ::wchar_t, wc: ::wchar_t, n: ::size_
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn wmemcmp(ws1: *const ::wchar_t, ws2: *const ::wchar_t, n: ::size_t) -> ::c_int {
+pub unsafe extern "C" fn wmemcmp(
+    ws1: *const ::wchar_t,
+    ws2: *const ::wchar_t,
+    n: ::size_t,
+) -> ::c_int {
     for i in 0..n {
         let wc1 = *ws1.add(i);
         let wc2 = *ws2.add(i);
@@ -754,14 +781,19 @@ pub extern "C" fn wcscasecmp(mut s1: *const ::wchar_t, mut s2: *const ::wchar_t)
 }
 
 #[no_mangle]
-pub extern "C" fn wcsncasecmp(mut s1: *const ::wchar_t, mut s2: *const ::wchar_t, n: ::size_t) -> ::c_int {
+pub extern "C" fn wcsncasecmp(
+    mut s1: *const ::wchar_t,
+    mut s2: *const ::wchar_t,
+    n: ::size_t,
+) -> ::c_int {
     if n == 0 {
         return 0;
     }
     unsafe {
         for _ in 0..n {
             if *s1 == 0 || *s2 == 0 || towlower(*s1 as ::wint_t) != towlower(*s2 as ::wint_t) {
-                return towlower(*s1 as ::wint_t).wrapping_sub(towlower(*s2 as ::wint_t)) as ::c_int;
+                return towlower(*s1 as ::wint_t).wrapping_sub(towlower(*s2 as ::wint_t))
+                    as ::c_int;
             }
             s1 = s1.add(1);
             s2 = s2.add(1);

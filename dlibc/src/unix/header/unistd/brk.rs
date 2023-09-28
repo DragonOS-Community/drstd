@@ -1,9 +1,6 @@
 use core::ptr;
 
-use crate::unix::{
-    header::errno::ENOMEM,
-    platform,
-};
+use crate::unix::{header::errno::ENOMEM, platform};
 
 static mut BRK: *mut ::c_void = ptr::null_mut();
 

@@ -22,7 +22,6 @@ mod dragonos;
 #[cfg(target_os = "redox")]
 mod redox;
 
-
 #[cfg(target_os = "linux")]
 use self::linux as sys;
 #[cfg(target_os = "redox")]

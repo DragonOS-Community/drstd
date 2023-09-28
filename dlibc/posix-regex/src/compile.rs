@@ -25,7 +25,7 @@ impl fmt::Debug for Range {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Collation {
     Char(u8),
-    Class(fn(u8) -> bool)
+    Class(fn(u8) -> bool),
 }
 impl Collation {
     /// Compare this collation to a character
@@ -33,7 +33,7 @@ impl Collation {
         match *self {
             Collation::Char(me) if insensitive => me & !32 == other & !32,
             Collation::Char(me) => me == other,
-            Collation::Class(f) => f(other)
+            Collation::Class(f) => f(other),
         }
     }
 }
@@ -48,15 +48,15 @@ pub enum Token {
     End,
     Group {
         id: usize,
-        branches: Vec<Vec<(Token, Range)>>
+        branches: Vec<Vec<(Token, Range)>>,
     },
     OneOf {
         invert: bool,
-        list: Vec<Collation>
+        list: Vec<Collation>,
     },
     Start,
     WordEnd,
-    WordStart
+    WordStart,
 }
 impl fmt::Debug for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -70,7 +70,7 @@ impl fmt::Debug for Token {
             Token::OneOf { invert, ref list } => write!(f, "[invert: {}; {:?}]", invert, list),
             Token::Start => write!(f, "^"),
             Token::WordEnd => write!(f, ">"),
-            Token::WordStart => write!(f, "<")
+            Token::WordStart => write!(f, "<"),
         }
     }
 }
@@ -86,14 +86,14 @@ pub enum Error {
     UnclosedRepetition,
     UnexpectedToken(u8),
     UnknownClass(Vec<u8>),
-    UnknownCollation
+    UnknownCollation,
 }
 
 /// A regex builder struct
 pub struct PosixRegexBuilder<'a> {
     input: &'a [u8],
     classes: HashMap<&'a [u8], fn(u8) -> bool>,
-    group_id: usize
+    group_id: usize,
 }
 impl<'a> PosixRegexBuilder<'a> {
     /// Create a new instance that is ready to parse the regex `input`
@@ -101,7 +101,7 @@ impl<'a> PosixRegexBuilder<'a> {
         Self {
             input,
             classes: HashMap::new(),
-            group_id: 1
+            group_id: 1,
         }
     }
     /// Add a custom collation class, for use within square brackets (such as `[[:digit:]]`)
@@ -142,16 +142,22 @@ impl<'a> PosixRegexBuilder<'a> {
         let mut out: Option<u32> = None;
         while let Some(&c @ b'0'..=b'9') = self.input.first() {
             self.consume(1);
-            out = Some(out.unwrap_or(0)
-                .checked_mul(10)
-                .and_then(|out| out.checked_add((c - b'0') as u32))
-                .ok_or(Error::IntegerOverflow)?);
+            out = Some(
+                out.unwrap_or(0)
+                    .checked_mul(10)
+                    .and_then(|out| out.checked_add((c - b'0') as u32))
+                    .ok_or(Error::IntegerOverflow)?,
+            );
         }
         Ok(out)
     }
     fn next(&mut self) -> Result<u8, Error> {
-        self.input.first()
-            .map(|&c| { self.consume(1); c })
+        self.input
+            .first()
+            .map(|&c| {
+                self.consume(1);
+                c
+            })
             .ok_or(Error::EOF)
     }
     fn expect(&mut self, c: u8) -> Result<(), Error> {
@@ -171,12 +177,14 @@ impl<'a> PosixRegexBuilder<'a> {
                 b'^' => Token::Start,
                 b'$' => Token::End,
                 b'.' => Token::Any,
-                b'*' => if let Some(last) = chain.last_mut() {
-                    last.1 = Range(0, None);
-                    continue;
-                } else {
-                    return Err(Error::LeadingRepetition);
-                },
+                b'*' => {
+                    if let Some(last) = chain.last_mut() {
+                        last.1 = Range(0, None);
+                        continue;
+                    } else {
+                        return Err(Error::LeadingRepetition);
+                    }
+                }
                 b'[' => {
                     let mut list = Vec::new();
                     let invert = self.input.first() == Some(&b'^');
@@ -199,33 +207,41 @@ impl<'a> PosixRegexBuilder<'a> {
                                     c = self.next()?;
                                     self.expect(b'.')?;
                                     self.expect(b']')?;
-                                },
+                                }
                                 b'=' => {
                                     c = self.next()?;
                                     self.expect(b'=')?;
                                     self.expect(b']')?;
-                                },
+                                }
                                 b':' => {
-                                    let end = self.input.iter().position(|&c| c == b':').ok_or(Error::EOF)?;
+                                    let end = self
+                                        .input
+                                        .iter()
+                                        .position(|&c| c == b':')
+                                        .ok_or(Error::EOF)?;
                                     let key = &self.input[..end];
-                                    let class = *self.classes.get(key).ok_or_else(|| Error::UnknownClass(key.to_vec()))?;
+                                    let class = *self
+                                        .classes
+                                        .get(key)
+                                        .ok_or_else(|| Error::UnknownClass(key.to_vec()))?;
                                     self.consume(end + 1);
                                     self.expect(b']')?;
 
                                     list.push(Collation::Class(class));
                                     push = false;
-                                },
-                                _ => return Err(Error::UnknownCollation)
+                                }
+                                _ => return Err(Error::UnknownCollation),
                             }
                         }
 
                         if push {
                             list.push(Collation::Char(c));
 
-                            if self.input.first() == Some(&b'-') && self.input.get(1) != Some(&b']') {
+                            if self.input.first() == Some(&b'-') && self.input.get(1) != Some(&b']')
+                            {
                                 self.consume(1);
                                 let dest = self.next()?;
-                                for c in (c+1)..=dest {
+                                for c in (c + 1)..=dest {
                                     list.push(Collation::Char(c));
                                 }
                             }
@@ -237,20 +253,17 @@ impl<'a> PosixRegexBuilder<'a> {
                         }
                     }
 
-                    Token::OneOf {
-                        invert,
-                        list
-                    }
-                },
+                    Token::OneOf { invert, list }
+                }
                 b'\\' => match self.next()? {
                     b'(' => {
                         let id = self.group_id;
                         self.group_id += 1;
                         Token::Group {
                             id,
-                            branches: self.compile_tokens()?
+                            branches: self.compile_tokens()?,
                         }
-                    },
+                    }
                     b')' => {
                         alternatives.push(chain);
                         return Ok(alternatives);
@@ -259,51 +272,67 @@ impl<'a> PosixRegexBuilder<'a> {
                         alternatives.push(chain);
                         chain = Vec::new();
                         continue;
-                    },
+                    }
                     b'<' => Token::WordStart,
                     b'>' => Token::WordEnd,
-                    c@b'?' | c@b'+' => if let Some(last) = chain.last_mut() {
-                        last.1 = match c {
-                            b'?' => Range(0, Some(1)),
-                            b'+' => Range(1, None),
-                            _ => unreachable!("{}", c)
-                        };
-                        continue;
-                    } else {
-                        return Err(Error::LeadingRepetition);
-                    },
-                    b'{' => if let Some(last) = chain.last_mut() {
-                        let first = self.take_int()?.ok_or(Error::EmptyRepetition)?;
-                        let mut second = Some(first);
-                        if let Some(b',') = self.input.first() {
-                            self.consume(1);
-                            second = self.take_int()?;
-                        }
-                        if self.input.first() == Some(&b'}') {
-                            self.consume(1);
-                        } else if self.input.starts_with(br"\}") {
-                            self.consume(2);
+                    c @ b'?' | c @ b'+' => {
+                        if let Some(last) = chain.last_mut() {
+                            last.1 = match c {
+                                b'?' => Range(0, Some(1)),
+                                b'+' => Range(1, None),
+                                _ => unreachable!("{}", c),
+                            };
+                            continue;
                         } else {
-                            return Err(Error::UnclosedRepetition);
+                            return Err(Error::LeadingRepetition);
                         }
-                        if second.map(|second| first > second).unwrap_or(false) {
-                            return Err(Error::IllegalRange);
+                    }
+                    b'{' => {
+                        if let Some(last) = chain.last_mut() {
+                            let first = self.take_int()?.ok_or(Error::EmptyRepetition)?;
+                            let mut second = Some(first);
+                            if let Some(b',') = self.input.first() {
+                                self.consume(1);
+                                second = self.take_int()?;
+                            }
+                            if self.input.first() == Some(&b'}') {
+                                self.consume(1);
+                            } else if self.input.starts_with(br"\}") {
+                                self.consume(2);
+                            } else {
+                                return Err(Error::UnclosedRepetition);
+                            }
+                            if second.map(|second| first > second).unwrap_or(false) {
+                                return Err(Error::IllegalRange);
+                            }
+                            last.1 = Range(first, second);
+                            continue;
+                        } else {
+                            return Err(Error::LeadingRepetition);
                         }
-                        last.1 = Range(first, second);
-                        continue;
-                    } else {
-                        return Err(Error::LeadingRepetition);
+                    }
+                    b'a' => Token::OneOf {
+                        invert: false,
+                        list: vec![Collation::Class(ctype::is_alnum)],
                     },
-                    b'a' => Token::OneOf { invert: false, list: vec![Collation::Class(ctype::is_alnum)] },
-                    b'd' => Token::OneOf { invert: false, list: vec![Collation::Class(ctype::is_digit)] },
-                    b's' => Token::OneOf { invert: false, list: vec![Collation::Class(ctype::is_space)] },
-                    b'S' => Token::OneOf { invert: true,  list: vec![Collation::Class(ctype::is_space)] },
+                    b'd' => Token::OneOf {
+                        invert: false,
+                        list: vec![Collation::Class(ctype::is_digit)],
+                    },
+                    b's' => Token::OneOf {
+                        invert: false,
+                        list: vec![Collation::Class(ctype::is_space)],
+                    },
+                    b'S' => Token::OneOf {
+                        invert: true,
+                        list: vec![Collation::Class(ctype::is_space)],
+                    },
                     b'n' => Token::Char(b'\n'),
                     b'r' => Token::Char(b'\r'),
                     b't' => Token::Char(b'\t'),
-                    c => Token::Char(c)
+                    c => Token::Char(c),
                 },
-                c => Token::Char(c)
+                c => Token::Char(c),
             };
             chain.push((token, Range(1, Some(1))));
         }

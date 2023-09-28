@@ -7,7 +7,7 @@ pub const FE_TONEAREST: ::c_int = 0;
 pub type fexcept_t = u64;
 
 #[repr(C)]
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct fenv_t {
     pub cw: u64,
 }

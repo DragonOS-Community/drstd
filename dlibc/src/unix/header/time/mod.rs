@@ -2,10 +2,7 @@
 
 use core::convert::{TryFrom, TryInto};
 
-use crate::unix::{
-    header::errno::EOVERFLOW,
-    platform,
-};
+use crate::unix::{header::errno::EOVERFLOW, platform};
 
 pub use self::constants::*;
 use clock_gettime;
@@ -141,7 +138,7 @@ pub unsafe extern "C" fn asctime_r(tm: *const tm, buf: *mut ::c_char) -> *mut ::
 pub extern "C" fn clock() -> ::clock_t {
     let mut ts = core::mem::MaybeUninit::<::timespec>::uninit();
 
-    if unsafe{clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts.as_mut_ptr())} != 0 {
+    if unsafe { clock_gettime(CLOCK_PROCESS_CPUTIME_ID, ts.as_mut_ptr()) } != 0 {
         return -1;
     }
     let ts = unsafe { ts.assume_init() };
