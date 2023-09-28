@@ -63,11 +63,6 @@ use core::{mem, ptr};
 #[doc(inline)]
 pub use alloc::alloc::*;
 
-use core::alloc::AllocError;
-use core::alloc::Allocator;
-use core::alloc::GlobalAlloc;
-use core::alloc::Layout;
-
 /// The default memory allocator provided by the operating system.
 ///
 /// This is based on `malloc` on Unix platforms and `HeapAlloc` on Windows,

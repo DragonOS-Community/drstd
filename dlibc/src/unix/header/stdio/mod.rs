@@ -1015,7 +1015,7 @@ pub unsafe extern "C" fn setvbuf(
 #[no_mangle]
 pub unsafe extern "C" fn tempnam(dir: *const ::c_char, pfx: *const ::c_char) -> *mut ::c_char {
     unsafe fn is_appropriate(pos_dir: *const ::c_char) -> bool {
-        !pos_dir.is_null() && ::access(pos_dir, ::W_OK) == 0
+        !pos_dir.is_null() && ::access(pos_dir, platform::W_OK) == 0
     }
 
     // directory search order is env!(TMPDIR), dir, P_tmpdir, "/tmp"
@@ -1197,6 +1197,6 @@ pub unsafe fn flush_io_streams() {
         let stream = &mut *stream;
         stream.flush()
     };
-    flush(stdout);
-    flush(stderr);
+    let _ = flush(stdout);
+    let _ = flush(stderr);
 }

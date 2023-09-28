@@ -206,6 +206,7 @@ pub enum BacktraceStyle {
 }
 
 impl BacktraceStyle {
+    #[allow(dead_code)]
     pub(crate) fn full() -> Option<Self> {
         if cfg!(feature = "backtrace") {
             Some(BacktraceStyle::Full)

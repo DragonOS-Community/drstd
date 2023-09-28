@@ -86,6 +86,7 @@ macro_rules! rtunwrap {
 // Even though it is an `u8`, it only ever has 4 values. These are documented in
 // `compiler/rustc_session/src/config/sigpipe.rs`.
 #[cfg_attr(test, allow(dead_code))]
+#[allow(dead_code)]
 unsafe fn init(argc: isize, argv: *const *const u8, sigpipe: u8) {
     unsafe {
         sys::init(argc, argv, sigpipe);
@@ -116,6 +117,7 @@ pub(crate) fn cleanup() {
 // To reduce the generated code of the new `lang_start`, this function is doing
 // the real work.
 #[cfg(not(test))]
+#[allow(dead_code)]
 fn lang_start_internal(
     main: &(dyn Fn() -> i32 + Sync + crate::std::panic::RefUnwindSafe),
     argc: isize,

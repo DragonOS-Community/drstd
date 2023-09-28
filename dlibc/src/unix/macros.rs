@@ -133,8 +133,8 @@ macro_rules! strto_impl {
         const CHECK_SIGN: bool = $signed;
         const MAX_VAL: $rettype = $maxval;
         const MIN_VAL: $rettype = $minval;
-
-        let set_endptr = |idx: isize| {
+        #[allow(unused_mut)]
+        let mut set_endptr = |idx: isize| {
             if !$endptr.is_null() {
                 // This is stupid, but apparently strto* functions want
                 // const input but mut output, yet the man page says
@@ -143,8 +143,9 @@ macro_rules! strto_impl {
                 *$endptr = $s.offset(idx) as *mut _;
             }
         };
-
-        let invalid_input = || {
+        
+        #[allow(unused_mut)]
+        let mut invalid_input = || {
             ::errno = EINVAL;
             set_endptr(0);
         };

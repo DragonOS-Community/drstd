@@ -66,6 +66,7 @@ use dlibc::sendfile as sendfile64;
 use dlibc::sendfile64;
 use dlibc::{EBADF, EINVAL, ENOSYS, EOPNOTSUPP, EOVERFLOW, EPERM, EXDEV};
 
+#[allow(dead_code)]
 pub(crate) fn copy_spec<R: Read + ?Sized, W: Write + ?Sized>(
     read: &mut R,
     write: &mut W,

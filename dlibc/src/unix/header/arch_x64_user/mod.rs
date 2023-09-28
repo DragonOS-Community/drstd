@@ -74,8 +74,8 @@ pub extern "C" fn _cbindgen_only_generates_structs_if_they_are_mentioned_which_i
     _a: user_fpregs_struct,
     _b: user_regs_struct,
     _c: user,
-    _d: elf_gregset_t,
-    _e: elf_greg_t,
-    _f: elf_fpregset_t,
+    _d: *mut elf_gregset_t,
+    _e: *mut elf_greg_t,
+    _f: *mut elf_fpregset_t,
 ) {
 }

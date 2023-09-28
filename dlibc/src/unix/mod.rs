@@ -805,7 +805,7 @@ extern "C" {
         all(target_os = "freebsd", any(freebsd11, freebsd10)),
         link_name = "readdir@FBSD_1.0"
     )]
-    pub fn readdir(dirp: *mut ::DIR) -> *mut ::dirent;
+    pub fn readdir(dirp: *mut ::DIR) -> *mut platform::dirent;
     #[cfg_attr(
         all(target_os = "macos", target_arch = "x86"),
         link_name = "closedir$UNIX2003"
@@ -1386,12 +1386,12 @@ extern "C" {
         link_name = "tcdrain$UNIX2003"
     )]
     pub fn tcdrain(fd: ::c_int) -> ::c_int;
-    pub fn cfgetispeed(termios: *const ::termios) -> ::speed_t;
-    pub fn cfgetospeed(termios: *const ::termios) -> ::speed_t;
-    pub fn cfsetispeed(termios: *mut ::termios, speed: ::speed_t) -> ::c_int;
-    pub fn cfsetospeed(termios: *mut ::termios, speed: ::speed_t) -> ::c_int;
-    pub fn tcgetattr(fd: ::c_int, termios: *mut ::termios) -> ::c_int;
-    pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const ::termios) -> ::c_int;
+    pub fn cfgetispeed(termios: *const platform::termios) -> ::speed_t;
+    pub fn cfgetospeed(termios: *const platform::termios) -> ::speed_t;
+    pub fn cfsetispeed(termios: *mut platform::termios, speed: ::speed_t) -> ::c_int;
+    pub fn cfsetospeed(termios: *mut platform::termios, speed: ::speed_t) -> ::c_int;
+    pub fn tcgetattr(fd: ::c_int, termios: *mut platform::termios) -> ::c_int;
+    pub fn tcsetattr(fd: ::c_int, optional_actions: ::c_int, termios: *const platform::termios) -> ::c_int;
     pub fn tcflow(fd: ::c_int, action: ::c_int) -> ::c_int;
     pub fn tcflush(fd: ::c_int, action: ::c_int) -> ::c_int;
     pub fn tcgetsid(fd: ::c_int) -> ::pid_t;
@@ -1487,8 +1487,8 @@ cfg_if! {
             /// https://illumos.org/man/3lib/libc
             /// https://docs.oracle.com/cd/E36784_01/html/E36873/libc-3lib.html
             /// https://www.unix.com/man-page/opensolaris/3LIB/libc/
-            pub fn readdir_r(dirp: *mut ::DIR, entry: *mut ::dirent,
-                             result: *mut *mut ::dirent) -> ::c_int;
+            pub fn readdir_r(dirp: *mut ::DIR, entry: *mut platform::dirent,
+                             result: *mut *mut platform::dirent) -> ::c_int;
         }
     }
 }
@@ -1558,8 +1558,8 @@ cfg_if! {
                     target_os = "nto",
                 )))] {
         extern {
-            pub fn cfmakeraw(termios: *mut ::termios);
-            pub fn cfsetspeed(termios: *mut ::termios,
+            pub fn cfmakeraw(termios: *mut platform::termios);
+            pub fn cfsetspeed(termios: *mut platform::termios,
                               speed: ::speed_t) -> ::c_int;
         }
    }
@@ -1617,4 +1617,4 @@ pub mod sync;
 
 mod io;
 
-pub use header::*;
+// pub use header::*;

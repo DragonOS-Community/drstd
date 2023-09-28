@@ -29,6 +29,9 @@
     redundant_semicolons,
     unused_macros,
     unused_macro_rules,
+    internal_features,
+    hidden_glob_reexports,
+    ambiguous_glob_reexports,
 )]
 #![cfg_attr(libc_deny_warnings, deny(warnings))]
 // Attributes needed when building as part of the standard library

@@ -1,4 +1,7 @@
 #![no_std]
+#![allow(internal_features)]
+#![allow(incomplete_features)]
+#![allow(hidden_glob_reexports)]
 #![feature(allocator_api)]
 #![feature(core_intrinsics)]
 #![feature(linkage)]
@@ -9,6 +12,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 #![feature(lang_items)]
+#![feature(provide_any)]
 #![feature(std_internals)]
 #![feature(extend_one)]
 #![feature(exact_size_is_empty)]
@@ -89,12 +93,9 @@
 #[macro_use]
 extern crate alloc;
 
-#[macro_use]
 extern crate memoffset;
 
-//TODO: fix this: adjust to dragonos sc
 #[cfg(target_os = "dragonos")]
-#[macro_use]
 extern crate dsc;
 
 #[macro_use]
@@ -104,7 +105,6 @@ pub mod std;
 pub use self::std::*;
 
 #[cfg(target_os = "dragonos")]
-#[macro_use]
 pub use dlibc::{eprint, eprintln, print, println};
 
 // use core::panic::PanicInfo;

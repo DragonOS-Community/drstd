@@ -11,8 +11,8 @@
 // use crate::std::collections::TryReserveErrorKind;
 // use crate::std::error::Error;
 // use crate::std::fmt::{self, Debug};
-// #[allow(deprecated)]
-use core::hash::{BuildHasher, Hash, Hasher, SipHasher13};
+#[allow(deprecated)]
+use core::hash::{Hasher, SipHasher13};
 // use crate::std::iter::FusedIterator;
 // use crate::std::ops::Index;
 // use crate::std::sys;

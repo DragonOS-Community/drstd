@@ -2,9 +2,9 @@ use core::{mem, ptr};
 use goblin::elf::program_header::{self, program_header32, program_header64, ProgramHeader};
 
 use self::tcb::{Master, Tcb};
-use crate::unix::start::Stack;
-use crate::unix::platform;
 use crate::eprintln;
+use crate::unix::platform;
+use crate::unix::start::Stack;
 
 #[cfg(target_os = "redox")]
 pub const PATH_SEP: char = ';';
@@ -32,9 +32,7 @@ static mut STATIC_TCB_MASTER: Master = Master {
 fn panic_notls(msg: impl core::fmt::Display) -> ! {
     eprintln!("panicked in ld.so: {}", msg);
 
-    unsafe {
-        core::intrinsics::abort();
-    }
+    core::intrinsics::abort();
 }
 
 pub trait ExpectTlsFree {
@@ -150,7 +148,7 @@ pub unsafe fn init(_sp: &'static Stack) {
     }
     #[cfg(target_os = "dragonos")]
     {
-        const ARCH_GET_FS: usize = 0x1003;
+        // const ARCH_GET_FS: usize = 0x1003;
         // syscall!(ARCH_PRCTL, ARCH_GET_FS, &mut tp as *mut usize);
         // unimplemented!()
     }

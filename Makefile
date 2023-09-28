@@ -77,8 +77,6 @@ all: | libs
 
 clean:
 	$(CARGO) clean
-	$(MAKE) -C tests clean
-	rm -rf sysroot
 
 check:
 	$(CARGO) check
@@ -96,7 +94,7 @@ install-headers: libs
 
 # $(BUILD)/release/libc.so
 libs: 
-	@cargo -Z build-std=core,alloc,compiler_builtins build --target x86_64-unknown-dragonos
+	@cargo -Z build-std=core,alloc,compiler_builtins build --target target.json --release
 #$(BUILD)/release/ld_so
 
 install-libs: libs

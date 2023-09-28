@@ -1,13 +1,13 @@
-use alloc::{boxed::Box, vec::Vec};
-use core::{fmt::Debug, intrinsics, ptr};
-use unix::platform::allocator::new_mspace;
 use crate::unix::{
-    header::{libgen},
+    allocator::ALLOCATOR,
+    header::libgen,
     ld_so::{self, linker::Linker},
     platform::{self, get_auxvs},
     sync::mutex::Mutex,
-    allocator::ALLOCATOR,
 };
+use alloc::{boxed::Box, vec::Vec};
+use core::{fmt::Debug, intrinsics, ptr};
+use unix::platform::allocator::new_mspace;
 
 #[repr(C)]
 pub struct Stack {
@@ -46,9 +46,9 @@ impl Debug for Stack {
 
 unsafe fn copy_string_array(array: *const *const ::c_char, len: usize) -> Vec<*mut ::c_char> {
     //println!("copy_string_array: array: {:p}, len: {}", array, len);
-    
+
     let mut vec = Vec::with_capacity(len + 1);
-    
+
     for i in 0..len {
         let item = *array.add(i);
         let mut len = 0;
@@ -136,13 +136,13 @@ extern "C" fn init_array() {
     //     init_complete = true
     // }
 }
-use stdio;
+use header::stdio;
 
 fn io_init() {
     unsafe {
         // Initialize stdin/stdout/stderr,
         // see https://github.com/rust-lang/rust/issues/51718
-        
+
         stdio::stdin = stdio::default_stdin.get();
         stdio::stdout = stdio::default_stdout.get();
         stdio::stderr = stdio::default_stderr.get();
@@ -192,7 +192,6 @@ pub unsafe extern "C" fn relibc_start(sp: &'static Stack) -> ! {
 
     // Ensure correct host system before executing more system calls
     relibc_verify_host();
-    
 
     // Initialize TLS, if necessary
     ld_so::init(sp);
@@ -287,5 +286,5 @@ pub unsafe extern "C" fn relibc_start(sp: &'static Stack) -> ! {
     // not argv or envp, because programs like bash try to modify this *const* pointer :|
     platform::pal::exit(0);
 
-    unreachable!();
+    // unreachable!();
 }
