@@ -82,8 +82,10 @@ check:
 	$(CARGO) check
 
 fmt:
-	./fmt.sh
+	$(CARGO) fmt
 
+fmt-check:
+	$(CARGO) fmt --check
 install-headers: libs
 	mkdir -pv "$(DESTDIR)/include"
 	cp -rv "include"/* "$(DESTDIR)/include"
