@@ -40,14 +40,12 @@ use dlibc::{c_int, mode_t};
     target_os = "dragonos",
     all(target_os = "linux", target_env = "gnu")
 ))]
-use dlibc::c_char;
 #[cfg(any(
     target_os = "linux",
     target_os = "emscripten",
     target_os = "android",
     target_os = "dragonos",
 ))]
-use dlibc::dirfd;
 #[cfg(any(target_os = "linux", target_os = "emscripten",))]
 use dlibc::fstatat64;
 #[cfg(any(
@@ -1634,6 +1632,7 @@ pub fn readlink(p: &Path) -> io::Result<PathBuf> {
         let mut buf = Vec::with_capacity(256);
 
         loop {
+            #[allow(unused_unsafe)]
             let buf_read =
                 cvt(unsafe { dlibc::readlink(p, buf.as_mut_ptr() as *mut _, buf.capacity()) })?
                     as usize;

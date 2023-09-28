@@ -1,9 +1,10 @@
 extern crate cbindgen;
 extern crate cc;
 
-use std::{env, fs, fs::DirEntry, path::Path};
+use std::fs::DirEntry;
 
 // include src/header directories that don't start with '_'
+#[allow(dead_code)]
 fn include_dir(d: &DirEntry) -> bool {
     d.metadata().map(|m| m.is_dir()).unwrap_or(false)
         && d.path()
@@ -34,7 +35,7 @@ fn include_dir(d: &DirEntry) -> bool {
 // }
 
 fn main() {
-    let crate_dir = env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set");
+    // let crate_dir = env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set");
 
     // Generate C includes
     // - based on contents of src/header/**

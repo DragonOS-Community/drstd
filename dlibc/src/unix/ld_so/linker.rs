@@ -350,7 +350,7 @@ impl Linker {
                                 sym
                             )))??;
                     let mut symbol = None;
-                    let mut found = false;
+                    let mut _found = false;
                     let lookup_start = match rel.r_type {
                         reloc::R_X86_64_COPY => 1,
                         _ => 0,
@@ -367,7 +367,7 @@ impl Linker {
                             );
                             symbol = Some(s);
                             t = lookup_obj.tls_offset;
-                            found = true;
+                            _found = true;
                             // Stop looking if any strong symbol is found
                             if strong {
                                 break;

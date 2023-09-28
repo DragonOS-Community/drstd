@@ -17,8 +17,7 @@ pub extern "C" fn e(sys: usize) -> usize {
     }
 }
 
-#[no_mangle]
-pub extern "C" fn getrandom(_buf: &mut [u8], _flags: ::c_uint) -> ::ssize_t {
+pub fn getrandom(_buf: &mut [u8], _flags: ::c_uint) -> ::ssize_t {
     0
 }
 
@@ -753,8 +752,8 @@ pub extern "C" fn syscall(_num: ::c_long) -> ::c_long {
 // 	unimplemented!()
 // }
 #[no_mangle]
-pub extern "C" fn pipe(fds: *mut ::c_int) -> ::c_int{
-	e(unsafe { syscall!(SYS_PIPE, fds) }) as ::c_int
+pub extern "C" fn pipe(fds: *mut ::c_int) -> ::c_int {
+    e(unsafe { syscall!(SYS_PIPE, fds) }) as ::c_int
 }
 // #[no_mangle]
 // pub extern "C" fn posix_memalign(memptr: *mut *mut ::c_void, align: ::size_t, size: ::size_t) -> ::c_int{
@@ -783,8 +782,8 @@ pub extern "C" fn pipe(fds: *mut ::c_int) -> ::c_int{
 // 	unimplemented!()
 // }
 #[no_mangle]
-pub extern "C" fn setuid(uid: ::uid_t) -> ::c_int{
-	0
+pub extern "C" fn setuid(_uid: ::uid_t) -> ::c_int {
+    0
 }
 
 // #[cfg_attr(
@@ -922,8 +921,8 @@ pub extern "C" fn setuid(uid: ::uid_t) -> ::c_int{
 // }
 
 #[no_mangle]
-pub extern "C" fn signal(signum: ::c_int, handler: ::sighandler_t) -> ::sighandler_t{
-	0
+pub extern "C" fn signal(_signum: ::c_int, _handler: ::sighandler_t) -> ::sighandler_t {
+    0
     //unimplemented!()
 }
 
@@ -1780,8 +1779,8 @@ pub extern "C" fn pthread_setspecific(_key: ::pthread_key_t, _value: *const ::c_
 // 	unimplemented!()
 // }
 #[no_mangle]
-pub extern "C" fn setgroups(ngroups: ::size_t, ptr: *const ::gid_t) -> ::c_int{
-	0
+pub extern "C" fn setgroups(_ngroups: ::size_t, _ptr: *const ::gid_t) -> ::c_int {
+    0
 }
 // #[no_mangle]
 // pub extern "C" fn pipe2(fds: *mut ::c_int, flags: ::c_int) -> ::c_int{

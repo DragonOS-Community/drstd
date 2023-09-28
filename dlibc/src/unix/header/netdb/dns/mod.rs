@@ -126,7 +126,8 @@ impl Dns {
                 if i > data.len() {
                     return Err(format!("{}: {}: pop_n16", file!(), line!()));
                 }
-                u16::from(n16::from_bytes(&data[i - 2..i]))
+                let x = u16::from(n16::from_bytes(&data[i - 2..i]));
+                x
             }};
         };
 

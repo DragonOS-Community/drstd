@@ -867,9 +867,9 @@ pub unsafe extern "C" fn freeaddrinfo(res: *mut addrinfo) {
         }
         if !bai.ai_addr.is_null() {
             if bai.ai_addrlen == mem::size_of::<sockaddr_in>() {
-                Box::from_raw(bai.ai_addr as *mut sockaddr_in);
+                let _ = Box::from_raw(bai.ai_addr as *mut sockaddr_in);
             } else if bai.ai_addrlen == mem::size_of::<sockaddr_in6>() {
-                Box::from_raw(bai.ai_addr as *mut sockaddr_in6);
+                let _ = Box::from_raw(bai.ai_addr as *mut sockaddr_in6);
             } else {
                 eprintln!("freeaddrinfo: unknown ai_addrlen {}", bai.ai_addrlen);
             }

@@ -5,6 +5,10 @@ use alloc::{
 };
 use core::mem;
 
+use super::{
+    dns::{Dns, DnsQuery},
+    sys::get_dns_server,
+};
 use crate::unix::header::{
     arpa_inet::htons,
     errno::*,
@@ -15,10 +19,6 @@ use crate::unix::header::{
     },
 };
 use unix::platform;
-use super::{
-    dns::{Dns, DnsQuery},
-    sys::get_dns_server,
-};
 
 pub struct LookupHost(IntoIter<in_addr>);
 
@@ -46,7 +46,7 @@ pub fn lookup_host(host: &str) -> Result<LookupHost, ::c_int> {
         let dns_addr = unsafe { mem::transmute::<[u8; 4], u32>(dns_arr) };
 
         let mut timespec = ::timespec::default();
-        unsafe{platform::pal::clock_gettime(::CLOCK_REALTIME, &mut timespec);}
+        platform::pal::clock_gettime(::CLOCK_REALTIME, &mut timespec);
         let tid = (timespec.tv_nsec >> 16) as u16;
 
         let packet = Dns {
@@ -80,14 +80,14 @@ pub fn lookup_host(host: &str) -> Result<LookupHost, ::c_int> {
                 return Err(EIO);
             }
             if ::send(sock, packet_data_ptr, packet_data_len, 0) < 0 {
-                Box::from_raw(packet_data_ptr);
+                let _ = Box::from_raw(packet_data_ptr);
                 return Err(EIO);
             }
             sock
         };
 
         unsafe {
-            Box::from_raw(packet_data_ptr);
+            let _ = Box::from_raw(packet_data_ptr);
         }
 
         let _i = 0 as socklen_t;
@@ -158,7 +158,9 @@ pub fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>, ::c_int> {
 
     if dns_vec.len() == 4 {
         let mut timespec = ::timespec::default();
-        unsafe{platform::pal::clock_gettime(::CLOCK_REALTIME, &mut timespec);}
+
+        platform::pal::clock_gettime(::CLOCK_REALTIME, &mut timespec);
+
         let tid = (timespec.tv_nsec >> 16) as u16;
 
         let packet = Dns {
@@ -203,7 +205,7 @@ pub fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>, ::c_int> {
         }
 
         unsafe {
-            Box::from_raw(packet_data_ptr);
+            let _ = Box::from_raw(packet_data_ptr);
         }
 
         let _i = mem::size_of::<sockaddr_in>() as socklen_t;

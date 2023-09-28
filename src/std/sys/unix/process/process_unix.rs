@@ -6,7 +6,7 @@ use crate::std::num::NonZeroI32;
 use crate::std::sys;
 use crate::std::sys::cvt;
 use crate::std::sys::process::process_common::*;
-use crate::{print, println};
+
 use core::ffi::NonZero_c_int;
 use dlibc;
 
@@ -319,7 +319,6 @@ impl Command {
         stdio: ChildPipes,
         maybe_envp: Option<&CStringArray>,
     ) -> Result<!, io::Error> {
-
         use crate::std::sys::{self, cvt_r};
 
         if let Some(fd) = stdio.stdin.fd() {

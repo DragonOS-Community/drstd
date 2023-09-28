@@ -84,6 +84,7 @@
 // a backtrace or actually symbolizing it.
 
 //use crate::std::backtrace_rs::{self, BytesOrWideString};
+#![allow(dead_code)]
 use crate::std::env;
 use crate::std::ffi::c_void;
 use crate::std::fmt;

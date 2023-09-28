@@ -8,8 +8,8 @@ use crate::unix::header::errno;
 
 pub use self::platform::*;
 
+use crate::unix::header::signal::sys::NSIG;
 use crate::unix::platform;
-use crate::unix::header::signal::sys::{NSIG};
 
 #[cfg(target_os = "linux")]
 #[path = "linux.rs"]
@@ -204,13 +204,13 @@ pub extern "C" fn signal(
         sa_restorer: Some(__restore_rt),
         sa_mask: sigset_t::default(),
     };
-    let mut old_sa = mem::MaybeUninit::uninit();
+    let mut old_sa = mem::MaybeUninit::zeroed();
     if unsafe { sigaction(sig, &sa as *const sigaction, old_sa.as_mut_ptr()) } < 0 {
-        mem::forget(old_sa);
+        // mem::forget(old_sa);
         return unsafe { mem::transmute(SIG_ERR) };
     }
     let sa_handler = unsafe { old_sa.assume_init() }.sa_sigaction;
-    unsafe{Some(*(sa_handler as *const () as *const extern "C" fn(::c_int)))}
+    unsafe { Some(*(sa_handler as *const () as *const extern "C" fn(::c_int))) }
 }
 
 // #[no_mangle]

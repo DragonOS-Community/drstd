@@ -324,7 +324,7 @@ pub unsafe extern "C" fn gethostname(mut name: *mut ::c_char, mut len: ::size_t)
     let mut uts = mem::MaybeUninit::<::utsname>::uninit();
     let err = platform::pal::uname(uts.as_mut_ptr());
     if err < 0 {
-        mem::forget(uts);
+        // mem::forget(uts);
         return err;
     }
     for c in uts.assume_init().nodename.iter() {

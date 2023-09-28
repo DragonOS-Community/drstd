@@ -112,6 +112,7 @@ mod imp {
     static MAIN_ALTSTACK: AtomicPtr<dlibc::c_void> = AtomicPtr::new(ptr::null_mut());
     static NEED_ALTSTACK: AtomicBool = AtomicBool::new(false);
 
+    #[allow(dead_code)]
     pub unsafe fn init() {
         let mut action: sigaction = mem::zeroed();
         for &signal in &[SIGSEGV, SIGBUS] {

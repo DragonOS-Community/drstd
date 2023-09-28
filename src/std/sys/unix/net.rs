@@ -445,6 +445,7 @@ impl Socket {
     }
 
     #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
+    #[allow(dead_code)]
     pub fn set_passcred(&self, passcred: bool) -> io::Result<()> {
         setsockopt(
             self,
@@ -455,6 +456,7 @@ impl Socket {
     }
 
     #[cfg(any(target_os = "android", target_os = "linux", target_os = "dragonos"))]
+    #[allow(dead_code)]
     pub fn passcred(&self) -> io::Result<bool> {
         let passcred: dlibc::c_int = getsockopt(self, dlibc::SOL_SOCKET, dlibc::SO_PASSCRED)?;
         Ok(passcred != 0)

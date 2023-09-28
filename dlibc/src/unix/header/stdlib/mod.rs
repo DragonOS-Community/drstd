@@ -18,12 +18,7 @@ use crate::unix::header::{
     wchar::*,
 };
 
-use crate::unix::{
-    c_str::CStr,
-    fs::File,
-    ld_so,
-    platform,
-};
+use crate::unix::{c_str::CStr, fs::File, ld_so, platform};
 
 mod rand48;
 mod random;
@@ -370,7 +365,11 @@ pub extern "C" fn grantpt(_fildes: ::c_int) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn initstate(seed: ::c_uint, state: *mut ::c_char, size: ::size_t) -> *mut ::c_char {
+pub unsafe extern "C" fn initstate(
+    seed: ::c_uint,
+    state: *mut ::c_char,
+    size: ::size_t,
+) -> *mut ::c_char {
     // Ported from musl
 
     if size < 8 {
@@ -539,7 +538,11 @@ pub unsafe extern "C" fn mblen(s: *const ::c_char, n: ::size_t) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn mbstowcs(pwcs: *mut ::wchar_t, mut s: *const ::c_char, n: ::size_t) -> ::size_t {
+pub unsafe extern "C" fn mbstowcs(
+    pwcs: *mut ::wchar_t,
+    mut s: *const ::c_char,
+    n: ::size_t,
+) -> ::size_t {
     let mut state: mbstate_t = mbstate_t {};
     mbsrtowcs(pwcs, &mut s, n, &mut state)
 }
@@ -611,12 +614,16 @@ pub unsafe extern "C" fn mktemp(name: *mut ::c_char) -> *mut ::c_char {
 
 fn get_nstime() -> u64 {
     let mut ts = mem::MaybeUninit::uninit();
-    unsafe{platform::pal::clock_gettime(::CLOCK_MONOTONIC, ts.as_mut_ptr());}
+    platform::pal::clock_gettime(::CLOCK_MONOTONIC, ts.as_mut_ptr());
     unsafe { ts.assume_init() }.tv_nsec as u64
 }
 
 #[no_mangle]
-pub extern "C" fn mkostemps(name: *mut ::c_char, suffix_len: ::c_int, mut flags: ::c_int) -> ::c_int {
+pub extern "C" fn mkostemps(
+    name: *mut ::c_char,
+    suffix_len: ::c_int,
+    mut flags: ::c_int,
+) -> ::c_int {
     flags &= !::O_ACCMODE;
     flags |= ::O_RDWR | ::O_CREAT | ::O_EXCL;
 
@@ -811,7 +818,11 @@ pub unsafe extern "C" fn realloc(ptr: *mut ::c_void, size: ::size_t) -> *mut ::c
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn reallocarray(ptr: *mut ::c_void, m: ::size_t, n: ::size_t) -> *mut ::c_void {
+pub unsafe extern "C" fn reallocarray(
+    ptr: *mut ::c_void,
+    m: ::size_t,
+    n: ::size_t,
+) -> *mut ::c_void {
     //Handle possible integer overflow in size calculation
     match m.checked_mul(n) {
         Some(size) => realloc(ptr, size),
@@ -824,7 +835,10 @@ pub unsafe extern "C" fn reallocarray(ptr: *mut ::c_void, m: ::size_t, n: ::size
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn realpath(pathname: *const ::c_char, resolved: *mut ::c_char) -> *mut ::c_char {
+pub unsafe extern "C" fn realpath(
+    pathname: *const ::c_char,
+    resolved: *mut ::c_char,
+) -> *mut ::c_char {
     let ptr = if resolved.is_null() {
         malloc(limits::PATH_MAX) as *mut ::c_char
     } else {
@@ -900,7 +914,8 @@ pub unsafe extern "C" fn setenv(
             core::ptr::write(existing.add(value_len), 0);
         } else {
             // Reuse platform::environ slot, but allocate a new pointer.
-            let ptr = platform::alloc(key_len as usize + 1 + value_len as usize + 1) as *mut ::c_char;
+            let ptr =
+                platform::alloc(key_len as usize + 1 + value_len as usize + 1) as *mut ::c_char;
             copy_kv(ptr, key, value, key_len, value_len);
             platform::environ.add(i).write(ptr);
         }
@@ -1010,7 +1025,8 @@ pub unsafe fn convert_octal(s: *const ::c_char) -> Option<(::c_ulong, isize, boo
 
 pub unsafe fn convert_hex(s: *const ::c_char) -> Option<(::c_ulong, isize, bool)> {
     if (*s != 0 && *s == b'0' as ::c_char)
-        && (*s.offset(1) != 0 && (*s.offset(1) == b'x' as ::c_char || *s.offset(1) == b'X' as ::c_char))
+        && (*s.offset(1) != 0
+            && (*s.offset(1) == b'x' as ::c_char || *s.offset(1) == b'X' as ::c_char))
     {
         convert_integer(s.offset(2), 16).map(|(val, idx, overflow)| (val, idx + 2, overflow))
     } else {
@@ -1018,7 +1034,10 @@ pub unsafe fn convert_hex(s: *const ::c_char) -> Option<(::c_ulong, isize, bool)
     }
 }
 
-pub unsafe fn convert_integer(s: *const ::c_char, base: ::c_int) -> Option<(::c_ulong, isize, bool)> {
+pub unsafe fn convert_integer(
+    s: *const ::c_char,
+    base: ::c_int,
+) -> Option<(::c_ulong, isize, bool)> {
     // -1 means the character is invalid
     #[rustfmt::skip]
     const LOOKUP_TABLE: [::c_long; 256] = [
@@ -1092,7 +1111,11 @@ pub unsafe extern "C" fn strtoul(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn strtol(s: *const ::c_char, endptr: *mut *mut ::c_char, base: ::c_int) -> ::c_long {
+pub unsafe extern "C" fn strtol(
+    s: *const ::c_char,
+    endptr: *mut *mut ::c_char,
+    base: ::c_int,
+) -> ::c_long {
     strto_impl!(
         ::c_long,
         true,
@@ -1159,7 +1182,10 @@ pub unsafe extern "C" fn system(command: *const ::c_char) -> ::c_int {
             ptr::null(),
         ];
 
-        unistd::execv(shell as *const ::c_char, args.as_ptr() as *const *const ::c_char);
+        unistd::execv(
+            shell as *const ::c_char,
+            args.as_ptr() as *const *const ::c_char,
+        );
 
         exit(127);
 

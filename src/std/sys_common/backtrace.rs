@@ -2,9 +2,11 @@
 
 use crate::std::sync::{Mutex, PoisonError};
 
+#[allow(dead_code)]
 /// Max number of frames to print.
 const MAX_NB_FRAMES: usize = 100;
 
+#[allow(dead_code)]
 pub fn lock() -> impl Drop {
     static LOCK: Mutex<()> = Mutex::new(());
     LOCK.lock().unwrap_or_else(PoisonError::into_inner)

@@ -24,6 +24,7 @@ impl<T> Once<T> {
     where
         F: FnOnce() -> T,
     {
+        #[allow(deprecated)]
         match self
             .status
             .compare_and_swap(UNINITIALIZED, INITIALIZING, SeqCst)

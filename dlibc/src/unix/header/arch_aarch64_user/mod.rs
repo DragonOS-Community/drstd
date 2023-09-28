@@ -22,8 +22,8 @@ pub type elf_fpregset_t = user_fpsimd_struct;
 pub extern "C" fn _cbindgen_only_generates_structs_if_they_are_mentioned_which_is_dumb_aarch64_user(
     _a: user_regs_struct,
     _b: user_fpsimd_struct,
-    _c: elf_gregset_t,
-    _d: elf_greg_t,
-    _e: elf_fpregset_t,
+    _c: *mut elf_gregset_t,
+    _d: *mut elf_greg_t,
+    _e: *mut elf_fpregset_t,
 ) {
 }

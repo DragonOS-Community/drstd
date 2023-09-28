@@ -955,6 +955,7 @@ pub unsafe fn slice_unchecked(s: &Wtf8, begin: usize, end: usize) -> &Wtf8 {
 pub fn slice_error_fail(s: &Wtf8, begin: usize, end: usize) -> ! {
     assert!(begin <= end);
     panic!("index {begin} and/or {end} in `{s:?}` do not lie on character boundary");
+    #[allow(unreachable_code)]
     loop {}
 }
 

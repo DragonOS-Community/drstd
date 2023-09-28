@@ -250,6 +250,7 @@ impl Tcb {
 
     /// Architecture specific code to read a usize from the TCB - x86_64
     #[inline(always)]
+    #[allow(dead_code)]
     #[cfg(target_arch = "x86_64")]
     unsafe fn arch_read(offset: usize) -> usize {
         let value;
@@ -273,7 +274,7 @@ impl Tcb {
     /// OS and architecture specific code to activate TLS - DragonOS x86_64
     #[cfg(all(target_os = "dragonos", target_arch = "x86_64"))]
     unsafe fn os_arch_activate(_tls_end: usize, _tls_len: usize) {
-        const ARCH_SET_FS: usize = 0x1002;
+        // const ARCH_SET_FS: usize = 0x1002;
         // syscall!(ARCH_PRCTL, ARCH_SET_FS, tls_end);
         unimplemented!()
     }

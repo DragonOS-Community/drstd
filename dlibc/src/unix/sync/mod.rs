@@ -9,11 +9,7 @@ pub use self::{
 };
 
 use crate::unix::platform;
-use core::{
-    cell::UnsafeCell,
-    ops::Deref,
-    sync::atomic::{self, AtomicI32 as AtomicInt},
-};
+use core::{cell::UnsafeCell, hint::spin_loop, ops::Deref, sync::atomic::AtomicI32 as AtomicInt};
 
 const FUTEX_WAIT: ::c_int = 0;
 const FUTEX_WAKE: ::c_int = 1;
@@ -87,7 +83,7 @@ impl AtomicLock {
     {
         // First, try spinning for really short durations
         for _ in 0..999 {
-            atomic::spin_loop_hint();
+            spin_loop();
             if attempt(self) == AttemptStatus::Desired {
                 return;
             }

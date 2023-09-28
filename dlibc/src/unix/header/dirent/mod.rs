@@ -1,4 +1,4 @@
-//! ::dirent implementation following http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dirent.h.html
+//! platform::dirent implementation following http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dirent.h.html
 
 use alloc::boxed::Box;
 use core::{mem, ptr};
@@ -12,7 +12,7 @@ use crate::unix::{
     platform,
 };
 
-const DIR_BUF_SIZE: usize = mem::size_of::<::dirent>() * 3;
+const DIR_BUF_SIZE: usize = mem::size_of::<platform::dirent>() * 3;
 
 // No repr(C) needed, C won't see the content
 pub struct DIR {
@@ -64,11 +64,11 @@ pub unsafe extern "C" fn dirfd(dir: *mut DIR) -> ::c_int {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn readdir(dir: *mut DIR) -> *mut ::dirent {
+pub unsafe extern "C" fn readdir(dir: *mut DIR) -> *mut platform::dirent {
     if (*dir).index >= (*dir).len {
         let read = platform::pal::getdents(
             *(*dir).file,
-            (*dir).buf.as_mut_ptr() as *mut ::dirent,
+            (*dir).buf.as_mut_ptr() as *mut platform::dirent,
             (*dir).buf.len(),
         );
         if read <= 0 {
@@ -82,7 +82,7 @@ pub unsafe extern "C" fn readdir(dir: *mut DIR) -> *mut ::dirent {
         (*dir).len = read as usize;
     }
 
-    let ptr = (*dir).buf.as_mut_ptr().add((*dir).index) as *mut ::dirent;
+    let ptr = (*dir).buf.as_mut_ptr().add((*dir).index) as *mut platform::dirent;
 
     (*dir).offset = (*ptr).d_off as usize;
     (*dir).index += (*ptr).d_reclen as usize;
@@ -91,9 +91,9 @@ pub unsafe extern "C" fn readdir(dir: *mut DIR) -> *mut ::dirent {
 #[no_mangle]
 pub extern "C" fn readdir_r(
     _dir: *mut DIR,
-    _entry: *mut ::dirent,
-    _result: *mut *mut ::dirent,
-) -> *mut ::dirent {
+    _entry: *mut platform::dirent,
+    _result: *mut *mut platform::dirent,
+) -> *mut platform::dirent {
     unimplemented!(); // plus, deprecated
 }
 
@@ -115,8 +115,8 @@ pub unsafe extern "C" fn rewinddir(dir: *mut DIR) {
 
 #[no_mangle]
 pub unsafe extern "C" fn alphasort(
-    first: *mut *const ::dirent,
-    second: *mut *const ::dirent,
+    first: *mut *const platform::dirent,
+    second: *mut *const platform::dirent,
 ) -> ::c_int {
     string::strcoll((**first).d_name.as_ptr(), (**second).d_name.as_ptr())
 }
@@ -124,9 +124,9 @@ pub unsafe extern "C" fn alphasort(
 #[no_mangle]
 pub unsafe extern "C" fn scandir(
     dirp: *const ::c_char,
-    namelist: *mut *mut *mut ::dirent,
-    filter: Option<extern "C" fn(_: *const ::dirent) -> ::c_int>,
-    compare: Option<extern "C" fn(_: *mut *const ::dirent, _: *mut *const ::dirent) -> ::c_int>,
+    namelist: *mut *mut *mut platform::dirent,
+    filter: Option<extern "C" fn(_: *const platform::dirent) -> ::c_int>,
+    compare: Option<extern "C" fn(_: *mut *const platform::dirent, _: *mut *const platform::dirent) -> ::c_int>,
 ) -> ::c_int {
     let dir = opendir(dirp);
     if dir.is_null() {
@@ -142,7 +142,7 @@ pub unsafe extern "C" fn scandir(
     platform::errno = 0;
 
     loop {
-        let entry: *mut ::dirent = readdir(dir);
+        let entry: *mut platform::dirent = readdir(dir);
         if entry.is_null() {
             break;
         }
@@ -153,7 +153,7 @@ pub unsafe extern "C" fn scandir(
             }
         }
 
-        let copy = platform::alloc(mem::size_of::<::dirent>()) as *mut ::dirent;
+        let copy = platform::alloc(mem::size_of::<platform::dirent>()) as *mut platform::dirent;
         if copy.is_null() {
             break;
         }
@@ -182,7 +182,7 @@ pub unsafe extern "C" fn scandir(
         stdlib::qsort(
             *namelist as *mut ::c_void,
             len as ::size_t,
-            mem::size_of::<*mut ::dirent>(),
+            mem::size_of::<*mut platform::dirent>(),
             mem::transmute(compare),
         );
 

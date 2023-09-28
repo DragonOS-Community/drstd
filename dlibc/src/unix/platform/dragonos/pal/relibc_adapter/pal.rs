@@ -4,6 +4,7 @@ use crate::unix::platform::pal::e;
 use crate::unix::*;
 use dsc::syscall;
 
+#[allow(improper_ctypes_definitions)]
 pub extern "C" fn utimens(_path: &CStr, _times: *const timespec) -> ::c_int {
     // e(unsafe { syscall!(UTIMENSAT, AT_FDCWD, path.as_ptr(), times, 0) }) as ::c_int
     unimplemented!()
