@@ -96,7 +96,7 @@ install-headers: libs
 
 # $(BUILD)/release/libc.so
 libs: 
-	@cargo +nightly -Z build-std=core,alloc,compiler_builtins build --target target.json --release
+	@cargo -Z build-std=core,alloc,compiler_builtins build --target target.json --release
 #$(BUILD)/release/ld_so
 
 install-libs: libs
