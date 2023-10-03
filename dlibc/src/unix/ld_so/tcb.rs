@@ -4,10 +4,10 @@ use goblin::error::{Error, Result};
 
 use crate::unix::platform;
 use crate::unix::{ld_so::linker::Linker, sync::mutex::Mutex};
-use MAP_ANONYMOUS;
-use MAP_PRIVATE;
-use PROT_READ;
-use PROT_WRITE;
+use crate::MAP_ANONYMOUS;
+use crate::MAP_PRIVATE;
+use crate::PROT_READ;
+use crate::PROT_WRITE;
 
 use crate::trace;
 
@@ -184,7 +184,7 @@ impl Tcb {
 
     /// Mapping with correct flags for TCB and TLS
     unsafe fn map(size: usize) -> Result<&'static mut [u8]> {
-        let ptr = ::mmap(
+        let ptr = crate::mmap(
             ptr::null_mut(),
             size,
             PROT_READ | PROT_WRITE,

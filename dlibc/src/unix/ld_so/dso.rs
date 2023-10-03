@@ -3,10 +3,17 @@ use super::{
     linker::Symbol,
     tcb::{round_up, Master},
 };
-use errno;
-use unix::header::errno::STR_ERROR;
+use crate::errno;
+use crate::unix::header::errno::STR_ERROR;
 
+use crate::mmap;
+use crate::munmap;
 use crate::trace;
+use crate::MAP_ANONYMOUS;
+use crate::MAP_FIXED_NOREPLACE;
+use crate::MAP_PRIVATE;
+use crate::PROT_READ;
+use crate::PROT_WRITE;
 use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
@@ -36,13 +43,6 @@ use goblin::{
     elf::Elf,
     error::{Error, Result},
 };
-use mmap;
-use munmap;
-use MAP_ANONYMOUS;
-use MAP_FIXED_NOREPLACE;
-use MAP_PRIVATE;
-use PROT_READ;
-use PROT_WRITE;
 
 /// Use to represent a library as well as all the symbols that is loaded withen it.
 #[derive(Default)]

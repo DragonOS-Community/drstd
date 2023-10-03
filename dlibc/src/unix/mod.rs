@@ -1612,11 +1612,11 @@ pub mod macros;
 
 pub mod c_str;
 pub mod c_vec;
-pub mod crt0;
+// pub mod crt0;
 pub mod fs;
 pub mod header;
 pub mod ld_so;
-pub mod start;
+// pub mod start;
 pub mod sync;
 
 mod io;

@@ -1,10 +1,10 @@
 use core::{mem, ptr};
 use goblin::elf::program_header::{self, program_header32, program_header64, ProgramHeader};
 
+use self::start::Stack;
 use self::tcb::{Master, Tcb};
 use crate::eprintln;
 use crate::unix::platform;
-use crate::unix::start::Stack;
 
 #[cfg(target_os = "redox")]
 pub const PATH_SEP: char = ';';

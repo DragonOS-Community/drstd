@@ -29,15 +29,15 @@ use super::{
     ExpectTlsFree, PATH_SEP,
 };
 
-use O_CLOEXEC;
-use O_RDONLY;
+use crate::O_CLOEXEC;
+use crate::O_RDONLY;
 
 use crate::trace;
-use PROT_EXEC;
+use crate::PROT_EXEC;
 
-use mprotect;
-use PROT_READ;
-use PROT_WRITE;
+use crate::mprotect;
+use crate::PROT_READ;
+use crate::PROT_WRITE;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Symbol {

@@ -8,30 +8,55 @@ use alloc::{
     vec::Vec,
 };
 
-use unix::platform::allocator::new_mspace;
+use crate::unix::platform::allocator::new_mspace;
 
 use super::platform;
 use crate::eprintln;
 use crate::println;
 
-use unix::{
+use crate::unix::{
     allocator::ALLOCATOR,
     c_str::CStr,
     header::unistd,
     platform::{get_auxv, get_auxvs},
-    start::Stack,
     sync::mutex::Mutex,
 };
 
 use super::{access::accessible, debug::_r_debug, linker::Linker, tcb::Tcb, PATH_SEP};
 use goblin::elf::header::header64::SIZEOF_EHDR;
 
+#[repr(C)]
+pub struct Stack {
+    pub argc: isize,
+    pub argv0: *const ::c_char,
+}
+
+impl Stack {
+    pub fn argv(&self) -> *const *const ::c_char {
+        &self.argv0 as *const _
+    }
+
+    pub fn envp(&self) -> *const *const ::c_char {
+        unsafe { self.argv().offset(self.argc + 1) }
+    }
+
+    pub fn auxv(&self) -> *const (usize, usize) {
+        unsafe {
+            let mut envp = self.envp();
+            while !(*envp).is_null() {
+                envp = envp.add(1);
+            }
+            envp.add(1) as *const (usize, usize)
+        }
+    }
+}
+
 unsafe fn get_argv(mut ptr: *const usize) -> (Vec<String>, *const usize) {
     //traverse the stack and collect argument vector
     let mut argv = Vec::new();
     while *ptr != 0 {
         let arg = *ptr;
-        match CStr::from_ptr(arg as *const ::c_char).to_str() {
+        match CStr::from_ptr(arg as *const crate::c_char).to_str() {
             Ok(arg_str) => argv.push(arg_str.to_owned()),
             _ => {
                 eprintln!("ld.so: failed to parse argv[{}]", argv.len());
@@ -49,7 +74,7 @@ unsafe fn get_env(mut ptr: *const usize) -> (BTreeMap<String, String>, *const us
     let mut envs = BTreeMap::new();
     while *ptr != 0 {
         let env = *ptr;
-        if let Ok(arg_str) = CStr::from_ptr(env as *const ::c_char).to_str() {
+        if let Ok(arg_str) = CStr::from_ptr(env as *const crate::c_char).to_str() {
             let mut parts = arg_str.splitn(2, '=');
             if let Some(key) = parts.next() {
                 if let Some(value) = parts.next() {
@@ -85,7 +110,7 @@ unsafe fn adjust_stack(sp: &'static mut Stack) {
         if arg == 0 {
             break;
         }
-        if let Ok(arg_str) = CStr::from_ptr(arg as *const ::c_char).to_str() {
+        if let Ok(arg_str) = CStr::from_ptr(arg as *const crate::c_char).to_str() {
             let mut parts = arg_str.splitn(2, '=');
             if let Some(key) = parts.next() {
                 if let Some(_value) = parts.next() {
@@ -179,7 +204,7 @@ pub extern "C" fn relibc_ld_so_start(sp: &'static mut Stack, ld_entry: usize) ->
         platform::environ = platform::OUR_ENVIRON.as_mut_ptr();
     }
 
-    let is_manual = if let Some(img_entry) = get_auxv(&auxv, ::AT_ENTRY) {
+    let is_manual = if let Some(img_entry) = get_auxv(&auxv, crate::AT_ENTRY) {
         img_entry == ld_entry
     } else {
         true
@@ -228,7 +253,7 @@ pub extern "C" fn relibc_ld_so_start(sp: &'static mut Stack, ld_entry: usize) ->
     let base_addr = {
         let mut base = None;
         if !is_manual && cfg!(not(target_os = "redox")) {
-            let phdr = get_auxv(&auxv, ::AT_PHDR).unwrap();
+            let phdr = get_auxv(&auxv, crate::AT_PHDR).unwrap();
             if phdr != 0 {
                 base = Some(phdr - SIZEOF_EHDR);
             }
