@@ -1,50 +1,21 @@
-use crate::unix::{
-    allocator::ALLOCATOR,
-    header::libgen,
-    ld_so::{self, linker::Linker},
-    platform::{self, get_auxvs},
-    sync::mutex::Mutex,
-};
 use alloc::{boxed::Box, vec::Vec};
 use core::{fmt::Debug, intrinsics, ptr};
-use unix::platform::allocator::new_mspace;
+use dlibc::unix::platform::allocator::new_mspace;
+use dlibc::{
+    ld_so::start::Stack,
+    unix::{
+        allocator::ALLOCATOR,
+        header::libgen,
+        ld_so::{self, linker::Linker},
+        platform::{self, get_auxvs},
+        sync::mutex::Mutex,
+    },
+};
 
-#[repr(C)]
-pub struct Stack {
-    pub argc: isize,
-    pub argv0: *const ::c_char,
-}
-
-impl Stack {
-    pub fn argv(&self) -> *const *const ::c_char {
-        &self.argv0 as *const _
-    }
-
-    pub fn envp(&self) -> *const *const ::c_char {
-        unsafe { self.argv().offset(self.argc + 1) }
-    }
-
-    pub fn auxv(&self) -> *const (usize, usize) {
-        unsafe {
-            let mut envp = self.envp();
-            while !(*envp).is_null() {
-                envp = envp.add(1);
-            }
-            envp.add(1) as *const (usize, usize)
-        }
-    }
-}
-
-impl Debug for Stack {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("Stack")
-            .field("argc", &self.argc)
-            .field("argv0", &self.argv0)
-            .finish()
-    }
-}
-
-unsafe fn copy_string_array(array: *const *const ::c_char, len: usize) -> Vec<*mut ::c_char> {
+unsafe fn copy_string_array(
+    array: *const *const dlibc::c_char,
+    len: usize,
+) -> Vec<*mut dlibc::c_char> {
     //println!("copy_string_array: array: {:p}, len: {}", array, len);
 
     let mut vec = Vec::with_capacity(len + 1);
@@ -56,7 +27,7 @@ unsafe fn copy_string_array(array: *const *const ::c_char, len: usize) -> Vec<*m
             len += 1;
         }
 
-        let buf = platform::alloc(len + 1) as *mut ::c_char;
+        let buf = platform::alloc(len + 1) as *mut dlibc::c_char;
         for i in 0..=len {
             *buf.add(i) = *item.add(i);
         }
@@ -82,7 +53,7 @@ static mut init_complete: bool = false;
 
 #[used]
 #[no_mangle]
-static mut __relibc_init_environ: *mut *mut ::c_char = ptr::null_mut();
+static mut __relibc_init_environ: *mut *mut dlibc::c_char = ptr::null_mut();
 
 fn alloc_init() {
     unsafe {
@@ -136,7 +107,7 @@ extern "C" fn init_array() {
     //     init_complete = true
     // }
 }
-use header::stdio;
+use dlibc::header::stdio;
 
 fn io_init() {
     unsafe {
@@ -220,7 +191,10 @@ pub unsafe extern "C" fn relibc_start(sp: &'static Stack) -> ! {
     // println!("to copy args");
     // Set up argc and argv
     let argc = sp.argc;
-    let argv = sp.argv();
+    let argv: *const *const i8 = sp.argv();
+
+    use crate::std::sys;
+    sys::args::init(argc, argv as *const *const u8);
 
     platform::inner_argv = copy_string_array(argv, argc as usize);
 
@@ -249,7 +223,7 @@ pub unsafe extern "C" fn relibc_start(sp: &'static Stack) -> ! {
     // println!("to get auxvs");
     let auxvs = get_auxvs(sp.auxv().cast());
     // println!("to init platform");
-    crate::unix::platform::init(auxvs);
+    dlibc::unix::platform::init(auxvs);
 
     // Setup signal stack, otherwise we cannot handle any signals besides SIG_IGN/SIG_DFL behavior.
     #[cfg(target_os = "redox")]

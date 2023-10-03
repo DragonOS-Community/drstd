@@ -103,6 +103,9 @@ extern crate dlibc;
 pub mod std;
 pub use self::std::*;
 
+mod crt0;
+mod start;
+
 #[cfg(target_os = "dragonos")]
 pub use dlibc::{eprint, eprintln, print, println};
 

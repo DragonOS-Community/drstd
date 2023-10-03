@@ -159,7 +159,7 @@ pub mod task {
 //pub use std_detect::is_x86_feature_detected;
 
 // Platform-abstraction modules
-mod sys;
+pub(crate) mod sys;
 mod sys_common;
 
 pub mod alloc;
