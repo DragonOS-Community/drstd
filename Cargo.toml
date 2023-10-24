@@ -35,7 +35,7 @@ features = ["elf32", "elf64", "endian_fd"]
 
 [target.'cfg(target_os = "dragonos")'.dependencies]
 # Development
-dragonos-dsc = { git = "https://git.mirrors.dragonos.org/DragonOS-Community/dragonos-dsc.git", rev = "ee7a2b9399" }
+dragonos-dsc = { git = "https://git.mirrors.dragonos.org/DragonOS-Community/dragonos-dsc.git", rev = "aa61cb0109" }
 
 [features]
 default = []
