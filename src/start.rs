@@ -1,5 +1,5 @@
 use alloc::{boxed::Box, vec::Vec};
-use core::{fmt::Debug, intrinsics, ptr};
+use core::{intrinsics, ptr};
 use dlibc::unix::platform::allocator::new_mspace;
 use dlibc::{
     ld_so::start::Stack,

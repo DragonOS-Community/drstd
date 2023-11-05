@@ -254,8 +254,8 @@ pub extern "C" fn mkdir(path: *const ::c_char, mode: mode_t) -> ::c_int {
 }
 
 #[no_mangle]
-pub extern "C" fn mkfifo(_path: *const ::c_char, _mode: mode_t) -> ::c_int {
-    unimplemented!()
+pub extern "C" fn mkfifo(path: *const ::c_char, mode: mode_t) -> ::c_int {
+    e(unsafe { syscall!(SYS_MKNOD, path, mode | 4096, 0) }) as ::c_int
 }
 
 #[no_mangle]
