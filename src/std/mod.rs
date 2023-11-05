@@ -105,6 +105,7 @@ pub mod error;
 pub mod ffi;
 pub mod fs;
 pub mod io;
+pub mod libc;
 pub mod net;
 pub mod num;
 pub mod os;
